@@ -788,7 +788,7 @@ function openView(id) {
       </div>
       <section class="comments">
         <h3>Комментарии · ${(it.comments || []).length}</h3>
-        <div class="comment-list">${(it.comments || []).map((c) => `<p class="comment">${escapeHTML(c.text)}</p>`).join("") || '<p class="comment-empty">Пока нет комментариев. Начни обсуждение!</p>'}</div>
+        <div class="comment-list">${(it.comments || []).map((c) => `<p class="comment"><strong class="comment-author">${escapeHTML(c.author || 'Гость')}</strong><br>${escapeHTML(c.text)}</p>`).join("") || '<p class="comment-empty">Пока нет комментариев. Начни обсуждение!</p>'}</div>
         <form id="comment-form" class="comment-form"><input class="input" name="comment" maxlength="500" placeholder="Написать комментарий…" required><button class="btn btn-primary" type="submit">Отправить</button></form>
       </section>
     </div>`;

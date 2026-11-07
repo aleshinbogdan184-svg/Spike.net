@@ -18,14 +18,14 @@ async function refreshShared() {
   try {
     const [posts, comments] = await Promise.all([
       sharedRequest('/spike_posts?select=*&order=created_at.desc&limit=200'),
-      sharedRequest('/spike_comments?select=post_id,body,created_at&order=created_at.asc&limit=2000'),
+      sharedRequest('/spike_comments?select=post_id,body,author_name,created_at&order=created_at.asc&limit=2000'),
     ]);
     items = posts.map(post => {
       const source = detectSource(post.url);
       return { id: post.id, title: post.title, url: post.url, type: source.type, source: source.source,
         ytId: source.ytId, desc: post.description, poster: post.poster, year: '', tags: [], cover: '',
         likes: 0, views: 0, watched: false, createdAt: new Date(post.created_at).getTime(),
-        comments: comments.filter(c => c.post_id === post.id).map(c => ({ text: c.body })) };
+        comments: comments.filter(c => c.post_id === post.id).map(c => ({ text: c.body, author: c.author_name || 'Гость' })) };
     });
     sharedReady = true;
     document.querySelector('#connection-status').textContent = 'Общая лента: публикации и комментарии видны всем. Лайки и просмотры пока не подключены.';
@@ -58,15 +58,22 @@ openView = function (id) {
   if (!form) return;
   const replacement = form.cloneNode(true);
   form.replaceWith(replacement);
+  const nickname = document.createElement('input');
+  nickname.className = 'input comment-nickname'; nickname.name = 'nickname';
+  nickname.maxLength = 30; nickname.placeholder = 'Твой ник'; nickname.required = true;
+  nickname.value = localStorage.getItem('spike.nickname') || '';
+  replacement.prepend(nickname);
   replacement.addEventListener('submit', async e => {
     e.preventDefault();
     const input = replacement.elements.comment;
     const body = input.value.trim();
-    if (!body || !sharedReady) return;
+    const author = nickname.value.trim();
+    if (!body || !author || !sharedReady) return;
     const button = replacement.querySelector('button');
     button.disabled = true;
     try {
-      await sharedRequest('/spike_comments', { method: 'POST', headers: { Prefer: 'return=minimal' }, body: JSON.stringify({ post_id: id, body }) });
+      await sharedRequest('/spike_comments', { method: 'POST', headers: { Prefer: 'return=minimal' }, body: JSON.stringify({ post_id: id, body, author_name: author }) });
+      localStorage.setItem('spike.nickname', author);
       await refreshShared(); openView(id); toast('Комментарий добавлен');
     } catch { button.disabled = false; toast('Не удалось отправить комментарий', true); }
   });
@@ -103,12 +110,13 @@ document.addEventListener('DOMContentLoaded', () => {
   categoryNav.querySelectorAll('[data-type]').forEach(button => {
     const icon = button.querySelector('.category-icon');
     if (icons[button.dataset.type]) icon.innerHTML = icons[button.dataset.type];
-    button.addEventListener('click', () => { switchTab('feed'); $('.side-link').classList.remove('active'); });
+    button.addEventListener('click', () => { switchTab('feed'); $('#sidebar-categories').hidden = true; $('#category-toggle').setAttribute('aria-expanded', 'false'); });
   });
-  $('.side-link').addEventListener('click', () => {
-    categoryNav.querySelector('[data-type="all"]').click();
-    switchTab('feed'); $('.side-link').classList.add('active');
+  $('#category-toggle').addEventListener('click', () => {
+    const menu = $('#sidebar-categories'); menu.hidden = !menu.hidden;
+    $('#category-toggle').setAttribute('aria-expanded', String(!menu.hidden));
   });
+  document.addEventListener('click', e => { if (!e.target.closest('.logo-menu')) { $('#sidebar-categories').hidden = true; $('#category-toggle').setAttribute('aria-expanded', 'false'); } });
   if (!window.supabase) { $('#auth-button').disabled = true; return; }
   authClient = window.supabase.createClient(SPIKE_API.replace('/rest/v1', ''), SPIKE_KEY);
   const button = $('#auth-button');

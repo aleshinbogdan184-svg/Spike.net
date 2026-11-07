@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css?v=glass2" />
 </head>
 <body>
   <!-- ====== ФОН ====== -->
@@ -25,24 +25,15 @@
   </div>
   <div class="vignette" aria-hidden="true"></div>
   <div class="noise" aria-hidden="true"></div>
-  <aside class="sidebar" aria-label="Навигация">
-    <div class="sidebar-brand"><span class="sidebar-mark">✦</span> Spike<span>.net</span></div>
-    <p class="sidebar-label">НАВИГАЦИЯ</p>
-    <button class="side-link active" type="button" data-side="all"><span>▦</span> Лента</button>
-    <p class="sidebar-label">КАТЕГОРИИ</p>
-    <div id="sidebar-categories"></div>
-    <div class="sidebar-bottom">ТВОЯ КОЛЛЕКЦИЯ ССЫЛОК<br><strong>Всё интересное в одном месте.</strong></div>
-  </aside>
 
   <!-- ====== БАР ====== -->
   <header class="topbar">
-    <div class="logo">
-      <span class="logo-icon">
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true">
-          <path d="M13.2 2 5 13.6h5.1L9 22l8.6-12.1h-5.3z"/>
-        </svg>
-      </span>
-      <span class="logo-text">Spike<span class="logo-dot">.net</span></span>
+    <div class="logo-menu">
+    <button class="logo logo-toggle" id="category-toggle" type="button" aria-expanded="false" aria-controls="sidebar-categories">
+      <span class="logo-icon"><img src="cactus.png" alt="" onerror="this.hidden=true;this.parentElement.textContent='🌵'"></span>
+      <span class="logo-text">Spike<span class="logo-dot">.net</span></span><span class="logo-chevron">⌄</span>
+    </button>
+    <nav id="sidebar-categories" class="category-dropdown" aria-label="Категории" hidden></nav>
     </div>
 
     <nav class="tabs" id="tabs">
@@ -175,6 +166,7 @@
       <div class="cat-grid" id="cat-grid"></div>
     </section>
   </main>
+  <footer class="site-footer"><div class="developers"><span>РАЗРАБОТЧИКИ</span><strong>splox <i>by</i> wyoka</strong></div></footer>
 
   <!-- ====== МОДАЛКА МОДЕРАЦИИ ====== -->
   <div class="modal-back" id="modal-mod-back" hidden>
@@ -299,8 +291,8 @@
   </div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-  <script src="app.js"></script>
+  <script src="app.js?v=glass2"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="shared.js"></script>
+  <script src="shared.js?v=glass2"></script>
 </body>
 </html>
