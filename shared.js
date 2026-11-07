@@ -6,6 +6,8 @@ const originalOpenView = openView;
 let authClient = null;
 const SPIKE_OWNER = '4120e992-bcb9-45e4-9822-609948510d9c';
 let isOwner = false;
+let currentUser = null;
+let reactionsReady = false;
 
 async function sharedRequest(path, options = {}) {
   const response = await fetch(SPIKE_API + path, {
@@ -28,15 +30,22 @@ async function refreshShared() {
       sharedRequest('/spike_posts?select=*&order=created_at.desc&limit=200'),
       sharedRequest('/spike_comments?select=post_id,body,author_name,created_at&order=created_at.asc&limit=2000'),
     ]);
+    let likes = [], views = [];
+    try {
+      [likes, views] = await Promise.all([sharedRequest('/spike_likes?select=post_id,user_id&limit=10000'), sharedRequest('/spike_views?select=post_id&limit=10000')]);
+      reactionsReady = true;
+    } catch { reactionsReady = false; }
+    liked = new Set(likes.filter(like => like.user_id === currentUser?.id).map(like => like.post_id));
     items = posts.map(post => {
       const source = detectSource(post.url);
       return { id: post.id, title: post.title, url: post.url, type: source.type, source: source.source,
         ytId: source.ytId, desc: post.description, poster: post.poster, year: '', tags: [], cover: '',
-        likes: 0, views: 0, watched: false, createdAt: new Date(post.created_at).getTime(),
+        likes: likes.filter(like => like.post_id === post.id).length, views: views.filter(view => view.post_id === post.id).length, watched: false, createdAt: new Date(post.created_at).getTime(),
         comments: comments.filter(c => c.post_id === post.id).map(c => ({ text: c.body, author: c.author_name || 'Гость' })) };
     });
     sharedReady = true;
-    document.querySelector('#connection-status').textContent = 'Общая лента: публикации и комментарии видны всем. Лайки и просмотры пока не подключены.';
+    document.querySelector('#connection-status').textContent = reactionsReady ? 'Общая лента: лайки и просмотры учитываются для вошедших пользователей.' : 'Общая лента работает. Лайки и просмотры ещё не настроены.';
+    document.body.classList.toggle('reactions-unavailable', !reactionsReady);
     renderAll();
   } catch (error) {
     sharedReady = false;
@@ -62,6 +71,7 @@ submitForm = async function (e) {
 
 openView = function (id) {
   originalOpenView(id);
+  if (reactionsReady && currentUser && authClient) authClient.from('spike_views').upsert({ post_id: id, user_id: currentUser.id }, { onConflict: 'post_id,user_id', ignoreDuplicates: true }).then(({ error }) => { if (!error) refreshShared(); });
   const form = $('#comment-form');
   if (!form) return;
   const replacement = form.cloneNode(true);
@@ -91,7 +101,15 @@ openView = function (id) {
   });
 };
 
-toggleLike = function () { toast('Общие лайки пока не подключены', true); };
+toggleLike = async function (id) {
+  if (!reactionsReady) { toast('Лайки ещё не настроены в базе', true); return; }
+  if (!currentUser || !authClient) { toast('Войди, чтобы поставить лайк', true); return; }
+  const query = authClient.from('spike_likes');
+  const result = liked.has(id) ? await query.delete().eq('post_id', id).eq('user_id', currentUser.id) : await query.insert({ post_id: id, user_id: currentUser.id });
+  if (result.error) { toast('Не удалось изменить лайк', true); return; }
+  await refreshShared();
+  if (viewId === id) openView(id);
+};
 removeItem = async function (id) {
   if (!isOwner || !authClient) { toast('Удаление доступно владельцу после входа', true); return; }
   const item = items.find(it => it.id === id);
@@ -114,7 +132,7 @@ document.addEventListener('DOMContentLoaded', () => {
   $('#view-edit').hidden = true;
   $('#view-delete').hidden = true;
   const style = document.createElement('style');
-  style.textContent = '[data-like], .like-btn, .views-badge, [data-watched], #stat-views, #stat-views + .stat-label, .card-meta span:nth-child(2) { display:none !important; }';
+  style.textContent = '[data-watched] { display:none !important; }';
   document.head.appendChild(style);
   refreshShared();
 });
@@ -129,11 +147,27 @@ document.addEventListener('DOMContentLoaded', () => {
     music: '<svg viewBox="0 0 40 40" aria-hidden="true"><path fill="#ffd329" d="M20 1l2.6 12L30 3l-3 12 12-5-9 9 10 3-12 2 7 11-11-7-4 12-3-12-11 7 7-11-12-2 11-3L4 10l12 5L12 3l7 10z"/></svg>',
     film: '<svg viewBox="0 0 40 40" aria-hidden="true"><rect width="40" height="40" rx="10" fill="#111"/><path fill="#ff7200" d="M8 5h6v13L23 5h8L19 19l18-9-14 12 16 2-16 2 14 9-18-6 12 9h-8l-9-12v12H8z"/></svg>'
   };
+  const themes = {
+    all: ['Собирай <span class="gradient-anim">тренды</span> из ссылок', 'Делись видео, играми, музыкой и фильмами. Всё интересное — в одной ленте.'],
+    youtube: ['Видео <span class="gradient-anim">YouTube</span>', 'Делись любимыми видео, находи новых авторов и обсуждай интересное с друзьями.'],
+    game: ['Игры <span class="gradient-anim">Steam</span>', 'Предлагай игры Steam, открывай новые миры и выбирай, во что сыграть вместе.'],
+    music: ['Яндекс <span class="gradient-anim">Музыка</span>', 'Собирай любимые треки и альбомы, делись музыкой и находи новое звучание.'],
+    film: ['Мир <span class="gradient-anim">Кинопоиска</span>', 'Делись фильмами и сериалами, обсуждай премьеры и выбирай, что посмотреть.']
+  };
+  function setTheme(type) {
+    const [title, description] = themes[type] || themes.all;
+    document.body.dataset.theme = type;
+    $('#theme-art-icon').innerHTML = icons[type] || '✦';
+    $('.hero-title').innerHTML = title;
+    $('.hero-sub').textContent = description;
+    $('#link-input').placeholder = type === 'all' ? 'Ссылка на YouTube, Steam, Яндекс Музыку или Кинопоиск' : `Вставь ссылку: ${type === 'game' ? 'Steam' : type === 'music' ? 'Яндекс Музыка' : type === 'film' ? 'Кинопоиск' : 'YouTube'}`;
+  }
   categoryNav.querySelectorAll('[data-type]').forEach(button => {
     const icon = button.querySelector('.category-icon');
     if (icons[button.dataset.type]) icon.innerHTML = icons[button.dataset.type];
-    button.addEventListener('click', () => { switchTab('feed'); $('#sidebar-categories').hidden = true; $('#category-toggle').setAttribute('aria-expanded', 'false'); });
+    button.addEventListener('click', () => { setTheme(button.dataset.type); switchTab('feed'); $('#sidebar-categories').hidden = true; $('#category-toggle').setAttribute('aria-expanded', 'false'); });
   });
+  $('#tabs [data-tab="feed"]').addEventListener('click', () => { categoryNav.querySelector('[data-type="all"]').click(); });
   $('#category-toggle').addEventListener('click', () => {
     const menu = $('#sidebar-categories'); menu.hidden = !menu.hidden;
     $('#category-toggle').setAttribute('aria-expanded', String(!menu.hidden));
@@ -147,9 +181,11 @@ document.addEventListener('DOMContentLoaded', () => {
   let user = null;
   authClient.auth.onAuthStateChange((_event, session) => {
     user = session?.user || null;
+    currentUser = user;
     isOwner = user?.id === SPIKE_OWNER;
     button.textContent = user ? 'Выйти' : 'Войти';
     $('#view-delete').hidden = !isOwner;
+    setTimeout(() => refreshShared(), 0);
   });
   button.addEventListener('click', async () => {
     if (user) { await authClient.auth.signOut(); toast('Вы вышли'); return; }

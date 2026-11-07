@@ -1142,3 +1142,31 @@ body { padding-left: 0; }
 .developers span { color: #a6aec1; font-size: 10px; letter-spacing: .15em; }.developers strong { font-size: 15px; }.developers i { font-size: 11px; color: #a7aebe; font-style: normal; }
 .comment-author { color: #c9e9ff; }.comment-form { flex-wrap: wrap; }.comment-form .comment-nickname { flex: 1 1 100%; }
 @media (max-width: 760px) { .topbar { position: sticky; flex-wrap: nowrap; } .topbar .tabs { overflow-x: auto; } .topbar-right { flex-shrink: 0; } .topbar-right .stats { display: none; } }
+
+/* Каждая категория — свой мир */
+body { --theme-rgb: 126, 99, 255; --theme-light: #d0c8ff; }
+body[data-theme="game"] { --theme-rgb: 38, 138, 255; --theme-light: #92d9ff; }
+body[data-theme="youtube"] { --theme-rgb: 255, 55, 78; --theme-light: #ffa4ac; }
+body[data-theme="music"] { --theme-rgb: 255, 194, 34; --theme-light: #ffe58b; }
+body[data-theme="film"] { --theme-rgb: 255, 118, 30; --theme-light: #ffc289; }
+.bg { background: radial-gradient(ellipse at 72% 18%, rgba(var(--theme-rgb), .24), transparent 48%), radial-gradient(ellipse at 12% 82%, rgba(var(--theme-rgb), .13), transparent 50%), #090b12; transition: background 450ms ease; }
+.hero { position: relative; padding: clamp(24px,4vw,50px); overflow: hidden; border-radius: 24px; border: 1px solid rgba(var(--theme-rgb),.25); background: linear-gradient(125deg,rgba(var(--theme-rgb),.15),rgba(17,20,32,.55) 65%); box-shadow: inset 0 1px 0 #ffffff18,0 20px 80px #0004; }
+.hero::after { content: ''; position: absolute; width: 250px; height: 250px; right: 6%; top: -60px; pointer-events: none; border: 1px solid rgba(var(--theme-rgb),.2); border-radius: 50%; box-shadow: 0 0 0 35px rgba(var(--theme-rgb),.035), 0 0 0 70px rgba(var(--theme-rgb),.025); animation: themeFloat 9s ease-in-out infinite alternate; }
+@keyframes themeFloat { to { transform: translateY(30px) rotate(25deg) scale(1.08); } }
+.hero-title, .hero-sub, .addbar, .src-chips, .local-notice, .badge { position: relative; z-index: 1; }
+.gradient-anim { background-image: linear-gradient(100deg,var(--theme-light),rgb(var(--theme-rgb))); }
+body[data-theme] .video-card:hover { border-color: rgba(var(--theme-rgb),.65); box-shadow: 0 16px 45px rgba(var(--theme-rgb),.18); }
+.reactions-unavailable [data-like], .reactions-unavailable .views-badge, .reactions-unavailable #stat-views, .reactions-unavailable #stat-views + .stat-label { display: none !important; }
+@media (prefers-reduced-motion: reduce) { .hero::after { animation: none; } }
+
+.theme-art { position: absolute; z-index: 0; right: 6%; top: 50%; width: clamp(150px, 22vw, 280px); aspect-ratio: 1; transform: translateY(-50%); display: grid; place-items: center; pointer-events: none; }
+.theme-art::before, .theme-art::after { content: ''; position: absolute; inset: 10%; border-radius: 50%; background: radial-gradient(circle, rgba(var(--theme-rgb),.35), transparent 70%); filter: blur(18px); animation: themeGlow 4s ease-in-out infinite alternate; }
+.theme-art::after { inset: 2%; background: transparent; border: 1px solid rgba(var(--theme-rgb),.3); filter: none; animation: orbitSpin 22s linear infinite; border-top-color: var(--theme-light); border-bottom-color: transparent; }
+.theme-art-orbit { position: absolute; inset: 15%; border: 1px solid rgba(var(--theme-rgb),.25); border-radius: 28%; transform: rotate(45deg); animation: orbitSpin 30s linear infinite reverse; }
+.theme-art-icon { position: relative; z-index: 1; width: 46%; aspect-ratio: 1; display: grid; place-items: center; color: var(--theme-light); font-size: clamp(70px, 9vw, 120px); filter: drop-shadow(0 0 22px rgba(var(--theme-rgb),.65)); animation: iconFloat 5s ease-in-out infinite alternate; }
+.theme-art-icon svg { width: 100%; height: 100%; }
+@keyframes themeGlow { from { opacity: .5; transform: scale(.85); } to { opacity: 1; transform: scale(1.2); } }
+@keyframes orbitSpin { to { transform: rotate(360deg); } }
+@keyframes iconFloat { to { transform: translateY(-12px) rotate(4deg); } }
+@media (max-width: 760px) { .theme-art { right: -35px; opacity: .3; width: 190px; } }
+@media (prefers-reduced-motion: reduce) { .theme-art::before, .theme-art::after, .theme-art-orbit, .theme-art-icon { animation: none; } }
