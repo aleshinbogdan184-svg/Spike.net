@@ -4,6 +4,8 @@ const SPIKE_KEY = 'sb_publishable_F-a4xfh09Www8dOSIn2cZQ_DuauYkie';
 let sharedReady = false;
 const originalOpenView = openView;
 let authClient = null;
+const SPIKE_OWNER = '4120e992-bcb9-45e4-9822-609948510d9c';
+let isOwner = false;
 
 async function sharedRequest(path, options = {}) {
   const response = await fetch(SPIKE_API + path, {
@@ -90,7 +92,17 @@ openView = function (id) {
 };
 
 toggleLike = function () { toast('Общие лайки пока не подключены', true); };
-removeItem = function () { toast('Удаление доступно только владельцу базы', true); };
+removeItem = async function (id) {
+  if (!isOwner || !authClient) { toast('Удаление доступно владельцу после входа', true); return; }
+  const item = items.find(it => it.id === id);
+  if (!item || !confirm(`Удалить «${item.title}» и все комментарии к публикации?`)) return;
+  try {
+    const { data, error } = await authClient.from('spike_posts').delete().eq('id', id).select('id');
+    if (error || !data || data.length !== 1) throw error || new Error('Удаление не разрешено');
+    if (viewId === id) closeView();
+    await refreshShared(); toast('Публикация удалена');
+  } catch (error) { console.error('Ошибка удаления:', error); toast('Не удалось удалить. Проверь настройки владельца.', true); }
+};
 openEdit = function () { toast('Редактирование общей ленты пока недоступно', true); };
 watchItem = function (id) {
   const item = items.find(it => it.id === id);
@@ -135,7 +147,9 @@ document.addEventListener('DOMContentLoaded', () => {
   let user = null;
   authClient.auth.onAuthStateChange((_event, session) => {
     user = session?.user || null;
+    isOwner = user?.id === SPIKE_OWNER;
     button.textContent = user ? 'Выйти' : 'Войти';
+    $('#view-delete').hidden = !isOwner;
   });
   button.addEventListener('click', async () => {
     if (user) { await authClient.auth.signOut(); toast('Вы вышли'); return; }
