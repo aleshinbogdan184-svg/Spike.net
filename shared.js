@@ -16,7 +16,8 @@ async function sharedRequest(path, options = {}) {
     error.status = response.status;
     throw error;
   }
-  return response.status === 204 ? null : response.json();
+  const text = await response.text();
+  return text ? JSON.parse(text) : null;
 }
 
 async function refreshShared() {
