@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Spike.net — собирай тренды из ссылок</title>
+  <meta name="description" content="Spike.net — подборка ссылок на YouTube, Steam, Яндекс Музыку и Кинопоиск." />
+  <meta name="theme-color" content="#06060c" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%237c5cff'/%3E%3Cstop offset='0.5' stop-color='%2322d3ee'/%3E%3Cstop offset='1' stop-color='%23f472b6'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M52 8L20 56h26l-6 36 34-52H48z' fill='url(%23g)'/%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- ====== ФОН ====== -->
+  <div class="bg" aria-hidden="true">
+    <canvas id="particles"></canvas>
+    <div class="aurora aurora-1"></div>
+    <div class="aurora aurora-2"></div>
+    <div class="aurora aurora-3"></div>
+    <div class="glow glow-1"></div>
+    <div class="glow glow-2"></div>
+    <div class="grid-bg"></div>
+  </div>
+  <div class="vignette" aria-hidden="true"></div>
+  <div class="noise" aria-hidden="true"></div>
+
+  <!-- ====== БАР ====== -->
+  <header class="topbar">
+    <div class="logo">
+      <span class="logo-icon">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor" aria-hidden="true">
+          <path d="M13.2 2 5 13.6h5.1L9 22l8.6-12.1h-5.3z"/>
+        </svg>
+      </span>
+      <span class="logo-text">Spike<span class="logo-dot">.net</span></span>
+    </div>
+
+    <nav class="tabs" id="tabs">
+      <button class="tab active" data-tab="feed" type="button">Лента</button>
+      <button class="tab" data-tab="trends" type="button">
+        Тренды
+        <span class="tab-dot"></span>
+      </button>
+      <button class="tab" data-tab="categories" type="button">Категории</button>
+    </nav>
+
+    <div class="topbar-right">
+      <div class="stats">
+        <div class="stat"><span id="stat-total">0</span><span class="stat-label">видео</span></div>
+        <div class="stat"><span id="stat-views">0</span><span class="stat-label">просмотров</span></div>
+      </div>
+      <button class="btn btn-ghost" id="btn-moderate" type="button" title="Модерация">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 11-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 11-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 11-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 110-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 112.83-2.83l.06.06a1.65 1.65 0 001.82.33H9a1.65 1.65 0 001-1.51V3a2 2 0 114 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 112.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82V9a1.65 1.65 0 001.51 1H21a2 2 0 110 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- ====== ГЛАВНАЯ ====== -->
+  <main class="main">
+    <nav class="category-nav" aria-label="Категории приложений"><div class="chip-group" id="chips-type">
+            <button class="chip active" data-type="all" type="button"><span class="category-icon">✦</span>Все</button>
+            <button class="chip" data-type="youtube" type="button"><span class="category-icon yt">▶</span>YouTube</button>
+            <button class="chip" data-type="game" type="button"><span class="category-icon steam">◉</span>Steam</button>
+            <button class="chip" data-type="music" type="button"><span class="category-icon music">♫</span>Яндекс Музыка</button>
+            <button class="chip" data-type="film" type="button"><span class="category-icon kino">К</span>Кинопоиск</button>
+          </div></nav>
+    <!-- HERO -->
+    <section class="hero">
+      <div class="badge">
+        <span class="badge-dot"></span>
+        <span>Вставь ссылку — попадёт в подборку</span>
+      </div>
+      <h1 class="hero-title">Собирай <span class="gradient-anim">тренды</span> из ссылок</h1>
+      <p class="hero-sub">Делись ссылками на YouTube, Steam, Яндекс Музыку и Кинопоиск. Сохраняй интересное, ставь лайки и оставляй комментарии.</p>
+
+      <div class="addbar">
+        <span class="addbar-icon">
+          <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
+        </span>
+        <input type="text" class="addbar-input" id="link-input" placeholder="Ссылка на YouTube, Steam, Яндекс Музыку или Кинопоиск" autocomplete="off" />
+        <button class="btn btn-primary" id="btn-add-link" type="button">
+          <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14m-7-7h14"/></svg>
+          Добавить
+        </button>
+      </div>
+
+      <div class="src-chips" id="src-chips">
+        <span class="src-chip">▶ YouTube</span>
+        <span class="src-chip">🎬 Кинопоиск</span>
+        <span class="src-chip">🎮 Steam</span>
+        <span class="src-chip">🎵 Яндекс Музыка</span>
+        <button class="src-chip src-chip-more" id="btn-add-manual" type="button">+ вручную</button>
+      </div>
+      <p class="local-notice">Локальный режим: публикации, лайки, комментарии и переходы сохраняются только в этом браузере.</p>
+    </section>
+
+    <!-- ====== ЛЕНТА ====== -->
+    <section class="tab-view" id="view-feed">
+      <div class="controls">
+
+        <div class="control-group">
+          <label class="control-label">Просмотр</label>
+          <div class="chip-group" id="chips-watch">
+            <button class="chip active" data-watch="all" type="button">Все</button>
+            <button class="chip" data-watch="unwatched" type="button">Не смотрел</button>
+            <button class="chip" data-watch="watched" type="button">Просмотрено</button>
+          </div>
+        </div>
+        <div class="control-group">
+          <label class="control-label">Сортировка</label>
+          <select class="select" id="sort-select">
+            <option value="likes">По лайкам</option>
+            <option value="views">По просмотрам</option>
+            <option value="newest">По новизне</option>
+            <option value="oldest">По старшинству</option>
+            <option value="title">По названию</option>
+          </select>
+        </div>
+        <div class="control-group control-search">
+          <label class="control-label">Поиск</label>
+          <input type="text" class="input" id="search-input" placeholder="Найти видео..." />
+        </div>
+      </div>
+
+      <div class="feed-head">
+        <h2 class="section-title">
+          <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+          Лента
+        </h2>
+        <span class="count-pill" id="feed-count">0 видео</span>
+      </div>
+      <div class="grid" id="feed-grid"></div>
+      <div class="empty" id="empty" hidden>
+        <div class="empty-inner">
+          <span class="empty-icon">
+            <svg viewBox="0 0 24 24" width="46" height="46" fill="none" stroke="currentColor" stroke-width="1.4"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71"/></svg>
+          </span>
+          <p>Ничего нет — вставь первую ссылку сверху</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====== ТРЕНДЫ ====== -->
+    <section class="tab-view" id="view-trends" hidden>
+      <div class="feed-head">
+        <h2 class="section-title">
+          <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M23 6l-9.5 9.5-5-5L1 18M17 6h6v6"/></svg>
+          Тренды
+        </h2>
+        <span class="count-pill">самое залайканное</span>
+      </div>
+      <div class="trend-list" id="trends-list"></div>
+    </section>
+
+    <!-- ====== КАТЕГОРИИ ====== -->
+    <section class="tab-view" id="view-categories" hidden>
+      <div class="feed-head">
+        <h2 class="section-title">
+          <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z"/></svg>
+          Категории по просмотрам
+        </h2>
+        <span class="count-pill" id="cats-count">0</span>
+      </div>
+      <div class="cat-grid" id="cat-grid"></div>
+    </section>
+  </main>
+
+  <!-- ====== МОДАЛКА МОДЕРАЦИИ ====== -->
+  <div class="modal-back" id="modal-mod-back" hidden>
+    <div class="modal" role="dialog" aria-labelledby="mod-title">
+      <div class="modal-head">
+        <h2 class="modal-title" id="mod-title">Модерация</h2>
+        <div class="modal-head-actions">
+          <button class="btn btn-ghost btn-sm btn-danger" id="mod-clear" type="button">Очистить всё</button>
+          <button class="btn btn-ghost btn-sm" id="mod-close" type="button">✕</button>
+        </div>
+      </div>
+      <div class="modal-body">
+        <div class="panel">
+          <div class="panel-row">
+            <span class="panel-label">Сортировка</span>
+            <div class="btn-group">
+              <button class="btn btn-outline btn-sm active" data-sort="likes" type="button">По лайкам</button>
+              <button class="btn btn-outline btn-sm" data-sort="views" type="button">По просмотрам</button>
+              <button class="btn btn-outline btn-sm" data-sort="newest" type="button">По новизне</button>
+              <button class="btn btn-outline btn-sm" data-sort="oldest" type="button">По старшинству</button>
+            </div>
+          </div>
+          <div class="panel-row">
+            <span class="panel-label">Поиск</span>
+            <input type="text" id="mod-search" class="input" placeholder="Название или тег..." />
+          </div>
+        </div>
+        <div class="list" id="mod-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== МОДАЛКА ДОБАВЛЕНИЯ / РЕДАКТИРОВАНИЯ ====== -->
+  <div class="modal-back" id="modal-add-back" hidden>
+    <div class="modal modal-add" role="dialog" aria-labelledby="add-title">
+      <div class="modal-head">
+        <h2 class="modal-title" id="add-title">Новая карточка</h2>
+        <button class="btn btn-ghost btn-sm" id="add-close" type="button">✕</button>
+      </div>
+      <form class="modal-body" id="add-form" novalidate>
+        <div class="field" id="thumb-preview-field" hidden>
+          <div class="thumb-preview shimmer" id="thumb-preview"></div>
+        </div>
+        <div class="field">
+          <label class="field-label" for="f-title">Название <span class="required">*</span></label>
+          <input type="text" class="input" id="f-title" placeholder="Название видео / фильма / игры" maxlength="140" required />
+          <span class="field-hint" id="f-title-hint">Название обязательно</span>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label class="field-label" for="f-type">Категория</label>
+            <select class="select" id="f-type">
+              <option value="youtube">YouTube-видео</option>
+              <option value="film">Фильм</option>
+              <option value="game">Игра</option>
+              <option value="music">Музыка</option>
+            </select>
+          </div>
+          <div class="field">
+            <label class="field-label" for="f-year">Год / сезон</label>
+            <input type="text" class="input" id="f-year" placeholder="2024 или S01" maxlength="30" />
+          </div>
+        </div>
+        <div class="field">
+          <label class="field-label" for="f-url">Ссылка</label>
+          <input type="text" class="input" id="f-url" placeholder="https://..." maxlength="600" />
+          <span class="field-hint" id="f-url-hint">Для видео YouTube и ссылок на страницу игры Steam обложка появится автоматически.</span>
+        </div>
+        <div class="field">
+          <label class="field-label" for="f-poster">Обложка (URL картинки)</label>
+          <input type="text" class="input" id="f-poster" placeholder="https://.../poster.jpg — необязательно" maxlength="600" />
+          <span class="field-hint">Для Яндекс Музыки и Кинопоиска можно вставить ссылку на постер вручную</span>
+        </div>
+        <div class="field">
+          <label class="field-label" for="f-desc">Описание</label>
+          <textarea class="textarea" id="f-desc" placeholder="О чём это? Почему стоит посмотреть/поиграть?" maxlength="600" rows="3"></textarea>
+        </div>
+        <div class="field">
+          <label class="field-label" for="f-tags">Теги</label>
+          <div class="tag-input-wrap">
+            <div class="tag-input" id="f-tags">
+              <input type="text" class="tag-text" placeholder="Enter или запятая" maxlength="30" />
+            </div>
+          </div>
+          <span class="field-hint">До 8 тегов. Enter / запятая — добавить, × — убрать.</span>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-ghost" id="add-cancel">Отмена</button>
+          <button type="submit" class="btn btn-primary" id="add-submit">Добавить</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ====== МОДАЛКА ПРОСМОТРА ====== -->
+  <div class="modal-back" id="modal-view-back" hidden>
+    <div class="modal modal-view" role="dialog" aria-labelledby="view-title">
+      <div class="modal-head">
+        <h2 class="modal-title" id="view-title">Просмотр</h2>
+        <div class="modal-head-actions">
+          <button class="btn btn-ghost btn-sm" id="view-edit" type="button">Редактировать</button>
+          <button class="btn btn-ghost btn-sm btn-danger" id="view-delete" type="button">Удалить</button>
+          <button class="btn btn-ghost btn-sm" id="view-close" type="button">✕</button>
+        </div>
+      </div>
+      <div class="modal-body" id="view-body"></div>
+    </div>
+  </div>
+
+  <!-- ====== ТОСТ ====== -->
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
