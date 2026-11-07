@@ -25,6 +25,14 @@
   </div>
   <div class="vignette" aria-hidden="true"></div>
   <div class="noise" aria-hidden="true"></div>
+  <aside class="sidebar" aria-label="Навигация">
+    <div class="sidebar-brand"><span class="sidebar-mark">✦</span> Spike<span>.net</span></div>
+    <p class="sidebar-label">НАВИГАЦИЯ</p>
+    <button class="side-link active" type="button" data-side="all"><span>▦</span> Лента</button>
+    <p class="sidebar-label">КАТЕГОРИИ</p>
+    <div id="sidebar-categories"></div>
+    <div class="sidebar-bottom">ТВОЯ КОЛЛЕКЦИЯ ССЫЛОК<br><strong>Всё интересное в одном месте.</strong></div>
+  </aside>
 
   <!-- ====== БАР ====== -->
   <header class="topbar">
@@ -47,6 +55,7 @@
     </nav>
 
     <div class="topbar-right">
+      <button class="btn btn-ghost" id="auth-button" type="button">Войти</button>
       <div class="stats">
         <div class="stat"><span id="stat-total">0</span><span class="stat-label">видео</span></div>
         <div class="stat"><span id="stat-views">0</span><span class="stat-label">просмотров</span></div>
@@ -276,9 +285,22 @@
   </div>
 
   <!-- ====== ТОСТ ====== -->
+  <div class="modal-back" id="auth-modal" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="auth-title">
+      <div class="modal-head"><h2 class="modal-title" id="auth-title">Вход в Spike</h2><button class="btn btn-ghost btn-sm" id="auth-close" type="button" aria-label="Закрыть">✕</button></div>
+      <form class="modal-body" id="auth-form">
+        <p class="auth-hint">Аккаунт необязателен для публикаций и комментариев.</p>
+        <label class="field">Почта<input class="input" type="email" id="auth-email" autocomplete="email" required></label>
+        <label class="field">Пароль<input class="input" type="password" id="auth-password" autocomplete="current-password" minlength="6" required></label>
+        <p class="auth-message" id="auth-message" role="status"></p>
+        <div class="modal-actions"><button class="btn btn-ghost" id="auth-register" type="button">Создать аккаунт</button><button class="btn btn-primary" type="submit">Войти</button></div>
+      </form>
+    </div>
+  </div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
   <script src="app.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="shared.js"></script>
 </body>
 </html>
