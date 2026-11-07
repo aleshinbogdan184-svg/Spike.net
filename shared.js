@@ -10,7 +10,12 @@ async function sharedRequest(path, options = {}) {
     ...options,
     headers: { apikey: SPIKE_KEY, Authorization: `Bearer ${SPIKE_KEY}`, 'Content-Type': 'application/json', ...options.headers },
   });
-  if (!response.ok) throw new Error(`Ошибка базы: ${response.status}`);
+  if (!response.ok) {
+    const detail = await response.json().catch(() => ({}));
+    const error = new Error(detail.message || `Ошибка базы: ${response.status}`);
+    error.status = response.status;
+    throw error;
+  }
   return response.status === 204 ? null : response.json();
 }
 
@@ -75,7 +80,11 @@ openView = function (id) {
       await sharedRequest('/spike_comments', { method: 'POST', headers: { Prefer: 'return=minimal' }, body: JSON.stringify({ post_id: id, body, author_name: author }) });
       localStorage.setItem('spike.nickname', author);
       await refreshShared(); openView(id); toast('Комментарий добавлен');
-    } catch { button.disabled = false; toast('Не удалось отправить комментарий', true); }
+    } catch (error) {
+      button.disabled = false;
+      toast(error.status === 403 || error.status === 401 ? 'Нет разрешения сохранить комментарий' : 'Не удалось отправить комментарий. Проверь соединение.', true);
+      console.error('Ошибка сохранения комментария:', error);
+    }
   });
 };
 
@@ -92,7 +101,7 @@ document.addEventListener('DOMContentLoaded', () => {
   $('#view-edit').hidden = true;
   $('#view-delete').hidden = true;
   const style = document.createElement('style');
-  style.textContent = '.like-btn, .views-badge, [data-watched], #stat-views, #stat-views + .stat-label, .card-meta span:nth-child(2) { display:none !important; }';
+  style.textContent = '[data-like], .like-btn, .views-badge, [data-watched], #stat-views, #stat-views + .stat-label, .card-meta span:nth-child(2) { display:none !important; }';
   document.head.appendChild(style);
   refreshShared();
 });
