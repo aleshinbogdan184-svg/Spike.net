@@ -1396,6 +1396,18 @@ body[data-view="achievements"] { --theme-rgb: 112, 188, 77; --theme-light: #d1ff
 }
 @media (max-width: 760px) and (prefers-reduced-motion: reduce) { .topbar .category-dropdown { transition: none; } }
 
+/* Профиль и награды */
+#profile-modal .modal { max-width: 600px; border-radius: 16px; background: linear-gradient(150deg,#29203f,#151321 65%); }
+#profile-form { padding: 22px; gap: 16px; }
+#profile-form .profile-preview { width: 96px; height: 96px; border-radius: 12px; margin-bottom: 3px; }
+.profile-customize { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.profile-frame-spark { border-color: #9deeff !important; box-shadow: 0 0 0 3px #226b83,0 0 18px #5adfff80; }
+.profile-frame-collector { border-color: #aaf591 !important; box-shadow: 0 0 0 3px #285734,0 0 18px #89ff8066; }
+.profile-frame-legend { border-color: #ffd273 !important; box-shadow: 0 0 0 3px #805b24,0 0 22px #ffc75a88; }
+.release-card ul { padding-left: 22px; }.release-card li strong { color: #eee5ff; }.release-callout { margin: 20px 0; padding: 14px; border-left: 3px solid var(--theme-light); background: rgba(var(--theme-rgb),.12); color: var(--theme-light); font-size: 13px; line-height: 1.6; }
+.public-profile { display: grid; justify-items: start; gap: 10px; }.public-profile h3 { color: var(--profile-accent,#d6bcff); }.profile-accent-cyan { --profile-accent: #9deeff; }.profile-accent-gold { --profile-accent: #ffdc80; }
+@media (max-width: 500px) { .profile-customize { grid-template-columns: 1fr; } #profile-form .modal-actions { flex-wrap: wrap; } }
+
 /* Spike 1.0 — компактный аркадный интерфейс */
 .main { max-width: 1180px; padding-top: 24px; }
 .hero { min-height: 230px; padding: clamp(22px,3vw,38px); border: 1px solid rgba(var(--theme-rgb),.35); border-radius: 16px; background: linear-gradient(120deg,rgba(var(--theme-rgb),.18),#171322 70%); box-shadow: 0 16px 40px #0004; }

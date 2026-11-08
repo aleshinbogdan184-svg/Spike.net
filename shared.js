@@ -9,6 +9,7 @@ const SPIKE_DEVELOPERS = new Set([SPIKE_OWNER, 'eba02036-3e58-43ac-aa82-ac0a66af
 let isOwner = false;
 let currentUser = null;
 let currentProfile = null;
+let earnedAchievements = new Set();
 let hypeKing = null;
 let bookmarkIds = new Set();
 let bookmarkReady = false;
@@ -414,6 +415,7 @@ document.addEventListener('DOMContentLoaded', () => {
     user = session?.user || null;
     currentUser = user;
     currentProfile = null;
+    earnedAchievements = new Set();
     $('#profile-button').hidden = !user;
     isOwner = !!user && SPIKE_DEVELOPERS.has(user.id);
     button.textContent = 'Войти';
@@ -425,6 +427,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const { data } = await authClient.from('spike_profiles').select('*').eq('user_id', user.id).maybeSingle();
         if (currentUser?.id !== user.id) return;
         currentProfile = data;
+        const result = await authClient.from('spike_achievements').select('code').eq('user_id', user.id);
+        if (currentUser?.id !== user.id) return;
+        if (!result.error) earnedAchievements = new Set(result.data.map(row => row.code));
       }
       await loadBookmarks();
       refreshShared();
@@ -445,14 +450,16 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!link) return;
     const body = $('#public-profile-body'); $('#public-profile-modal').hidden = false; body.textContent = 'Загрузка…';
     try {
-      const rows = await sharedRequest(`/spike_profiles?user_id=eq.${encodeURIComponent(link.dataset.userProfile)}&select=nickname,avatar_path`);
+      const rows = await sharedRequest(`/spike_profiles?user_id=eq.${encodeURIComponent(link.dataset.userProfile)}&select=nickname,avatar_path,frame_style,accent_style`);
       const profile = rows[0];
       if (!profile) { body.textContent = 'Профиль не найден.'; return; }
       const count = items.flatMap(item => item.comments).filter(comment => comment.userId === link.dataset.userProfile).length;
       const badges = []; if (count >= 1) badges.push('🏆 Первый комментарий'); if (count >= 10) badges.push('🏆 Общительный');
       const ownPosts = items.filter(item => item.authorId === link.dataset.userProfile);
       const king = hypeKing?.user_id === link.dataset.userProfile;
-      body.innerHTML = `<div class="profile-avatar-wrap">${king ? '<span class="profile-crown">👑</span>' : ''}<div class="profile-preview">${profile.avatar_path ? `<img src="${escapeHTML(avatarUrl(profile.avatar_path))}" alt="">` : '✦'}</div></div><h3>${escapeHTML(profile.nickname)} ${king ? '👑 Король трендов' : ''}</h3><strong>Достижения</strong><p>${badges.length ? badges.join(' · ') : 'Пока нет открытых достижений.'}</p><strong>Публикации</strong>${ownPosts.length ? ownPosts.map(post => `<button class="btn btn-ghost" type="button" data-profile-post="${escapeHTML(post.id)}">${escapeHTML(post.title)}</button>`).join('') : '<p>Новых публикаций пока нет. Старые карточки не были привязаны к автору.</p>'}`;
+      const frame = ['classic','spark','collector','legend'].includes(profile.frame_style) ? profile.frame_style : 'classic';
+      const accent = ['violet','cyan','gold'].includes(profile.accent_style) ? profile.accent_style : 'violet';
+      body.innerHTML = `<div class="public-profile profile-accent-${accent}"><div class="profile-avatar-wrap">${king ? '<span class="profile-crown">👑</span>' : ''}<div class="profile-preview profile-frame-${frame}">${profile.avatar_path ? `<img src="${escapeHTML(avatarUrl(profile.avatar_path))}" alt="">` : '✦'}</div></div><h3>${escapeHTML(profile.nickname)} ${king ? '👑 Король трендов' : ''}</h3><strong>Достижения</strong><p>${badges.length ? badges.join(' · ') : 'Пока нет открытых достижений.'}</p><strong>Публикации</strong>${ownPosts.length ? ownPosts.map(post => `<button class="btn btn-ghost" type="button" data-profile-post="${escapeHTML(post.id)}">${escapeHTML(post.title)}</button>`).join('') : '<p>Новых публикаций пока нет. Старые карточки не были привязаны к автору.</p>'}</div>`;
     } catch { body.textContent = 'Не удалось загрузить профиль.'; }
   });
   $('#public-profile-body').addEventListener('click', e => { const button = e.target.closest('[data-profile-post]'); if (button) { $('#public-profile-modal').hidden = true; openView(button.dataset.profilePost); } });
@@ -467,11 +474,17 @@ document.addEventListener('DOMContentLoaded', () => {
   function showProfile() {
     $('#profile-title').textContent = SPIKE_DEVELOPERS.has(currentUser?.id) ? 'Мой профиль · РАЗРАБОТЧИК' : 'Мой профиль';
     $('#profile-nickname').value = currentProfile?.nickname || '';
+    $('#profile-frame').value = currentProfile?.frame_style || 'classic';
+    $('#profile-accent').value = currentProfile?.accent_style || 'violet';
+    const locks = { spark: 'reply_1', collector: 'bookmark_10', legend: 'comment_25', cyan: 'like_5', gold: 'bookmark_5' };
+    [$('#profile-frame'), $('#profile-accent')].forEach(select => [...select.options].forEach(option => { option.disabled = !!locks[option.value] && !earnedAchievements.has(locks[option.value]); }));
     $('#profile-avatar').value = '';
     $('#profile-message').textContent = '';
     const preview = $('#profile-preview'); preview.textContent = '';
+    preview.className = `profile-preview profile-frame-${['classic','spark','collector','legend'].includes(currentProfile?.frame_style) ? currentProfile.frame_style : 'classic'}`;
     if (currentProfile?.avatar_path) { const img = document.createElement('img'); img.src = avatarUrl(currentProfile.avatar_path) + '?v=' + Date.now(); img.alt = ''; preview.appendChild(img); } else preview.textContent = '✦';
-    const badges = myAchievements().filter(b => b.done).map(b => `🏆 ${b.name}`);
+    const rewards = { reply_1: 'Искра диалога · рамка «Искра»', bookmark_10: 'Архивариус · рамка «Коллекционер»', comment_25: 'Голос Spike · рамка «Легенда»', like_5: 'Ценитель · лазурный цвет', bookmark_5: 'Собиратель · золотой цвет' };
+    const badges = Object.entries(rewards).filter(([code]) => earnedAchievements.has(code)).map(([, title]) => `🏆 ${title}`);
     $('#profile-achievements').textContent = badges.length ? badges.join(' · ') : 'Пока нет открытых достижений.';
     profileModal.hidden = false;
   }
@@ -492,7 +505,7 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       let path = currentProfile?.avatar_path || null;
       if (file) { path = `${currentUser.id}/avatar`; const { error } = await authClient.storage.from('spike-avatars').upload(path, file, { upsert: true, contentType: file.type }); if (error) throw error; }
-      const { data, error } = await authClient.from('spike_profiles').upsert({ user_id: currentUser.id, nickname, avatar_path: path }).select().single();
+      const { data, error } = await authClient.from('spike_profiles').upsert({ user_id: currentUser.id, nickname, avatar_path: path, frame_style: $('#profile-frame').value, accent_style: $('#profile-accent').value }).select().single();
       if (error) throw error;
       currentProfile = data; profileModal.hidden = true; await refreshShared(); toast('Профиль сохранён');
     } catch (error) { console.error('Ошибка профиля:', error); msg.textContent = error.code === '23505' ? 'Этот ник уже занят.' : 'Не удалось сохранить профиль. Проверь настройки базы и формат изображения.'; }
