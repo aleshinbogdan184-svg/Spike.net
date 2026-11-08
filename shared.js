@@ -65,6 +65,7 @@ async function refreshShared() {
     document.body.classList.toggle('reactions-unavailable', !reactionsReady);
     renderAll();
     renderExtras();
+    renderShorts();
     const match = location.hash.match(/^#post=([0-9a-f-]{36})$/i);
     if (match && items.some(item => item.id === match[1]) && viewId !== match[1]) { history.replaceState(null, '', location.pathname + location.search); openView(match[1]); }
   } catch (error) {
@@ -73,6 +74,12 @@ async function refreshShared() {
     document.querySelector('#connection-status').textContent = 'Нет подключения к общей ленте. Проверьте настройку базы и подключение к интернету.';
     renderAll();
   }
+}
+
+function renderShorts() {
+  const list = $('#shorts-list'); if (!list) return;
+  if (!items.length) { list.innerHTML = '<p class="empty-inner">Пока нет публикаций.</p>'; return; }
+  list.innerHTML = items.map(it => `<article class="short-card" data-short="${escapeHTML(it.id)}"><div class="short-cover">${thumbHTML(it)}</div><div class="short-content"><span class="source-pill">${escapeHTML(it.source)}</span><h2>${escapeHTML(it.title)}</h2><p>Дважды нажми, чтобы поставить лайк</p><div class="short-actions"><button class="btn" data-like="${escapeHTML(it.id)}" type="button">${liked.has(it.id) ? '♥' : '♡'} ${it.likes}</button><button class="btn" data-open="${escapeHTML(it.id)}" type="button">💬 ${it.comments.length}</button><button class="btn btn-primary" data-watch="${escapeHTML(it.id)}" type="button">Открыть ↗</button></div></div></article>`).join('');
 }
 
 function myAchievements() {
@@ -292,8 +299,20 @@ document.addEventListener('DOMContentLoaded', () => {
   $('#random-post').addEventListener('click', () => {
     const available = filtered();
     if (!available.length) { toast('В этой подборке пока нет публикаций', true); return; }
-    openView(available[Math.floor(Math.random() * available.length)].id);
+    const sorted = [...available].sort((a, b) => b.likes - a.likes);
+    const popular = sorted.filter(item => item.likes > 0).slice(0, Math.max(1, Math.ceil(sorted.length / 2)));
+    const pool = popular.length ? popular : available;
+    const chosen = pool[Math.floor(Math.random() * pool.length)];
+    const button = $('#random-post'); button.disabled = true; button.classList.add('random-spin');
+    button.textContent = '✦ Ищем находку…';
+    setTimeout(() => { button.disabled = false; button.classList.remove('random-spin'); button.textContent = '🎲 Случайная находка'; openView(chosen.id); }, matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 650);
   });
+  let lastTap = { id: '', time: 0 };
+  $('#shorts-list').addEventListener('dblclick', e => { const card = e.target.closest('[data-short]'); if (card && !e.target.closest('button')) toggleLike(card.dataset.short); });
+  $('#shorts-list').addEventListener('touchend', e => {
+    const card = e.target.closest('[data-short]'); if (!card || e.target.closest('button')) return;
+    const now = Date.now(); if (lastTap.id === card.dataset.short && now - lastTap.time < 300) { e.preventDefault(); toggleLike(card.dataset.short); lastTap.time = 0; } else lastTap = { id: card.dataset.short, time: now };
+  }, { passive: false });
   document.addEventListener('click', async e => {
     const button = e.target.closest('[data-bookmark]');
     if (!button) return;
