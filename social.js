@@ -35,6 +35,8 @@ function renderSocial() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+  const updates = $('#view-updates .release-card ul');
+  if (updates) { const item = document.createElement('li'); item.innerHTML = '<strong>Посты и подписки:</strong> новый дизайн сообщества, загрузка изображений с устройства, подписки через профиль и лента постов авторов.'; updates.appendChild(item); }
   const sidebar = $('.layout-sidebar');
   const sideButton = document.createElement('button'); sideButton.type = 'button'; sideButton.innerHTML = '▤ <span>Посты</span>';
   sideButton.addEventListener('click', () => { $('#tabs [data-tab="social"]').click(); window.scrollTo({ top: 0, behavior: 'smooth' }); });
@@ -45,10 +47,19 @@ document.addEventListener('DOMContentLoaded', () => {
   $('#social-close').addEventListener('click', () => { $('#social-modal').hidden = true; });
   $('#social-form').addEventListener('submit', async e => {
     e.preventDefault(); if (!currentUser || !authClient) return;
-    const title = $('#social-title-input').value.trim(), body = $('#social-body').value.trim(), image = $('#social-image').value.trim();
+    const title = $('#social-title-input').value.trim(), body = $('#social-body').value.trim(), image = $('#social-image').value.trim(), file = $('#social-file').files[0];
     if (!title || (image && !/^https?:\/\//i.test(image))) { $('#social-error').textContent = 'Укажи заголовок и корректную ссылку на картинку.'; return; }
+    if (file && (file.size > 3145728 || !['image/png','image/jpeg','image/webp'].includes(file.type))) { $('#social-error').textContent = 'Выбери PNG, JPEG или WebP размером до 3 МБ.'; return; }
     const button = e.currentTarget.querySelector('[type="submit"]'); button.disabled = true;
-    const { error } = await authClient.from('spike_social_posts').insert({ author_id: currentUser.id, title, body, category: $('#social-category').value, image_url: image });
+    let imageUrl = image, uploadedPath = '';
+    if (file) {
+      uploadedPath = `${currentUser.id}/${crypto.randomUUID()}`;
+      const upload = await authClient.storage.from('spike-post-images').upload(uploadedPath, file, { contentType: file.type });
+      if (upload.error) { button.disabled = false; $('#social-error').textContent = 'Не удалось загрузить изображение. Проверь настройки хранилища.'; return; }
+      imageUrl = authClient.storage.from('spike-post-images').getPublicUrl(uploadedPath).data.publicUrl;
+    }
+    const { error } = await authClient.from('spike_social_posts').insert({ author_id: currentUser.id, title, body, category: $('#social-category').value, image_url: imageUrl });
+    if (error && uploadedPath) await authClient.storage.from('spike-post-images').remove([uploadedPath]);
     button.disabled = false; if (error) { $('#social-error').textContent = 'Не удалось опубликовать пост. Проверь настройки базы.'; return; }
     $('#social-modal').hidden = true; await loadSocial(); toast('Пост опубликован');
   });
@@ -68,3 +79,22 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 });
+
+async function addProfileFollow(userId, container) {
+  const { count, error } = await authClient.from('spike_follows').select('*', { count: 'exact', head: true }).eq('followed_id', userId);
+  if (error || !container.isConnected) return;
+  const line = document.createElement('p'); line.textContent = `Подписчики: ${count || 0}`; container.appendChild(line);
+  if (!currentUser || currentUser.id === userId) return;
+  const { data, error: lookupError } = await authClient.from('spike_follows').select('followed_id').eq('follower_id', currentUser.id).eq('followed_id', userId).maybeSingle();
+  if (lookupError || !container.isConnected) return;
+  let following = !!data;
+  const button = document.createElement('button'); button.type = 'button'; button.className = 'btn btn-primary'; button.textContent = following ? '✓ Подписан' : '＋ Подписаться'; container.appendChild(button);
+  button.addEventListener('click', async () => {
+    button.disabled = true;
+    const query = authClient.from('spike_follows');
+    const result = following ? await query.delete().eq('follower_id', currentUser.id).eq('followed_id', userId) : await query.insert({ follower_id: currentUser.id, followed_id: userId });
+    button.disabled = false;
+    if (result.error) { toast('Не удалось изменить подписку', true); return; }
+    following = !following; button.textContent = following ? '✓ Подписан' : '＋ Подписаться'; line.textContent = `Подписчики: ${Math.max(0, (count || 0) + (following ? (data ? 0 : 1) : (data ? -1 : 0)))}`;
+  });
+}
