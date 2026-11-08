@@ -20,18 +20,22 @@ let commentLikes = [];
 const viewedThisSession = new Set();
 
 async function sharedRequest(path, options = {}) {
-  const response = await fetch(SPIKE_API + path, {
-    ...options,
-    headers: { apikey: SPIKE_KEY, Authorization: `Bearer ${SPIKE_KEY}`, 'Content-Type': 'application/json', ...options.headers },
-  });
-  if (!response.ok) {
-    const detail = await response.json().catch(() => ({}));
-    const error = new Error(detail.message || `Ошибка базы: ${response.status}`);
-    error.status = response.status;
-    throw error;
-  }
-  const text = await response.text();
-  return text ? JSON.parse(text) : null;
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 12000);
+  try {
+    const response = await fetch(SPIKE_API + path, {
+      ...options, signal: controller.signal,
+      headers: { apikey: SPIKE_KEY, Authorization: `Bearer ${SPIKE_KEY}`, 'Content-Type': 'application/json', ...options.headers },
+    });
+    if (!response.ok) {
+      const detail = await response.json().catch(() => ({}));
+      const error = new Error(detail.message || `Ошибка базы: ${response.status}`);
+      error.status = response.status;
+      throw error;
+    }
+    const text = await response.text();
+    return text ? JSON.parse(text) : null;
+  } finally { clearTimeout(timer); }
 }
 
 async function refreshShared() {
@@ -63,6 +67,7 @@ async function refreshShared() {
         comments: commentsByPost.get(post.id) || [] };
     });
     sharedReady = true;
+    $('#retry-feed').hidden = true;
     document.querySelector('#connection-status').textContent = reactionsReady ? 'Общая лента: лайки и просмотры учитываются для вошедших пользователей.' : 'Общая лента работает. Лайки и просмотры ещё не настроены.';
     document.body.classList.toggle('reactions-unavailable', !reactionsReady);
     renderAll();
@@ -72,9 +77,10 @@ async function refreshShared() {
     if (match && items.some(item => item.id === match[1]) && viewId !== match[1]) { history.replaceState(null, '', location.pathname + location.search); openView(match[1]); }
   } catch (error) {
     sharedReady = false;
-    items = [];
-    document.querySelector('#connection-status').textContent = 'Нет подключения к общей ленте. Проверьте настройку базы и подключение к интернету.';
-    renderAll();
+    console.error('Ошибка загрузки общей ленты:', error);
+    document.querySelector('#connection-status').textContent = 'Не удалось загрузить общую ленту. Проверь соединение и попробуй ещё раз.';
+    $('#retry-feed').hidden = false;
+    if (!items.length) { $('#empty').hidden = true; $('#feed-count').textContent = 'Нет соединения'; }
   }
 }
 
@@ -286,6 +292,8 @@ watchItem = function (id) {
 
 document.addEventListener('DOMContentLoaded', () => {
   $('#btn-moderate').hidden = true;
+  $('#empty').hidden = true;
+  $('#retry-feed').addEventListener('click', () => { $('#retry-feed').hidden = true; $('#connection-status').textContent = 'Подключение к общей ленте…'; refreshShared(); });
   const desktopLayout = matchMedia('(min-width: 761px)');
   const topbar = $('.topbar'), sidebar = $('.layout-sidebar');
   const logoMenu = $('.logo-menu'), accountControls = $('.topbar-right'), tabs = $('#tabs');
