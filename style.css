@@ -1265,5 +1265,6 @@ body[data-view="trends"] .aurora, body[data-view="categories"] .aurora { opacity
 .profile-link { border: 0; padding: 0; background: transparent; color: #c9e9ff; font-weight: bold; cursor: pointer; }.profile-link:hover { text-decoration: underline; }
 .reports-help { margin: 14px 16px 0; color: var(--muted); font-size: 12px; line-height: 1.6; }
 .profile-achievements { margin-top: 8px; color: #ffdc80; font-size: 12px; line-height: 1.6; }
+.comment-like { display: inline-flex; margin: 6px 0 0 8px; color: #e9b2cf; }.comment-like.liked { color: #ff719f; }
 .topbar { gap: 8px; }.tabs { gap: 3px; min-width: 0; overflow-x: auto; scrollbar-width: thin; }.tab { padding: 6px 9px; flex-shrink: 0; }.tab-compact, .report-compact { min-width: 34px; justify-content: center; padding: 6px 8px; }.topbar-right { gap: 6px; }.video-card-foot { gap: 3px; flex-wrap: wrap; }.card-foot-btn { padding: 4px 7px; }.card-actions { gap: 2px; }
 @media (max-width: 760px) { .topbar { flex-wrap: wrap; }.logo-menu { order: 0; }.topbar-right { order: 1; margin-left: auto; }.tabs { order: 2; width: 100%; }.topbar-right .btn { padding: 6px 7px; font-size: 11px; }.stats { display: none; } }

@@ -13,6 +13,8 @@ let bookmarkIds = new Set();
 let bookmarkReady = false;
 const avatarUrl = path => path ? `${SPIKE_API.replace('/rest/v1', '')}/storage/v1/object/public/spike-avatars/${encodeURIComponent(path.split('/')[0])}/avatar` : '';
 let reactionsReady = false;
+let commentLikesReady = false;
+let commentLikes = [];
 const viewedThisSession = new Set();
 
 async function sharedRequest(path, options = {}) {
@@ -39,6 +41,8 @@ async function refreshShared() {
     const profiles = await sharedRequest('/spike_profiles?select=user_id,nickname,avatar_path&limit=10000');
     const profileMap = new Map(profiles.map(p => [p.user_id, p]));
     let likes = [], views = [];
+    try { commentLikes = await sharedRequest('/spike_comment_likes?select=comment_id,user_id&limit=10000'); commentLikesReady = true; }
+    catch { commentLikes = []; commentLikesReady = false; }
     try {
       [likes, views] = await Promise.all([sharedRequest('/spike_likes?select=post_id,user_id&limit=10000'), sharedRequest('/spike_views?select=post_id&limit=10000')]);
       reactionsReady = true;
@@ -129,6 +133,24 @@ submitForm = async function (e) {
 
 openView = function (id) {
   originalOpenView(id);
+  if (commentLikesReady) {
+    $('#view-body').querySelectorAll('[data-comment-id]').forEach(element => {
+      const commentId = element.dataset.commentId;
+      const count = commentLikes.filter(like => like.comment_id === commentId).length;
+      const mine = commentLikes.some(like => like.comment_id === commentId && like.user_id === currentUser?.id);
+      const button = document.createElement('button'); button.type = 'button'; button.className = `card-foot-btn comment-like ${mine ? 'liked' : ''}`;
+      button.textContent = `${mine ? '♥' : '♡'} ${count}`; button.setAttribute('aria-label', `Лайки комментария: ${count}`);
+      element.appendChild(button);
+      button.addEventListener('click', async () => {
+        if (!currentUser || !authClient) { toast('Войди, чтобы лайкнуть комментарий', true); return; }
+        button.disabled = true;
+        const query = authClient.from('spike_comment_likes');
+        const { error } = mine ? await query.delete().eq('comment_id', commentId).eq('user_id', currentUser.id) : await query.insert({ comment_id: commentId, user_id: currentUser.id });
+        if (error) { button.disabled = false; toast('Не удалось изменить лайк комментария', true); return; }
+        await refreshShared(); if (viewId === id) openView(id);
+      });
+    });
+  }
   const viewKey = currentUser && `${currentUser.id}:${id}`;
   if (reactionsReady && viewKey && authClient && !viewedThisSession.has(viewKey)) {
     viewedThisSession.add(viewKey);
