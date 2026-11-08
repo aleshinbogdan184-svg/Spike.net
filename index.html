@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Russo+One&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=hype31" />
+  <link rel="stylesheet" href="style.css?v=feed32" />
 </head>
 <body>
   <!-- ====== ФОН ====== -->
@@ -44,7 +44,6 @@
         <span class="tab-dot"></span>
       </button>
       <button class="tab" data-tab="categories" type="button">Категории</button>
-      <button class="tab" data-tab="shorts" type="button">Шортс</button>
       <button class="tab tab-compact" data-tab="bookmarks" type="button" title="Закладки" aria-label="Закладки">★</button>
       <button class="tab tab-compact" data-tab="achievements" type="button" title="Достижения" aria-label="Достижения">🏆</button>
     </nav>
@@ -99,6 +98,7 @@
       <button class="btn btn-ghost manual-add" id="btn-add-manual" type="button">+ Добавить вручную</button>
       <p class="local-notice" id="connection-status">Подключение к общей ленте…</p>
     </section>
+    <div id="hype-king" class="hype-king" hidden></div>
 
     <!-- ====== ЛЕНТА ====== -->
     <section class="tab-view" id="view-feed">
@@ -172,7 +172,6 @@
       </div>
       <div class="cat-grid" id="cat-grid"></div>
     </section>
-    <section class="tab-view" id="view-shorts" hidden><div class="view-intro"><span class="view-intro-icon">▶</span><div><h1>Шортс</h1><p>Листай находки. Двойное нажатие — лайк.</p></div></div><div id="shorts-list" class="shorts-list"></div></section>
     <section class="tab-view" id="view-bookmarks" hidden><div class="view-intro"><span class="view-intro-icon">★</span><div><h1>Закладки</h1><p>Твои сохранённые находки.</p></div></div><div id="bookmarks-message" class="empty-inner"></div><div class="grid" id="bookmarks-grid"></div></section>
     <section class="tab-view" id="view-achievements" hidden><div class="view-intro"><span class="view-intro-icon">🏆</span><div><h1>Достижения</h1><p>Твои первые шаги в Spike.</p></div></div><div id="achievements-grid" class="cat-grid"></div></section>
   </main>
@@ -315,6 +314,6 @@
 
   <script src="app.js?v=weekly30"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="shared.js?v=hype31"></script>
+  <script src="shared.js?v=feed32"></script>
 </body>
 </html>

@@ -9,6 +9,7 @@ const SPIKE_DEVELOPERS = new Set([SPIKE_OWNER, 'eba02036-3e58-43ac-aa82-ac0a66af
 let isOwner = false;
 let currentUser = null;
 let currentProfile = null;
+let hypeKing = null;
 let bookmarkIds = new Set();
 let bookmarkReady = false;
 const avatarUrl = path => path ? `${SPIKE_API.replace('/rest/v1', '')}/storage/v1/object/public/spike-avatars/${encodeURIComponent(path.split('/')[0])}/avatar` : '';
@@ -65,7 +66,7 @@ async function refreshShared() {
     document.body.classList.toggle('reactions-unavailable', !reactionsReady);
     renderAll();
     renderExtras();
-    renderShorts();
+    loadHypeKing();
     const match = location.hash.match(/^#post=([0-9a-f-]{36})$/i);
     if (match && items.some(item => item.id === match[1]) && viewId !== match[1]) { history.replaceState(null, '', location.pathname + location.search); openView(match[1]); }
   } catch (error) {
@@ -76,11 +77,16 @@ async function refreshShared() {
   }
 }
 
-function renderShorts() {
-  const list = $('#shorts-list'); if (!list) return;
-  if (!items.length) { list.innerHTML = '<p class="empty-inner">Пока нет публикаций.</p>'; return; }
-  list.innerHTML = items.map(it => `<article class="short-card" data-short="${escapeHTML(it.id)}"><div class="short-cover">${thumbHTML(it)}</div><div class="short-content"><span class="source-pill">${escapeHTML(it.source)}</span><h2>${escapeHTML(it.title)}</h2><p>Дважды нажми, чтобы поставить лайк</p><div class="short-actions"><button class="btn" data-like="${escapeHTML(it.id)}" type="button">${liked.has(it.id) ? '♥' : '♡'} ${it.likes}</button><button class="btn" data-open="${escapeHTML(it.id)}" type="button">💬 ${it.comments.length}</button><button class="btn btn-primary" data-watch="${escapeHTML(it.id)}" type="button">Открыть ↗</button></div></div></article>`).join('');
+async function loadHypeKing() {
+  const box = $('#hype-king'); if (!box) return;
+  try {
+    const rows = await sharedRequest('/rpc/spike_hype_king', { method: 'POST', body: '{}' });
+    hypeKing = rows[0] || null;
+    box.hidden = !hypeKing;
+    if (hypeKing) box.innerHTML = `👑 <span>Король трендов на сегодня</span> <button class="profile-link" type="button" data-user-profile="${escapeHTML(hypeKing.user_id)}">${escapeHTML(hypeKing.nickname)}</button> <small>· ${hypeKing.votes} лайков за вчера</small>`;
+  } catch { hypeKing = null; box.hidden = true; }
 }
+
 
 function myAchievements() {
   const comments = items.flatMap(item => item.comments).filter(comment => comment.userId === currentUser?.id);
@@ -307,12 +313,6 @@ document.addEventListener('DOMContentLoaded', () => {
     button.textContent = '✦ Ищем находку…';
     setTimeout(() => { button.disabled = false; button.classList.remove('random-spin'); button.textContent = '🎲 Случайная находка'; openView(chosen.id); }, matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 650);
   });
-  let lastTap = { id: '', time: 0 };
-  $('#shorts-list').addEventListener('dblclick', e => { const card = e.target.closest('[data-short]'); if (card && !e.target.closest('button')) toggleLike(card.dataset.short); });
-  $('#shorts-list').addEventListener('touchend', e => {
-    const card = e.target.closest('[data-short]'); if (!card || e.target.closest('button')) return;
-    const now = Date.now(); if (lastTap.id === card.dataset.short && now - lastTap.time < 300) { e.preventDefault(); toggleLike(card.dataset.short); lastTap.time = 0; } else lastTap = { id: card.dataset.short, time: now };
-  }, { passive: false });
   document.addEventListener('click', async e => {
     const button = e.target.closest('[data-bookmark]');
     if (!button) return;
@@ -434,7 +434,8 @@ document.addEventListener('DOMContentLoaded', () => {
       const count = items.flatMap(item => item.comments).filter(comment => comment.userId === link.dataset.userProfile).length;
       const badges = []; if (count >= 1) badges.push('🏆 Первый комментарий'); if (count >= 10) badges.push('🏆 Общительный');
       const ownPosts = items.filter(item => item.authorId === link.dataset.userProfile);
-      body.innerHTML = `<div class="profile-preview">${profile.avatar_path ? `<img src="${escapeHTML(avatarUrl(profile.avatar_path))}" alt="">` : '✦'}</div><h3>${escapeHTML(profile.nickname)}</h3><strong>Достижения</strong><p>${badges.length ? badges.join(' · ') : 'Пока нет открытых достижений.'}</p><strong>Публикации</strong>${ownPosts.length ? ownPosts.map(post => `<button class="btn btn-ghost" type="button" data-profile-post="${escapeHTML(post.id)}">${escapeHTML(post.title)}</button>`).join('') : '<p>Новых публикаций пока нет. Старые карточки не были привязаны к автору.</p>'}`;
+      const king = hypeKing?.user_id === link.dataset.userProfile;
+      body.innerHTML = `<div class="profile-avatar-wrap">${king ? '<span class="profile-crown">👑</span>' : ''}<div class="profile-preview">${profile.avatar_path ? `<img src="${escapeHTML(avatarUrl(profile.avatar_path))}" alt="">` : '✦'}</div></div><h3>${escapeHTML(profile.nickname)} ${king ? '👑 Король трендов' : ''}</h3><strong>Достижения</strong><p>${badges.length ? badges.join(' · ') : 'Пока нет открытых достижений.'}</p><strong>Публикации</strong>${ownPosts.length ? ownPosts.map(post => `<button class="btn btn-ghost" type="button" data-profile-post="${escapeHTML(post.id)}">${escapeHTML(post.title)}</button>`).join('') : '<p>Новых публикаций пока нет. Старые карточки не были привязаны к автору.</p>'}`;
     } catch { body.textContent = 'Не удалось загрузить профиль.'; }
   });
   $('#public-profile-body').addEventListener('click', e => { const button = e.target.closest('[data-profile-post]'); if (button) { $('#public-profile-modal').hidden = true; openView(button.dataset.profilePost); } });
