@@ -1377,6 +1377,15 @@ body[data-view="achievements"] { --theme-rgb: 112, 188, 77; --theme-light: #d1ff
   .site-layout { padding-top: 28px; }
 }
 
+/* На компьютере категории раскрываются рядом с логотипом, не у края экрана. */
+@media (min-width: 761px) {
+  .layout-sidebar .logo-menu { position: relative; z-index: 55; }
+  .layout-sidebar .category-dropdown { position: absolute; top: calc(100% + 8px); left: 0; bottom: auto; width: 210px; max-height: min(70vh, 420px); padding: 8px; overflow-y: auto; border: 1px solid #675184; border-radius: 10px; background: #181321; box-shadow: 0 18px 40px #0009; transform: translateY(-6px); opacity: 0; visibility: hidden; transition: opacity .18s ease, transform .18s ease, visibility .18s; }
+  .layout-sidebar .category-dropdown.is-open { opacity: 1; transform: translateY(0); visibility: visible; }
+  .category-backdrop { background: transparent; backdrop-filter: none; -webkit-backdrop-filter: none; }
+}
+@media (prefers-reduced-motion: reduce) { .layout-sidebar .category-dropdown { transition: none; } }
+
 /* Spike 1.0 — компактный аркадный интерфейс */
 .main { max-width: 1180px; padding-top: 24px; }
 .hero { min-height: 230px; padding: clamp(22px,3vw,38px); border: 1px solid rgba(var(--theme-rgb),.35); border-radius: 16px; background: linear-gradient(120deg,rgba(var(--theme-rgb),.18),#171322 70%); box-shadow: 0 16px 40px #0004; }
