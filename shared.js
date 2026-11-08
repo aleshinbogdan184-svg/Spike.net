@@ -220,7 +220,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const email = $('#auth-email').value.trim(); const password = $('#auth-password').value;
     if (!$('#auth-email').checkValidity() || password.length < 6) { message.textContent = 'Укажи почту и пароль не короче 6 символов.'; return; }
     message.textContent = 'Создаём аккаунт…';
-    const { error } = await authClient.auth.signUp({ email, password, options: { emailRedirectTo: 'https://aleshinbogdan184-svg.github.io/Spike.net/' } });
+    const { error } = await authClient.auth.signUp({ email, password, options: { emailRedirectTo: 'https://spike123net.github.io/Spike.net/' } });
     message.textContent = error ? 'Не удалось зарегистрироваться. Попробуй позже.' : 'Если потребуется, подтверди почту по ссылке в письме, затем войди.';
     if (!error) $('#auth-password').value = '';
   });
