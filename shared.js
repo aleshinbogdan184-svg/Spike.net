@@ -303,17 +303,23 @@ document.addEventListener('DOMContentLoaded', () => {
     $('.hero-sub').textContent = description;
     $('#link-input').placeholder = type === 'all' ? 'Ссылка на видео, игру, музыку или кино' : `Вставь ссылку: ${type === 'twitch' ? 'Twitch' : type === 'game' ? 'Steam' : type === 'music' ? 'Spotify, SoundCloud или Яндекс Музыка' : type === 'film' ? 'Кинопоиск' : 'YouTube'}`;
   }
+  const menu = $('#sidebar-categories'), toggle = $('#category-toggle'), backdrop = $('#category-backdrop');
+  function setMenu(open, restoreFocus = false) {
+    menu.classList.toggle('is-open', open); menu.inert = !open;
+    menu.setAttribute('aria-hidden', String(!open)); toggle.setAttribute('aria-expanded', String(open));
+    toggle.querySelector('.logo-chevron').textContent = open ? '✕' : '☰';
+    backdrop.hidden = !open;
+    if (restoreFocus) toggle.focus();
+  }
   categoryNav.querySelectorAll('[data-type]').forEach(button => {
     const icon = button.querySelector('.category-icon');
     if (icons[button.dataset.type]) icon.innerHTML = icons[button.dataset.type];
-    button.addEventListener('click', () => { setTheme(button.dataset.type); switchTab('feed'); $('#sidebar-categories').hidden = true; $('#category-toggle').setAttribute('aria-expanded', 'false'); });
+    button.addEventListener('click', () => { setTheme(button.dataset.type); switchTab('feed'); setMenu(false); });
   });
   $('#tabs [data-tab="feed"]').addEventListener('click', () => { categoryNav.querySelector('[data-type="all"]').click(); });
-  $('#category-toggle').addEventListener('click', () => {
-    const menu = $('#sidebar-categories'); menu.hidden = !menu.hidden;
-    $('#category-toggle').setAttribute('aria-expanded', String(!menu.hidden));
-  });
-  document.addEventListener('click', e => { if (!e.target.closest('.logo-menu')) { $('#sidebar-categories').hidden = true; $('#category-toggle').setAttribute('aria-expanded', 'false'); } });
+  toggle.addEventListener('click', () => setMenu(toggle.getAttribute('aria-expanded') !== 'true'));
+  backdrop.addEventListener('click', () => setMenu(false, true));
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && toggle.getAttribute('aria-expanded') === 'true') setMenu(false, true); });
   if (!window.supabase) { $('#auth-button').disabled = true; return; }
   authClient = window.supabase.createClient(SPIKE_API.replace('/rest/v1', ''), SPIKE_KEY);
   const button = $('#auth-button');
