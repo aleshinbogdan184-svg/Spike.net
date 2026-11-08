@@ -895,6 +895,8 @@ async function addFromLink() {
 function switchTab(name) {
   $$("#tabs .tab").forEach((b) => b.classList.toggle("active", b.dataset.tab === name));
   $$(".tab-view").forEach((v) => { v.hidden = v.id !== `view-${name}`; });
+  $(".hero").hidden = name !== "feed";
+  document.body.dataset.view = name;
 }
 
 function bindEvents() {
@@ -1025,7 +1027,7 @@ function initParticles() {
   if (!canvas || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   const ctx = canvas.getContext("2d");
   let w, h, parts, raf;
-  const COUNT = Math.min(46, Math.floor(window.innerWidth / 28));
+  const COUNT = Math.min(22, Math.floor(window.innerWidth / 55));
   const palettes = ["124,92,255", "34,211,238", "244,114,182", "52,211,153"];
 
   function resize() {
@@ -1052,19 +1054,6 @@ function initParticles() {
       ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
       ctx.fillStyle = `rgba(${p.c},0.45)`;
       ctx.fill();
-      for (let j = i + 1; j < parts.length; j++) {
-        const q = parts[j];
-        const dx = p.x - q.x, dy = p.y - q.y;
-        const d2 = dx * dx + dy * dy;
-        if (d2 < 10000) {
-          ctx.beginPath();
-          ctx.moveTo(p.x, p.y);
-          ctx.lineTo(q.x, q.y);
-          ctx.strokeStyle = `rgba(124,92,255,${0.1 * (1 - d2 / 10000)})`;
-          ctx.lineWidth = 0.5;
-          ctx.stroke();
-        }
-      }
     }
     raf = requestAnimationFrame(loop);
   }
@@ -1082,10 +1071,7 @@ function init() {
   load();
   bindEvents();
   renderAll();
-  initParticles();
-  enrichPosters();
-  // догоняем обложки, когда браузер свободен
-  window.addEventListener("load", () => setTimeout(enrichPosters, 800));
+  // Статичные фоновые звёзды заменяют постоянную перерисовку canvas.
 }
 
 document.addEventListener("DOMContentLoaded", init);

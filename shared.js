@@ -8,6 +8,7 @@ const SPIKE_OWNER = '4120e992-bcb9-45e4-9822-609948510d9c';
 let isOwner = false;
 let currentUser = null;
 let reactionsReady = false;
+const viewedThisSession = new Set();
 
 async function sharedRequest(path, options = {}) {
   const response = await fetch(SPIKE_API + path, {
@@ -36,12 +37,16 @@ async function refreshShared() {
       reactionsReady = true;
     } catch { reactionsReady = false; }
     liked = new Set(likes.filter(like => like.user_id === currentUser?.id).map(like => like.post_id));
+    const likeCounts = new Map(), viewCounts = new Map(), commentsByPost = new Map();
+    likes.forEach(like => likeCounts.set(like.post_id, (likeCounts.get(like.post_id) || 0) + 1));
+    views.forEach(view => viewCounts.set(view.post_id, (viewCounts.get(view.post_id) || 0) + 1));
+    comments.forEach(c => { if (!commentsByPost.has(c.post_id)) commentsByPost.set(c.post_id, []); commentsByPost.get(c.post_id).push({ text: c.body, author: c.author_name || 'Гость' }); });
     items = posts.map(post => {
       const source = detectSource(post.url);
       return { id: post.id, title: post.title, url: post.url, type: source.type, source: source.source,
         ytId: source.ytId, desc: post.description, poster: post.poster, year: '', tags: [], cover: '',
-        likes: likes.filter(like => like.post_id === post.id).length, views: views.filter(view => view.post_id === post.id).length, watched: false, createdAt: new Date(post.created_at).getTime(),
-        comments: comments.filter(c => c.post_id === post.id).map(c => ({ text: c.body, author: c.author_name || 'Гость' })) };
+        likes: likeCounts.get(post.id) || 0, views: viewCounts.get(post.id) || 0, watched: false, createdAt: new Date(post.created_at).getTime(),
+        comments: commentsByPost.get(post.id) || [] };
     });
     sharedReady = true;
     document.querySelector('#connection-status').textContent = reactionsReady ? 'Общая лента: лайки и просмотры учитываются для вошедших пользователей.' : 'Общая лента работает. Лайки и просмотры ещё не настроены.';
@@ -71,7 +76,11 @@ submitForm = async function (e) {
 
 openView = function (id) {
   originalOpenView(id);
-  if (reactionsReady && currentUser && authClient) authClient.from('spike_views').upsert({ post_id: id, user_id: currentUser.id }, { onConflict: 'post_id,user_id', ignoreDuplicates: true }).then(({ error }) => { if (!error) refreshShared(); });
+  const viewKey = currentUser && `${currentUser.id}:${id}`;
+  if (reactionsReady && viewKey && authClient && !viewedThisSession.has(viewKey)) {
+    viewedThisSession.add(viewKey);
+    authClient.from('spike_views').upsert({ post_id: id, user_id: currentUser.id }, { onConflict: 'post_id,user_id', ignoreDuplicates: true }).then(({ error }) => { if (error) viewedThisSession.delete(viewKey); else refreshShared(); });
+  }
   const form = $('#comment-form');
   if (!form) return;
   const replacement = form.cloneNode(true);

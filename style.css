@@ -1242,3 +1242,14 @@ body[data-view="trends"] .aurora, body[data-view="categories"] .aurora { opacity
 .grid-bg { inset: 45% -35% -35%; opacity: .26; background-image: linear-gradient(rgba(var(--theme-rgb),.35) 1px,transparent 1px),linear-gradient(90deg,rgba(var(--theme-rgb),.35) 1px,transparent 1px); background-size: 95px 95px; transform: perspective(420px) rotateX(65deg); transform-origin: center bottom; mask-image: linear-gradient(transparent,#000); }
 .noise { opacity: .09; }
 @media (prefers-reduced-motion: reduce) { .bg::before { animation: none; } }
+
+/* Снижаем число дорогих перерисовок и размытия на всём экране. */
+.aurora, .glow, .noise, #particles { display: none; }
+.btn, .tab, .chip, .view-action, .card-foot-btn, .controls, .developers, .topbar, .category-dropdown { backdrop-filter: none; -webkit-backdrop-filter: none; }
+.topbar, .category-dropdown { background-color: #171126; }
+.thumb-img-wrap, .poster-fb, .cat-bar-inner, .gradient-anim, .badge::before, .badge-dot, .modal-title::after, .view-title::before { animation: none; }
+.theme-art::before { filter: none; animation: none; }
+.theme-art-orbit, .theme-art::after { animation: none; }
+.video-card, .trend-item, .list-item { animation: none; }
+.video-card, .trend-item, .cat-card { content-visibility: auto; contain-intrinsic-size: auto 300px; }
+@media (max-width: 760px) { .theme-art-icon, .theme-art-icon svg, .category-icon svg { animation: none; } .bg::after { display: none; } }
