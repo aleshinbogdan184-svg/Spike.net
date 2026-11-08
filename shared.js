@@ -355,7 +355,7 @@ document.addEventListener('DOMContentLoaded', () => {
   icons.music = pixel('<path fill="#ffd32c" stroke="#09090e" stroke-width=".7" d="M7 0h2v5l3-3 1 1-2 3 5-1v2l-4 1 4 2-1 2-4-2 2 4-2 1-3-4-1 5H6l1-5-4 3-1-2 3-3-5 1V8l5-1-4-2 1-2 4 2z"/>');
   icons.film = pixel('<path fill="#08080c" d="M4 1h8v1h2v2h1v8h-1v2h-2v1H4v-1H2v-2H1V4h1V2h2z"/><path fill="#ff7900" d="M4 3h2v4h1V6h1V5h1V4h1V3h2v1h-1v1h-1v1H9v1h4v2H9v1h1v1h1v1h1v1h-2v-1H9v-1H8v-1H7V9H6v4H4z"/><path fill="#ffcc16" d="M11 11h1v1h1v1h-2z"/>');
   const themes = {
-    all: ['Собирай <span class="gradient-anim">тренды</span> из ссылок', 'Делись видео, играми, музыкой и фильмами. Всё интересное — в одной ленте.'],
+    all: ['Не просто ссылка.<br><span class="gradient-anim">Твоя находка.</span>', 'В чате она потеряется. На Spike её увидят друзья и сообщество: сохраняй интересное, обсуждай и находи новое.'],
     youtube: ['Видео <span class="gradient-anim">YouTube</span>', 'Делись любимыми видео, находи новых авторов и обсуждай интересное с друзьями.'],
     twitch: ['Клипы <span class="gradient-anim">Twitch</span>', 'Сохраняй яркие моменты со стримов и делись любимыми клипами Twitch с друзьями.'],
     game: ['Игры <span class="gradient-anim">Steam</span>', 'Предлагай игры Steam, открывай новые миры и выбирай, во что сыграть вместе.'],
