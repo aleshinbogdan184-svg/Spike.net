@@ -1415,6 +1415,9 @@ body[data-view="achievements"] { --theme-rgb: 112, 188, 77; --theme-light: #d1ff
 .comment-frame-neon .comment-avatar,.profile-frame-neon { border-color:#80ffff!important; box-shadow:0 0 12px #24e9ff; }
 .comment-frame-heart .comment-avatar,.profile-frame-heart { border-color:#ff80bc!important; box-shadow:0 0 12px #ff448899; }
 .comment-frame-voice .comment-avatar,.profile-frame-voice { border-color:#e0b3ff!important; box-shadow:3px 3px 0 #934aff; }
+.profile-frame-starfish,.comment-frame-starfish .comment-avatar { border: 3px solid #ff95b1 !important; box-shadow: 0 0 0 3px #a3d63a, 0 0 0 5px #7856a3, 0 0 14px #ff81ad88; border-radius: 25% 12% 25% 12% !important; }
+.profile-frame-sponge,.comment-frame-sponge .comment-avatar { border: 3px dashed #ffd83e !important; box-shadow: 0 0 0 3px #774b27, 0 0 0 5px #fff2b0, 0 0 14px #ffd83e88; border-radius: 18% !important; }
+.profile-frame-banana,.comment-frame-banana .comment-avatar { border: 3px solid #ffe04f !important; box-shadow: 0 0 0 3px #376a9c, 0 0 0 5px #b9c7d1, 0 0 14px #ffdf4988; border-radius: 35% !important; }
 @media (max-width: 500px) { .profile-customize { grid-template-columns: 1fr; } #profile-form .modal-actions { flex-wrap: wrap; } }
 
 /* Spike 1.0 — компактный аркадный интерфейс */
