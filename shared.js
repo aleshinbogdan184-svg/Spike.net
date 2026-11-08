@@ -9,6 +9,8 @@ const SPIKE_DEVELOPERS = new Set([SPIKE_OWNER, 'eba02036-3e58-43ac-aa82-ac0a66af
 let isOwner = false;
 let currentUser = null;
 let currentProfile = null;
+let bookmarkIds = new Set();
+let bookmarkReady = false;
 const avatarUrl = path => path ? `${SPIKE_API.replace('/rest/v1', '')}/storage/v1/object/public/spike-avatars/${encodeURIComponent(path.split('/')[0])}/avatar` : '';
 let reactionsReady = false;
 const viewedThisSession = new Set();
@@ -45,7 +47,7 @@ async function refreshShared() {
     const likeCounts = new Map(), viewCounts = new Map(), commentsByPost = new Map();
     likes.forEach(like => likeCounts.set(like.post_id, (likeCounts.get(like.post_id) || 0) + 1));
     views.forEach(view => viewCounts.set(view.post_id, (viewCounts.get(view.post_id) || 0) + 1));
-    comments.forEach(c => { if (!commentsByPost.has(c.post_id)) commentsByPost.set(c.post_id, []); const p = profileMap.get(c.user_id); commentsByPost.get(c.post_id).push({ text: c.body, author: p?.nickname || c.author_name || 'Гость', avatar: avatarUrl(p?.avatar_path), developer: !!c.user_id && SPIKE_DEVELOPERS.has(c.user_id) }); });
+    comments.forEach(c => { if (!commentsByPost.has(c.post_id)) commentsByPost.set(c.post_id, []); const p = profileMap.get(c.user_id); commentsByPost.get(c.post_id).push({ text: c.body, userId: c.user_id, author: p?.nickname || c.author_name || 'Гость', avatar: avatarUrl(p?.avatar_path), developer: !!c.user_id && SPIKE_DEVELOPERS.has(c.user_id) }); });
     items = posts.map(post => {
       const source = detectSource(post.url);
       return { id: post.id, title: post.title, url: post.url, type: source.type, source: source.source,
@@ -57,12 +59,40 @@ async function refreshShared() {
     document.querySelector('#connection-status').textContent = reactionsReady ? 'Общая лента: лайки и просмотры учитываются для вошедших пользователей.' : 'Общая лента работает. Лайки и просмотры ещё не настроены.';
     document.body.classList.toggle('reactions-unavailable', !reactionsReady);
     renderAll();
+    renderExtras();
   } catch (error) {
     sharedReady = false;
     items = [];
     document.querySelector('#connection-status').textContent = 'Нет подключения к общей ленте. Проверьте настройку базы и подключение к интернету.';
     renderAll();
   }
+}
+
+function renderExtras() {
+  const grid = $('#bookmarks-grid'), message = $('#bookmarks-message');
+  if (!grid || !message) return;
+  const list = items.filter(item => bookmarkIds.has(item.id));
+  message.hidden = !!currentUser && bookmarkReady && list.length > 0;
+  message.textContent = !currentUser ? 'Войди, чтобы сохранять закладки.' : !bookmarkReady ? 'Закладки ещё не настроены или недоступны.' : 'Пока нет закладок. Нажми ☆ на карточке.';
+  grid.innerHTML = list.map((item, i) => cardHTML(item, i)).join('');
+  document.querySelectorAll('[data-bookmark]').forEach(button => {
+    const saved = bookmarkIds.has(button.dataset.bookmark);
+    button.textContent = saved ? '★' : '☆'; button.title = saved ? 'Убрать из закладок' : 'Сохранить в закладки';
+  });
+  const achievements = $('#achievements-grid');
+  if (!currentUser) { achievements.innerHTML = '<p>Войди, чтобы увидеть достижения.</p>'; return; }
+  const mine = items.flatMap(item => item.comments).filter(comment => comment.userId === currentUser.id).length;
+  const badges = [ ['Первый комментарий', 'Оставь комментарий под публикацией', mine >= 1], ['Общительный', 'Оставь 10 комментариев', mine >= 10], ['Первая закладка', 'Сохрани публикацию', bookmarkReady && bookmarkIds.size >= 1] ];
+  achievements.innerHTML = badges.map(([title, description, done]) => `<div class="cat-card achievement"><span>${done ? '🏆' : '🔒'}</span><h3>${escapeHTML(title)}</h3><p>${escapeHTML(description)}</p><small>${done ? 'Открыто' : 'Пока закрыто'}</small></div>`).join('');
+}
+
+async function loadBookmarks() {
+  bookmarkIds = new Set(); bookmarkReady = false;
+  if (currentUser && authClient) {
+    const { data, error } = await authClient.from('spike_bookmarks').select('post_id');
+    if (!error) { bookmarkReady = true; bookmarkIds = new Set(data.map(row => row.post_id)); }
+  }
+  renderExtras();
 }
 
 submitForm = async function (e) {
@@ -153,6 +183,24 @@ document.addEventListener('DOMContentLoaded', () => {
   style.textContent = '[data-watched] { display:none !important; }';
   document.head.appendChild(style);
   refreshShared();
+  $('#random-post').addEventListener('click', () => {
+    const available = filtered();
+    if (!available.length) { toast('В этой подборке пока нет публикаций', true); return; }
+    openView(available[Math.floor(Math.random() * available.length)].id);
+  });
+  document.addEventListener('click', async e => {
+    const button = e.target.closest('[data-bookmark]');
+    if (!button) return;
+    if (!currentUser) { toast('Войди, чтобы сохранять закладки', true); return; }
+    if (!bookmarkReady) { toast('Закладки пока недоступны', true); return; }
+    const id = button.dataset.bookmark;
+    button.disabled = true;
+    const result = bookmarkIds.has(id)
+      ? await authClient.from('spike_bookmarks').delete().eq('user_id', currentUser.id).eq('post_id', id)
+      : await authClient.from('spike_bookmarks').insert({ user_id: currentUser.id, post_id: id });
+    if (result.error) { button.disabled = false; toast('Не удалось сохранить закладку', true); return; }
+    await loadBookmarks();
+  });
 });
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -220,6 +268,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (currentUser?.id !== user.id) return;
         currentProfile = data;
       }
+      await loadBookmarks();
       refreshShared();
     }, 0);
   });

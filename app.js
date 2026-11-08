@@ -401,6 +401,7 @@ function cardHTML(it, index) {
         </div>
         ${it.tags.length ? `<div class="card-tags">${it.tags.slice(0, 4).map((t) => `<span class="card-tag">#${escapeHTML(t)}</span>`).join("")}</div>` : ""}
         <div class="video-card-foot">
+          <button class="card-foot-btn bookmark-btn" data-bookmark="${escapeHTML(it.id)}" type="button" title="Сохранить в закладки">☆</button>
           <button class="card-foot-btn like-btn ${isLiked ? "liked" : ""}" data-like="${it.id}" type="button" title="Лайк">
             <span class="pixel-heart" aria-hidden="true">♥</span><span>${it.likes}</span>
           </button>
@@ -793,7 +794,7 @@ function openView(id) {
       </div>
       <section class="comments">
         <h3>Комментарии · ${(it.comments || []).length}</h3>
-        <div class="comment-list">${(it.comments || []).map((c) => `<p class="comment">${c.avatar ? `<img class="comment-avatar" src="${escapeHTML(c.avatar)}" alt="">` : '<span class="comment-avatar comment-avatar-fallback">✦</span>'}<strong class="comment-author">${escapeHTML(c.author || 'Гость')}</strong><br>${escapeHTML(c.text)}</p>`).join("") || '<p class="comment-empty">Пока нет комментариев. Начни обсуждение!</p>'}</div>
+        <div class="comment-list">${(it.comments || []).map((c) => `<p class="comment">${c.avatar ? `<img class="comment-avatar" src="${escapeHTML(c.avatar)}" alt="">` : '<span class="comment-avatar comment-avatar-fallback">✦</span>'}<strong class="comment-author ${c.developer ? 'developer-name' : ''}">${escapeHTML(c.author || 'Гость')}</strong>${c.developer ? ' <span class="developer-badge">✦ РАЗРАБОТЧИК</span>' : ''}<br>${escapeHTML(c.text)}</p>`).join("") || '<p class="comment-empty">Пока нет комментариев. Начни обсуждение!</p>'}</div>
         <form id="comment-form" class="comment-form"><input class="input" name="comment" maxlength="500" placeholder="Написать комментарий…" required><button class="btn btn-primary" type="submit">Отправить</button></form>
       </section>
     </div>`;

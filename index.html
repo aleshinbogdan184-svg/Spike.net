@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Russo+One&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=dev12" />
+  <link rel="stylesheet" href="style.css?v=bookmarks15" />
 </head>
 <body>
   <!-- ====== ФОН ====== -->
@@ -44,6 +44,8 @@
         <span class="tab-dot"></span>
       </button>
       <button class="tab" data-tab="categories" type="button">Категории</button>
+      <button class="tab" data-tab="bookmarks" type="button">Закладки</button>
+      <button class="tab" data-tab="achievements" type="button">Достижения</button>
     </nav>
 
     <div class="topbar-right">
@@ -128,6 +130,7 @@
           Лента
         </h2>
         <span class="count-pill" id="feed-count">0 видео</span>
+        <button class="btn btn-ghost" id="random-post" type="button">🎲 Случайная находка</button>
       </div>
       <div class="grid" id="feed-grid"></div>
       <div class="empty" id="empty" hidden>
@@ -165,6 +168,8 @@
       </div>
       <div class="cat-grid" id="cat-grid"></div>
     </section>
+    <section class="tab-view" id="view-bookmarks" hidden><div class="view-intro"><span class="view-intro-icon">★</span><div><h1>Закладки</h1><p>Твои сохранённые находки.</p></div></div><div id="bookmarks-message" class="empty-inner"></div><div class="grid" id="bookmarks-grid"></div></section>
+    <section class="tab-view" id="view-achievements" hidden><div class="view-intro"><span class="view-intro-icon">🏆</span><div><h1>Достижения</h1><p>Твои первые шаги в Spike.</p></div></div><div id="achievements-grid" class="cat-grid"></div></section>
   </main>
   <footer class="site-footer"><div class="developers"><span>РАЗРАБОТЧИКИ</span><strong>splox <i>by</i> wyoka</strong></div></footer>
 
@@ -299,8 +304,8 @@
     </form></div></div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-  <script src="app.js?v=dev12"></script>
+  <script src="app.js?v=bookmarks15"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="shared.js?v=admin13"></script>
+  <script src="shared.js?v=bookmarks15"></script>
 </body>
 </html>

@@ -1258,3 +1258,6 @@ body[data-view="trends"] .aurora, body[data-view="categories"] .aurora { opacity
 .profile-preview img { width: 100%; height: 100%; object-fit: cover; image-rendering: pixelated; }
 .comment-avatar { width: 32px; height: 32px; object-fit: cover; float: left; margin-right: 10px; border: 2px solid #a783e9; image-rendering: pixelated; }
 .comment-avatar-fallback { display: grid; place-items: center; background: #56358c; }
+.developer-name { color: #e2c1ff; text-shadow: 0 0 5px #b760ff, 0 0 14px #934bff; }
+.developer-badge { display: inline-block; padding: 2px 5px; border: 1px solid #d3a6ff; color: #f3dcff; background: #7042a7; box-shadow: 2px 2px 0 #210f37; font-size: 9px; letter-spacing: .04em; }
+.achievement { padding: 18px; }.achievement > span { font-size: 28px; }.achievement h3 { font-size: 14px; }.achievement p, .achievement small { color: var(--muted); font-size: 12px; line-height: 1.5; }.bookmark-btn { color: #ffd66b; font-size: 16px; }
