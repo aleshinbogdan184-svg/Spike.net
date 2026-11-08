@@ -1272,6 +1272,7 @@ body[data-view="trends"] .aurora, body[data-view="categories"] .aurora { opacity
 /* Боковое меню и единый цвет раздела */
 .logo-toggle[aria-expanded="true"] { background: rgba(var(--theme-rgb),.24); border-color: rgba(var(--theme-rgb),.8); box-shadow: 0 0 20px rgba(var(--theme-rgb),.3); }
 .category-backdrop { position: fixed; inset: 0; z-index: 44; background: rgba(4,3,12,.42); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); }
+.topbar { z-index: 50; }
 .category-dropdown { position: fixed; z-index: 49; top: 62px; left: 0; bottom: 0; width: min(260px, 82vw); padding: 20px 12px; border: 0; border-radius: 0; overflow-y: auto; background: rgba(13,11,23,.96); box-shadow: 15px 0 45px #0007; transform: translateX(-105%); visibility: hidden; transition: transform .25s ease, visibility .25s; }
 .category-dropdown.is-open { transform: translateX(0); visibility: visible; }
 .category-dropdown #chips-type .chip[data-type="youtube"]:hover { background: #ff33432b; box-shadow: inset 3px 0 #ff4455, 0 0 18px #ff334322; }
@@ -1286,3 +1287,24 @@ body[data-theme="game"] .hero::before { background-image: repeating-linear-gradi
 body[data-theme="music"] .hero::before { background-image: repeating-linear-gradient(0deg,transparent 0 17px,rgba(var(--theme-rgb),.65) 18px 19px,transparent 20px 24px); }
 .grid { align-items: stretch; }.video-card { height: 100%; }.video-card-body { flex: 1; }.card-title { min-height: 2.6em; line-height: 1.3; -webkit-line-clamp: 2; }.video-card-foot { margin-top: auto; }
 @media (prefers-reduced-motion: reduce) { .category-dropdown { transition: none; } }
+
+/* Обновлённая лёгкая ретро-тема */
+:root { --text: #f6f3ff; --muted: #c9c0df; --muted-2: #aa9fbe; --border: #64527f; }
+body { background: #0d0b16; }
+.bg { background: radial-gradient(ellipse at 80% 0, rgba(var(--theme-rgb),.17), transparent 44%), linear-gradient(155deg,#151020,#0d0b16 65%,#151024); }
+.topbar { padding-top: 9px; padding-bottom: 9px; background: #151020; border-bottom: 2px solid #49345f; box-shadow: 0 4px 0 #090711; }
+.logo-toggle { gap: 8px; }.logo-text { color: #f3eafa; background: none; }.logo-dot { color: #beabda; }
+.tab { color: #c9bedf; background: #211a30; border-color: #4f4166; }.tab.active { color: #fff; background: rgb(var(--theme-rgb)); border-color: var(--theme-light); }
+.main { max-width: 1280px; padding-top: 32px; }
+.hero { background: linear-gradient(115deg,rgba(var(--theme-rgb),.22),#1a1428 65%); border-color: rgba(var(--theme-rgb),.65); box-shadow: 5px 5px 0 #090710,9px 9px 0 rgba(var(--theme-rgb),.2); }
+.hero-title { font-size: clamp(20px,2.5vw,33px); }.hero-sub { font-family: 'Russo One',sans-serif; color: #d2c9e4; font-size: 13px; }
+.badge { border-radius: 2px; background: rgba(var(--theme-rgb),.14); border-color: rgba(var(--theme-rgb),.5); color: var(--theme-light); }
+.addbar { background: #100e1d; border: 2px solid rgba(var(--theme-rgb),.65); box-shadow: 3px 3px 0 #050409; }.addbar-input { color: #fff; }
+.controls { background: #1b1727; border-color: #55466c; padding: 16px; }.control-label { color: #c6badb; }
+.grid, .trend-list, .cat-grid { gap: 18px; }.video-card, .trend-item, .cat-card { background: #1a1625; border-color: #55466c; }.video-card-body { padding: 14px; gap: 8px; }.card-title { font-size: 14px; color: #fff; }.card-meta, .source-pill { color: #b6aac9; }
+.card-foot-btn { background: #211b30; border-color: #514264; color: #e1d7ee; }.video-card-foot { border-color: #4b3d5e; }
+.empty-inner { background: #1b1727; border: 2px dashed #65517d; box-shadow: 4px 4px #090710; }.empty-inner p { color: #c9bed9; }
+.modal { background: #1b1728; border-color: #8c70ae; }.modal-back { backdrop-filter: none; -webkit-backdrop-filter: none; background: rgba(4,3,9,.83); }
+.input, .select, .textarea { background-color: #100e19; border-color: #625273; }.input::placeholder, .textarea::placeholder { color: #a79ab9; }
+.category-dropdown { background: #151020; }.category-backdrop { backdrop-filter: none; -webkit-backdrop-filter: none; background: rgba(4,3,12,.65); }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; } }
