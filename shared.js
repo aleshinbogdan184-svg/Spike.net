@@ -124,15 +124,7 @@ openView = function (id) {
   replyHint.addEventListener('click', () => { replyTo = null; replyHint.textContent = ''; });
   const report = document.createElement('button'); report.className = 'view-action'; report.type = 'button'; report.textContent = '⚑ Пожаловаться';
   $('.view-actions', $('#view-body')).appendChild(report);
-  report.addEventListener('click', async () => {
-    const reason = prompt('Почему вы жалуетесь на публикацию? (от 3 до 500 символов)');
-    if (reason === null) return;
-    if (reason.trim().length < 3 || reason.trim().length > 500) { toast('Укажи причину от 3 до 500 символов', true); return; }
-    report.disabled = true;
-    try { await sharedRequest('/spike_reports', { method: 'POST', headers: { Prefer: 'return=minimal' }, body: JSON.stringify({ post_id: id, reason: reason.trim() }) }); toast('Жалоба отправлена'); }
-    catch { toast('Не удалось отправить жалобу', true); }
-    finally { report.disabled = false; }
-  });
+  report.addEventListener('click', () => openReportForm(id));
   const replacement = form.cloneNode(true);
   form.replaceWith(replacement);
   const nickname = document.createElement('input');
@@ -198,6 +190,17 @@ document.addEventListener('DOMContentLoaded', () => {
   style.textContent = '[data-watched] { display:none !important; }';
   document.head.appendChild(style);
   refreshShared();
+  $('#report-new-button').addEventListener('click', () => openReportForm());
+  $('#report-form-close').addEventListener('click', () => { $('#report-form-modal').hidden = true; });
+  $('#report-form').addEventListener('submit', async e => {
+    e.preventDefault();
+    const post = $('#report-post').value, reason = $('#report-reason').value.trim(), message = $('#report-form-message');
+    if (!post || reason.length < 3 || reason.length > 500) { message.textContent = 'Выбери публикацию и укажи причину от 3 до 500 символов.'; return; }
+    const button = e.currentTarget.querySelector('[type="submit"]'); button.disabled = true;
+    try { await sharedRequest('/spike_reports', { method: 'POST', headers: { Prefer: 'return=minimal' }, body: JSON.stringify({ post_id: post, reason }) }); $('#report-form-modal').hidden = true; toast('Жалоба отправлена'); }
+    catch { message.textContent = 'Не удалось отправить жалобу. Проверь подключение и настройку базы.'; }
+    finally { button.disabled = false; }
+  });
   $('#random-post').addEventListener('click', () => {
     const available = filtered();
     if (!available.length) { toast('В этой подборке пока нет публикаций', true); return; }
@@ -217,6 +220,14 @@ document.addEventListener('DOMContentLoaded', () => {
     await loadBookmarks();
   });
 });
+
+function openReportForm(id = '') {
+  const select = $('#report-post');
+  select.innerHTML = '<option value="">Выбери публикацию</option>' + items.map(item => `<option value="${escapeHTML(item.id)}">${escapeHTML(item.title)}</option>`).join('');
+  if (id) select.value = id;
+  $('#report-reason').value = ''; $('#report-form-message').textContent = '';
+  $('#report-form-modal').hidden = false;
+}
 
 document.addEventListener('DOMContentLoaded', () => {
   const categoryNav = $('#chips-type');
@@ -297,6 +308,18 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   $('#reports-button').addEventListener('click', showReports);
   $('#reports-close').addEventListener('click', () => { $('#reports-modal').hidden = true; });
+  $('#public-profile-close').addEventListener('click', () => { $('#public-profile-modal').hidden = true; });
+  document.addEventListener('click', async e => {
+    const link = e.target.closest('[data-user-profile]');
+    if (!link) return;
+    const body = $('#public-profile-body'); $('#public-profile-modal').hidden = false; body.textContent = 'Загрузка…';
+    try {
+      const rows = await sharedRequest(`/spike_profiles?user_id=eq.${encodeURIComponent(link.dataset.userProfile)}&select=nickname,avatar_path`);
+      const profile = rows[0];
+      if (!profile) { body.textContent = 'Профиль не найден.'; return; }
+      body.innerHTML = `<div class="profile-preview">${profile.avatar_path ? `<img src="${escapeHTML(avatarUrl(profile.avatar_path))}" alt="">` : '✦'}</div><h3>${escapeHTML(profile.nickname)}</h3><p>Список публикаций пока недоступен: авторы старых карточек не сохранялись.</p>`;
+    } catch { body.textContent = 'Не удалось загрузить профиль.'; }
+  });
   $('#reports-list').addEventListener('click', async e => {
     const open = e.target.closest('[data-report-open]');
     if (open) { $('#reports-modal').hidden = true; openView(open.dataset.reportOpen); return; }
@@ -312,6 +335,12 @@ document.addEventListener('DOMContentLoaded', () => {
     $('#profile-message').textContent = '';
     const preview = $('#profile-preview'); preview.textContent = '';
     if (currentProfile?.avatar_path) { const img = document.createElement('img'); img.src = avatarUrl(currentProfile.avatar_path) + '?v=' + Date.now(); img.alt = ''; preview.appendChild(img); } else preview.textContent = '✦';
+    const count = items.flatMap(item => item.comments).filter(comment => comment.userId === currentUser?.id).length;
+    const badges = [];
+    if (count >= 1) badges.push('🏆 Первый комментарий');
+    if (count >= 10) badges.push('🏆 Общительный');
+    if (bookmarkReady && bookmarkIds.size) badges.push('🏆 Первая закладка');
+    $('#profile-achievements').textContent = badges.length ? badges.join(' · ') : 'Пока нет открытых достижений.';
     profileModal.hidden = false;
   }
   $('#profile-button').addEventListener('click', showProfile);

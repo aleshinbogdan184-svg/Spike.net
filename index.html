@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Russo+One&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=replies16" />
+  <link rel="stylesheet" href="style.css?v=reportform19" />
 </head>
 <body>
   <!-- ====== ФОН ====== -->
@@ -52,6 +52,7 @@
       <button class="btn btn-ghost" id="auth-button" type="button">Войти</button>
       <button class="btn btn-ghost" id="profile-button" type="button" hidden>Профиль</button>
       <button class="btn btn-ghost" id="reports-button" type="button" hidden>Жалобы</button>
+      <button class="btn btn-ghost" id="report-new-button" type="button">Пожаловаться</button>
       <div class="stats">
         <div class="stat"><span id="stat-total">0</span><span class="stat-label">видео</span></div>
         <div class="stat"><span id="stat-views">0</span><span class="stat-label">просмотров</span></div>
@@ -152,7 +153,7 @@
           <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M23 6l-9.5 9.5-5-5L1 18M17 6h6v6"/></svg>
           Тренды
         </h2>
-        <span class="count-pill">самое залайканное</span>
+        <span class="count-pill">публикации за 7 дней · по общим лайкам</span>
       </div>
       <div class="trend-list" id="trends-list"></div>
     </section>
@@ -301,13 +302,16 @@
     <form class="modal-body" id="profile-form"><div class="profile-preview" id="profile-preview">✦</div>
       <label class="field">Уникальный ник <input class="input" id="profile-nickname" minlength="2" maxlength="24" required></label>
       <label class="field">Аватар: PNG, JPEG или WebP до 1 МБ <input class="input" type="file" id="profile-avatar" accept="image/png,image/jpeg,image/webp"></label>
+      <div><strong>Мои достижения</strong><div id="profile-achievements" class="profile-achievements"></div></div>
       <p class="auth-message" id="profile-message" role="status"></p><button class="btn btn-primary" type="submit">Сохранить профиль</button>
     </form></div></div>
-  <div class="modal-back" id="reports-modal" hidden><div class="modal" role="dialog" aria-modal="true" aria-labelledby="reports-title"><div class="modal-head"><h2 class="modal-title" id="reports-title">Жалобы</h2><button class="btn btn-ghost btn-sm" id="reports-close" type="button">✕</button></div><div class="modal-body" id="reports-list"></div></div></div>
+  <div class="modal-back" id="reports-modal" hidden><div class="modal" role="dialog" aria-modal="true" aria-labelledby="reports-title"><div class="modal-head"><h2 class="modal-title" id="reports-title">Жалобы</h2><button class="btn btn-ghost btn-sm" id="reports-close" type="button">✕</button></div><p class="reports-help">Здесь видны жалобы для модераторов. Отправить новую можно кнопкой «Пожаловаться» сверху.</p><div class="modal-body" id="reports-list"></div></div></div>
+  <div class="modal-back" id="report-form-modal" hidden><div class="modal" role="dialog" aria-modal="true" aria-labelledby="report-form-title"><div class="modal-head"><h2 class="modal-title" id="report-form-title">Отправить жалобу</h2><button class="btn btn-ghost btn-sm" id="report-form-close" type="button">✕</button></div><form class="modal-body" id="report-form"><label class="field">Публикация<select class="select" id="report-post" required></select></label><label class="field">Причина<textarea class="textarea" id="report-reason" minlength="3" maxlength="500" required placeholder="Опиши проблему"></textarea></label><p class="field-hint" id="report-form-message" role="status"></p><button class="btn btn-primary" type="submit">Отправить жалобу</button></form></div></div>
+  <div class="modal-back" id="public-profile-modal" hidden><div class="modal" role="dialog" aria-modal="true" aria-labelledby="public-profile-title"><div class="modal-head"><h2 class="modal-title" id="public-profile-title">Профиль</h2><button class="btn btn-ghost btn-sm" id="public-profile-close" type="button">✕</button></div><div class="modal-body" id="public-profile-body"></div></div></div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-  <script src="app.js?v=replies16"></script>
+  <script src="app.js?v=community17"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="shared.js?v=replies16"></script>
+  <script src="shared.js?v=reportform19"></script>
 </body>
 </html>
