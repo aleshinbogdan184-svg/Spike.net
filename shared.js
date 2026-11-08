@@ -117,6 +117,34 @@ async function loadBookmarks() {
   renderExtras();
 }
 
+addFromLink = async function () {
+  const input = $('#link-input');
+  const raw = input.value.trim();
+  if (!raw) { toast('Вставь ссылку', true); input.focus(); return; }
+  if (!sharedReady) { toast('Нет подключения к общей ленте', true); return; }
+  const url = normalizeUrl(raw), source = detectSource(url);
+  if (!url || source.type === 'other') { toast('Поддерживаются YouTube, Twitch, Steam, Spotify, SoundCloud, Яндекс Музыка и Кинопоиск', true); return; }
+  const button = $('#btn-add-link');
+  if (button.disabled) return;
+  button.disabled = true;
+  try {
+    let title = '';
+    if (source.ytId) {
+      const meta = await Promise.race([youtubeMeta(source.ytId), new Promise(resolve => setTimeout(() => resolve({}), 2500))]);
+      title = meta.title || '';
+    }
+    if (!title && source.type === 'game') title = slugTitle(url);
+    if (!title) title = ({ youtube: 'Видео YouTube', twitch: 'Клип или трансляция Twitch', game: 'Игра Steam', music: `Музыка · ${source.source}`, film: 'Кино · Кинопоиск' })[source.type] || 'Публикация';
+    await sharedRequest('/spike_posts', { method: 'POST', headers: { Prefer: 'return=minimal' }, body: JSON.stringify({ title: title.slice(0, 140), url, poster: '', description: '' }) });
+    if (input.value.trim() === raw) input.value = '';
+    await refreshShared();
+    const sourceChip = $(`#chips-type [data-type="${source.type}"]`);
+    if (sourceChip) sourceChip.click(); else { switchTab('feed'); renderFeed(); }
+    toast(`Добавлено: ${source.source}`);
+  } catch (error) { console.error('Ошибка добавления:', error); toast('Не удалось добавить ссылку. Проверь настройки базы и подключение.', true); }
+  finally { button.disabled = false; }
+};
+
 submitForm = async function (e) {
   e.preventDefault();
   if (!sharedReady) { toast('Нет подключения к общей ленте', true); return; }
