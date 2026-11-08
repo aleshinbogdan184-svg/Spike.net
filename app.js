@@ -427,9 +427,9 @@ function cardHTML(it, index) {
 }
 
 function trendsHTML() {
-  const top = items.filter((it) => it.createdAt >= Date.now() - 7 * 86400000).sort((a, b) => b.likes - a.likes || b.views - a.views).slice(0, 12);
+  const top = items.filter((it) => it.weeklyLikes > 0).sort((a, b) => b.weeklyLikes - a.weeklyLikes || b.createdAt - a.createdAt).slice(0, 12);
   if (!top.length) {
-    return `<div class="empty-inner" style="grid-column:1/-1;"><p>За последние семь дней публикаций пока нет</p></div>`;
+    return `<div class="empty-inner" style="grid-column:1/-1;"><p>За последние семь дней лайков пока нет</p></div>`;
   }
   return top.map((it, i) => `
     <article class="trend-item" data-open="${it.id}" style="animation-delay:${i * 30}ms">
@@ -448,7 +448,7 @@ function trendsHTML() {
         </div>
       </div>
       <div class="trend-stats">
-        <span class="trend-likes">❤ ${it.likes}</span>
+        <span class="trend-likes">❤ ${it.weeklyLikes} за неделю</span>
         <span class="trend-views">👁 ${fmtNum(it.views)}</span>
       </div>
     </article>`).join("");

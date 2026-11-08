@@ -44,19 +44,20 @@ async function refreshShared() {
     try { commentLikes = await sharedRequest('/spike_comment_likes?select=comment_id,user_id&limit=10000'); commentLikesReady = true; }
     catch { commentLikes = []; commentLikesReady = false; }
     try {
-      [likes, views] = await Promise.all([sharedRequest('/spike_likes?select=post_id,user_id&limit=10000'), sharedRequest('/spike_views?select=post_id&limit=10000')]);
+      [likes, views] = await Promise.all([sharedRequest('/spike_likes?select=post_id,user_id,created_at&limit=10000'), sharedRequest('/spike_views?select=post_id&limit=10000')]);
       reactionsReady = true;
     } catch { reactionsReady = false; }
     liked = new Set(likes.filter(like => like.user_id === currentUser?.id).map(like => like.post_id));
-    const likeCounts = new Map(), viewCounts = new Map(), commentsByPost = new Map();
+    const likeCounts = new Map(), weeklyCounts = new Map(), viewCounts = new Map(), commentsByPost = new Map();
     likes.forEach(like => likeCounts.set(like.post_id, (likeCounts.get(like.post_id) || 0) + 1));
+    likes.forEach(like => { if (like.created_at && new Date(like.created_at).getTime() >= Date.now() - 7 * 86400000) weeklyCounts.set(like.post_id, (weeklyCounts.get(like.post_id) || 0) + 1); });
     views.forEach(view => viewCounts.set(view.post_id, (viewCounts.get(view.post_id) || 0) + 1));
     comments.forEach(c => { if (!commentsByPost.has(c.post_id)) commentsByPost.set(c.post_id, []); const p = profileMap.get(c.user_id); commentsByPost.get(c.post_id).push({ id: c.id, parentId: c.parent_id, text: c.body, userId: c.user_id, author: p?.nickname || c.author_name || 'Гость', avatar: avatarUrl(p?.avatar_path), developer: !!c.user_id && SPIKE_DEVELOPERS.has(c.user_id) }); });
     items = posts.map(post => {
       const source = detectSource(post.url);
       return { id: post.id, title: post.title, url: post.url, type: source.type, source: source.source,
         ytId: source.ytId, desc: post.description, poster: post.poster, year: '', tags: [], cover: '', authorId: post.user_id || null, author: profileMap.get(post.user_id)?.nickname || '',
-        likes: likeCounts.get(post.id) || 0, views: viewCounts.get(post.id) || 0, watched: false, createdAt: new Date(post.created_at).getTime(),
+        likes: likeCounts.get(post.id) || 0, weeklyLikes: weeklyCounts.get(post.id) || 0, views: viewCounts.get(post.id) || 0, watched: false, createdAt: new Date(post.created_at).getTime(),
         comments: commentsByPost.get(post.id) || [] };
     });
     sharedReady = true;
