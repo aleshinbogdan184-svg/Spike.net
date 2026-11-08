@@ -40,19 +40,20 @@ async function sharedRequest(path, options = {}) {
 
 async function refreshShared() {
   try {
-    const [posts, comments] = await Promise.all([
+    const requests = await Promise.allSettled([
       sharedRequest('/spike_posts?select=*&order=created_at.desc&limit=200'),
       sharedRequest('/spike_comments?select=id,parent_id,post_id,body,author_name,user_id,created_at&order=created_at.asc&limit=2000'),
+      sharedRequest('/spike_profiles?select=user_id,nickname,avatar_path,frame_style,accent_style&limit=10000'),
+      sharedRequest('/spike_comment_likes?select=comment_id,user_id&limit=10000'),
+      sharedRequest('/spike_likes?select=post_id,user_id,created_at&limit=10000'),
+      sharedRequest('/spike_views?select=post_id&limit=10000'),
     ]);
-    const profiles = await sharedRequest('/spike_profiles?select=user_id,nickname,avatar_path,frame_style,accent_style&limit=10000');
+    if (requests[0].status !== 'fulfilled') throw requests[0].reason;
+    const data = index => requests[index].status === 'fulfilled' ? requests[index].value : [];
+    const posts = data(0), comments = data(1), profiles = data(2), likes = data(4), views = data(5);
     const profileMap = new Map(profiles.map(p => [p.user_id, p]));
-    let likes = [], views = [];
-    try { commentLikes = await sharedRequest('/spike_comment_likes?select=comment_id,user_id&limit=10000'); commentLikesReady = true; }
-    catch { commentLikes = []; commentLikesReady = false; }
-    try {
-      [likes, views] = await Promise.all([sharedRequest('/spike_likes?select=post_id,user_id,created_at&limit=10000'), sharedRequest('/spike_views?select=post_id&limit=10000')]);
-      reactionsReady = true;
-    } catch { reactionsReady = false; }
+    commentLikes = data(3); commentLikesReady = requests[3].status === 'fulfilled';
+    reactionsReady = requests[4].status === 'fulfilled' && requests[5].status === 'fulfilled';
     liked = new Set(likes.filter(like => like.user_id === currentUser?.id).map(like => like.post_id));
     const likeCounts = new Map(), weeklyCounts = new Map(), viewCounts = new Map(), commentsByPost = new Map();
     likes.forEach(like => likeCounts.set(like.post_id, (likeCounts.get(like.post_id) || 0) + 1));
@@ -68,7 +69,9 @@ async function refreshShared() {
     });
     sharedReady = true;
     $('#retry-feed').hidden = true;
-    document.querySelector('#connection-status').textContent = reactionsReady ? 'Общая лента: лайки и просмотры учитываются для вошедших пользователей.' : 'Общая лента работает. Лайки и просмотры ещё не настроены.';
+    const partial = requests.slice(1).some(result => result.status !== 'fulfilled');
+    document.querySelector('#connection-status').textContent = partial ? 'Лента загружена, но часть данных недоступна. Попробуй обновить позже.' : 'Общая лента: лайки и просмотры учитываются для вошедших пользователей.';
+    if (partial) $('#retry-feed').hidden = false;
     document.body.classList.toggle('reactions-unavailable', !reactionsReady);
     renderAll();
     renderExtras();
