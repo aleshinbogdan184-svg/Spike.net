@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=themes3" />
+  <link rel="stylesheet" href="style.css?v=retro5" />
 </head>
 <body>
   <!-- ====== ФОН ====== -->
@@ -62,9 +62,10 @@
     <nav class="category-nav" aria-label="Категории приложений"><div class="chip-group" id="chips-type">
             <button class="chip active" data-type="all" type="button"><span class="category-icon">✦</span>Все</button>
             <button class="chip" data-type="youtube" type="button"><span class="category-icon yt">▶</span>YouTube</button>
+            <button class="chip" data-type="twitch" type="button"><span class="category-icon twitch">▣</span>Twitch</button>
             <button class="chip" data-type="game" type="button"><span class="category-icon steam">◉</span>Steam</button>
-            <button class="chip" data-type="music" type="button"><span class="category-icon music">♫</span>Яндекс Музыка</button>
-            <button class="chip" data-type="film" type="button"><span class="category-icon kino">К</span>Кинопоиск</button>
+            <button class="chip" data-type="music" type="button"><span class="category-icon music">♫</span>Музыка</button>
+            <button class="chip" data-type="film" type="button"><span class="category-icon kino">К</span>Spike Кино</button>
           </div></nav>
     <!-- HERO -->
     <section class="hero">
@@ -87,13 +88,7 @@
         </button>
       </div>
 
-      <div class="src-chips" id="src-chips">
-        <span class="src-chip">▶ YouTube</span>
-        <span class="src-chip">🎬 Кинопоиск</span>
-        <span class="src-chip">🎮 Steam</span>
-        <span class="src-chip">🎵 Яндекс Музыка</span>
-        <button class="src-chip src-chip-more" id="btn-add-manual" type="button">+ вручную</button>
-      </div>
+      <button class="btn btn-ghost manual-add" id="btn-add-manual" type="button">+ Добавить вручную</button>
       <p class="local-notice" id="connection-status">Подключение к общей ленте…</p>
     </section>
 
@@ -221,6 +216,7 @@
             <label class="field-label" for="f-type">Категория</label>
             <select class="select" id="f-type">
               <option value="youtube">YouTube-видео</option>
+              <option value="twitch">Twitch</option>
               <option value="film">Фильм</option>
               <option value="game">Игра</option>
               <option value="music">Музыка</option>
@@ -292,8 +288,8 @@
   </div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-  <script src="app.js?v=glass2"></script>
+  <script src="app.js?v=retro5"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="shared.js?v=themes3"></script>
+  <script src="shared.js?v=retro5"></script>
 </body>
 </html>

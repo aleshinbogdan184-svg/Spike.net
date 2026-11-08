@@ -1170,3 +1170,26 @@ body[data-theme] .video-card:hover { border-color: rgba(var(--theme-rgb),.65); b
 @keyframes iconFloat { to { transform: translateY(-12px) rotate(4deg); } }
 @media (max-width: 760px) { .theme-art { right: -35px; opacity: .3; width: 190px; } }
 @media (prefers-reduced-motion: reduce) { .theme-art::before, .theme-art::after, .theme-art-orbit, .theme-art-icon { animation: none; } }
+
+/* Ретро-футуризм: пиксельные детали, объём и неоновая сетка */
+body[data-theme="twitch"] { --theme-rgb: 145,70,255; --theme-light: #ddbdff; }
+body { --bg: #090818; letter-spacing: .01em; }
+.bg { background-color: #090818; }
+.grid-bg { opacity: .55; background-image: linear-gradient(rgba(var(--theme-rgb),.22) 1px,transparent 1px),linear-gradient(90deg,rgba(var(--theme-rgb),.22) 1px,transparent 1px); background-size: 58px 58px; }
+.hero { border-radius: 8px; border: 1px solid rgba(var(--theme-rgb),.45); box-shadow: 6px 6px 0 rgba(var(--theme-rgb),.18),0 18px 60px #0008,inset 0 1px 0 #ffffff20; }
+.hero-title { letter-spacing: -.045em; text-shadow: 3px 3px 0 rgba(var(--theme-rgb),.32); }
+.btn, .tab, .chip, .view-action, .video-card { border-radius: 7px; box-shadow: 3px 3px 0 rgba(var(--theme-rgb),.19),inset 0 1px 0 #ffffff22; }
+.category-dropdown { border-radius: 8px; box-shadow: 5px 5px 0 rgba(var(--theme-rgb),.3),0 16px 35px #000b; }
+.category-icon { border-radius: 5px; image-rendering: pixelated; box-shadow: 2px 2px 0 #0009; }
+.category-icon.twitch { background: #9146ff !important; color: #fff; }
+.category-icon.twitch svg { filter: drop-shadow(1px 1px 0 #1a0b30); }
+.manual-add { margin-top: 13px; font-size: 11px; }
+.type-twitch { color: #d2b4ff; background: #9146ff24; border: 1px solid #9146ff66; }
+.theme-art-icon { image-rendering: pixelated; }
+
+/* Пиксельное сердце и объёмные игровые элементы */
+.pixel-heart { font-size: 0; width: 16px; height: 14px; display: inline-block; background: #718096; clip-path: polygon(0 14%, 14% 14%, 14% 0, 43% 0, 43% 14%, 57% 14%, 57% 0, 86% 0, 86% 14%, 100% 14%, 100% 57%, 86% 57%, 86% 71%, 71% 71%, 71% 85%, 57% 85%, 57% 100%, 43% 100%, 43% 85%, 29% 85%, 29% 71%, 14% 71%, 14% 57%, 0 57%); filter: drop-shadow(2px 3px 0 #221323); transition: transform .15s, background .15s; }
+.like-btn:hover .pixel-heart, .like-btn.liked .pixel-heart { background: linear-gradient(135deg,#ff9cb9 0 22%,#ff426d 23% 65%,#bd214f 66%); transform: translateY(-2px) scale(1.12); }
+.like-btn { border: 1px solid #ffffff1c; background: #ffffff08; box-shadow: 2px 3px 0 #0008, inset 0 1px #ffffff20; }
+.theme-art-orbit { border-radius: 2px; box-shadow: 8px 8px 0 rgba(var(--theme-rgb),.12), inset 4px 4px 0 rgba(var(--theme-rgb),.08); }
+.theme-art-icon { filter: drop-shadow(5px 6px 0 rgba(var(--theme-rgb),.3)) drop-shadow(0 0 22px rgba(var(--theme-rgb),.65)); }

@@ -9,10 +9,11 @@ const LEGACY_KEYS = ["predlozhka.items.v2", "spike.items.v3"];
 
 const TYPES = {
   youtube: { label: "YouTube", icon: "▶" },
-  film:    { label: "Кинопоиск",   icon: "🎬" },
+  twitch:  { label: "Twitch", icon: "▣" },
+  film:    { label: "Spike Кино",   icon: "🎬" },
   series:  { label: "Сериал",  icon: "📺" },
   game:    { label: "Steam",    icon: "🎮" },
-  music:   { label: "Яндекс Музыка",  icon: "🎵" },
+  music:   { label: "Музыка",  icon: "🎵" },
   other:   { label: "Другое",  icon: "✦" },
 };
 
@@ -132,9 +133,10 @@ function steamAppId(url) {
 function twitchLogin(url) {
   try {
     const u = new URL(url);
-    if (!u.hostname.includes("twitch.tv")) return "";
+    if (u.hostname !== "www.twitch.tv" && u.hostname !== "twitch.tv") return "";
     const seg = u.pathname.split("/").filter(Boolean);
     if (!seg.length) return "";
+    if (seg.length !== 1) return "";
     if (["videos", "clip", "directory", "downloads"].includes(seg[0])) return "";
     return seg[0].replace(/[^\w]/g, "");
   } catch { return ""; }
@@ -174,8 +176,11 @@ function detectSource(url) {
   const host = hostOf(url);
   const is = (domain) => host === domain || host.endsWith(`.${domain}`);
   if (is("youtube.com") || is("youtu.be")) return { type: "youtube", source: "YouTube", ytId: ytIdFromUrl(url) };
+  if (is("twitch.tv") || is("clips.twitch.tv")) return { type: "twitch", source: "Twitch", ytId: "" };
   if (is("steampowered.com") || is("steamcommunity.com")) return { type: "game", source: "Steam", ytId: "" };
   if (["music.yandex.ru", "music.yandex.com", "music.yandex.by", "music.yandex.kz"].some(is)) return { type: "music", source: "Яндекс Музыка", ytId: "" };
+  if (is("spotify.com") || is("spotify.link")) return { type: "music", source: "Spotify", ytId: "" };
+  if (is("soundcloud.com") || is("on.soundcloud.com")) return { type: "music", source: "SoundCloud", ytId: "" };
   if (is("kinopoisk.ru")) return { type: "film", source: "Кинопоиск", ytId: "" };
   return { type: "other", source: host, ytId: "" };
 }
@@ -397,7 +402,7 @@ function cardHTML(it, index) {
         ${it.tags.length ? `<div class="card-tags">${it.tags.slice(0, 4).map((t) => `<span class="card-tag">#${escapeHTML(t)}</span>`).join("")}</div>` : ""}
         <div class="video-card-foot">
           <button class="card-foot-btn like-btn ${isLiked ? "liked" : ""}" data-like="${it.id}" type="button" title="Лайк">
-            <span>${isLiked ? "❤" : "♡"}</span><span>${it.likes}</span>
+            <span class="pixel-heart" aria-hidden="true">♥</span><span>${it.likes}</span>
           </button>
           <button class="card-foot-btn" data-open="${it.id}" type="button" title="Комментарии">💬 ${(it.comments || []).length}</button>
           <button class="card-foot-btn watch-btn" data-watch="${it.id}" type="button" title="${it.watched ? "Смотреть ещё раз" : "Смотреть"}">

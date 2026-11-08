@@ -143,6 +143,7 @@ document.addEventListener('DOMContentLoaded', () => {
   categoryNav.querySelector('[data-type="all"]').hidden = true;
   const icons = {
     youtube: '<svg viewBox="0 0 40 40" aria-hidden="true"><rect x="2" y="6" width="36" height="28" rx="8" fill="currentColor"/><path d="M17 13v14l11-7z" fill="#fff"/></svg>',
+    twitch: '<svg viewBox="0 0 40 40" aria-hidden="true"><path fill="#9146ff" d="M6 3h31v23L27 36H18l-6 4v-4H6z"/><path fill="white" d="M12 7h21v17l-6 6h-7l-4 4v-4h-4z"/><path stroke="#9146ff" stroke-width="3" d="M20 12v10m7-10v10"/></svg>',
     game: '<svg viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="19" fill="currentColor"/><circle cx="26" cy="14" r="6" fill="none" stroke="white" stroke-width="3"/><path d="M3 23l12 5a5 5 0 0 0 8-4l7-6M12 28l5 2" fill="none" stroke="white" stroke-width="3"/></svg>',
     music: '<svg viewBox="0 0 40 40" aria-hidden="true"><path fill="#ffd329" d="M20 1l2.6 12L30 3l-3 12 12-5-9 9 10 3-12 2 7 11-11-7-4 12-3-12-11 7 7-11-12-2 11-3L4 10l12 5L12 3l7 10z"/></svg>',
     film: '<svg viewBox="0 0 40 40" aria-hidden="true"><rect width="40" height="40" rx="10" fill="#111"/><path fill="#ff7200" d="M8 5h6v13L23 5h8L19 19l18-9-14 12 16 2-16 2 14 9-18-6 12 9h-8l-9-12v12H8z"/></svg>'
@@ -150,9 +151,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const themes = {
     all: ['Собирай <span class="gradient-anim">тренды</span> из ссылок', 'Делись видео, играми, музыкой и фильмами. Всё интересное — в одной ленте.'],
     youtube: ['Видео <span class="gradient-anim">YouTube</span>', 'Делись любимыми видео, находи новых авторов и обсуждай интересное с друзьями.'],
+    twitch: ['Клипы <span class="gradient-anim">Twitch</span>', 'Сохраняй яркие моменты со стримов и делись любимыми клипами Twitch с друзьями.'],
     game: ['Игры <span class="gradient-anim">Steam</span>', 'Предлагай игры Steam, открывай новые миры и выбирай, во что сыграть вместе.'],
-    music: ['Яндекс <span class="gradient-anim">Музыка</span>', 'Собирай любимые треки и альбомы, делись музыкой и находи новое звучание.'],
-    film: ['Мир <span class="gradient-anim">Кинопоиска</span>', 'Делись фильмами и сериалами, обсуждай премьеры и выбирай, что посмотреть.']
+    music: ['Мир <span class="gradient-anim">музыки</span>', 'Делись треками и альбомами из Spotify, SoundCloud и Яндекс Музыки.'],
+    film: ['<span class="gradient-anim">Spike Кино</span>', 'Делись фильмами и сериалами с Кинопоиска, обсуждай премьеры и выбирай, что посмотреть.']
   };
   function setTheme(type) {
     const [title, description] = themes[type] || themes.all;
@@ -160,7 +162,7 @@ document.addEventListener('DOMContentLoaded', () => {
     $('#theme-art-icon').innerHTML = icons[type] || '✦';
     $('.hero-title').innerHTML = title;
     $('.hero-sub').textContent = description;
-    $('#link-input').placeholder = type === 'all' ? 'Ссылка на YouTube, Steam, Яндекс Музыку или Кинопоиск' : `Вставь ссылку: ${type === 'game' ? 'Steam' : type === 'music' ? 'Яндекс Музыка' : type === 'film' ? 'Кинопоиск' : 'YouTube'}`;
+    $('#link-input').placeholder = type === 'all' ? 'Ссылка на видео, игру, музыку или кино' : `Вставь ссылку: ${type === 'twitch' ? 'Twitch' : type === 'game' ? 'Steam' : type === 'music' ? 'Spotify, SoundCloud или Яндекс Музыка' : type === 'film' ? 'Кинопоиск' : 'YouTube'}`;
   }
   categoryNav.querySelectorAll('[data-type]').forEach(button => {
     const icon = button.querySelector('.category-icon');
