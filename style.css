@@ -1308,3 +1308,22 @@ body { background: #0d0b16; }
 .input, .select, .textarea { background-color: #100e19; border-color: #625273; }.input::placeholder, .textarea::placeholder { color: #a79ab9; }
 .category-dropdown { background: #151020; }.category-backdrop { backdrop-filter: none; -webkit-backdrop-filter: none; background: rgba(4,3,12,.65); }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; } }
+
+/* Лёгкие тематические края — без canvas и постоянной перерисовки */
+body { --theme-rgb: 129, 102, 255; --theme-light: #d3c8ff; }
+body[data-theme="game"] { --theme-rgb: 32, 145, 233; --theme-light: #9cddff; }
+body[data-theme="youtube"] { --theme-rgb: 225, 58, 75; --theme-light: #ffadb5; }
+body[data-theme="twitch"] { --theme-rgb: 154, 80, 237; --theme-light: #e0c0ff; }
+body[data-theme="music"] { --theme-rgb: 233, 176, 34; --theme-light: #ffea9b; }
+body[data-theme="film"] { --theme-rgb: 230, 111, 32; --theme-light: #ffc28d; }
+body[data-view="trends"] { --theme-rgb: 234, 84, 141; --theme-light: #ffbed7; }
+body[data-view="categories"] { --theme-rgb: 40, 183, 168; --theme-light: #a4fff0; }
+body[data-view="bookmarks"] { --theme-rgb: 227, 171, 46; --theme-light: #ffe8a1; }
+body[data-view="achievements"] { --theme-rgb: 112, 188, 77; --theme-light: #d1ffa3; }
+.bg { background: radial-gradient(ellipse at 12% 20%,rgba(var(--theme-rgb),.18),transparent 28%), radial-gradient(ellipse at 88% 55%,rgba(var(--theme-rgb),.16),transparent 30%), linear-gradient(155deg,#151020,#0c0b15 60%,#14101e); }
+.bg::before { opacity: .4; }
+.main::before, .main::after { content: ''; position: fixed; z-index: -1; width: 70px; height: 70px; pointer-events: none; border: 2px solid rgba(var(--theme-rgb),.25); box-shadow: 8px 8px 0 rgba(var(--theme-rgb),.08),16px 16px 0 rgba(var(--theme-rgb),.04); transform: rotate(45deg); }
+.main::before { left: max(20px,calc((100vw - 1390px)/2)); top: 33%; }.main::after { right: max(20px,calc((100vw - 1390px)/2)); bottom: 22%; width: 48px; height: 48px; }
+.topbar { border-bottom-color: rgba(var(--theme-rgb),.6); }.view-intro { border-color: rgba(var(--theme-rgb),.65); background: linear-gradient(120deg,rgba(var(--theme-rgb),.3),#15121f 75%); }.view-intro-icon { background: rgb(var(--theme-rgb)); border-color: var(--theme-light); }
+.video-card:hover, .cat-card:hover, .trend-item:hover { border-color: rgba(var(--theme-rgb),.8); }
+@media (max-width: 1450px) { .main::before, .main::after { display: none; } }
