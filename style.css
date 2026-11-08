@@ -1365,6 +1365,18 @@ body[data-view="achievements"] { --theme-rgb: 112, 188, 77; --theme-light: #d1ff
 @media (max-width: 1200px) { .site-layout { grid-template-columns: 165px minmax(0,1fr); }.layout-aside { display: none; } }
 @media (max-width: 760px) { .site-layout { display: block; padding: 16px 12px 0; }.layout-sidebar { display: none; }.main { padding: 0 0 50px; }.hero { padding: 22px 18px; }.theme-art { opacity: .15; right: -20px; } #feed-grid { grid-template-columns: 1fr; }.topbar { gap: 6px; } }
 
+/* На большом экране все основные действия в левой колонке. */
+@media (min-width: 761px) {
+  .topbar { display: none; }
+  .layout-sidebar { top: 22px; z-index: 50; }
+  .layout-sidebar .logo-menu { margin: 0 0 14px; }
+  .layout-sidebar .logo { display: flex; }
+  .layout-sidebar .topbar-right { margin: 12px 0 0; display: flex; flex-wrap: wrap; align-items: center; gap: 7px; }
+  .layout-sidebar .stats { width: 100%; justify-content: flex-start; margin-top: 8px; }
+  .layout-sidebar .stat { align-items: flex-start; }
+  .site-layout { padding-top: 28px; }
+}
+
 /* Spike 1.0 — компактный аркадный интерфейс */
 .main { max-width: 1180px; padding-top: 24px; }
 .hero { min-height: 230px; padding: clamp(22px,3vw,38px); border: 1px solid rgba(var(--theme-rgb),.35); border-radius: 16px; background: linear-gradient(120deg,rgba(var(--theme-rgb),.18),#171322 70%); box-shadow: 0 16px 40px #0004; }
