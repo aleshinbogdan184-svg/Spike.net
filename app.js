@@ -783,7 +783,6 @@ function openView(id) {
         <div class="view-meta-item"><div class="view-meta-k">Год / сезон</div><div class="view-meta-v">${escapeHTML(it.year || "—")}</div></div>
         <div class="view-meta-item"><div class="view-meta-k">Лайки</div><div class="view-meta-v">❤ ${it.likes}</div></div>
         <div class="view-meta-item"><div class="view-meta-k">Просмотры</div><div class="view-meta-v">👁 ${fmtNum(it.views)}</div></div>
-        <div class="view-meta-item"><div class="view-meta-k">Статус</div><div class="view-meta-v">${it.watched ? "✔ Просмотрено" : "○ Не смотрел"}</div></div>
       </div>
       ${it.tags.length ? `<div class="view-tags">${it.tags.map((t) => `<span class="card-tag">#${escapeHTML(t)}</span>`).join("")}</div>` : ""}
       <div class="view-actions">

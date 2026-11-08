@@ -286,7 +286,8 @@ document.addEventListener('DOMContentLoaded', () => {
     currentProfile = null;
     $('#profile-button').hidden = !user;
     isOwner = !!user && SPIKE_DEVELOPERS.has(user.id);
-    button.textContent = user ? 'Выйти' : 'Войти';
+    button.textContent = 'Войти';
+    button.hidden = !!user;
     $('#view-delete').hidden = !isOwner;
     $('#reports-button').hidden = !isOwner;
     setTimeout(async () => {
@@ -317,7 +318,9 @@ document.addEventListener('DOMContentLoaded', () => {
       const rows = await sharedRequest(`/spike_profiles?user_id=eq.${encodeURIComponent(link.dataset.userProfile)}&select=nickname,avatar_path`);
       const profile = rows[0];
       if (!profile) { body.textContent = 'Профиль не найден.'; return; }
-      body.innerHTML = `<div class="profile-preview">${profile.avatar_path ? `<img src="${escapeHTML(avatarUrl(profile.avatar_path))}" alt="">` : '✦'}</div><h3>${escapeHTML(profile.nickname)}</h3><p>Список публикаций пока недоступен: авторы старых карточек не сохранялись.</p>`;
+      const count = items.flatMap(item => item.comments).filter(comment => comment.userId === link.dataset.userProfile).length;
+      const badges = []; if (count >= 1) badges.push('🏆 Первый комментарий'); if (count >= 10) badges.push('🏆 Общительный');
+      body.innerHTML = `<div class="profile-preview">${profile.avatar_path ? `<img src="${escapeHTML(avatarUrl(profile.avatar_path))}" alt="">` : '✦'}</div><h3>${escapeHTML(profile.nickname)}</h3><strong>Достижения</strong><p>${badges.length ? badges.join(' · ') : 'Пока нет открытых достижений.'}</p><p>Список публикаций пока недоступен: авторы старых карточек не сохранялись.</p>`;
     } catch { body.textContent = 'Не удалось загрузить профиль.'; }
   });
   $('#reports-list').addEventListener('click', async e => {
@@ -345,6 +348,11 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   $('#profile-button').addEventListener('click', showProfile);
   $('#profile-close').addEventListener('click', () => { profileModal.hidden = true; });
+  $('#profile-signout').addEventListener('click', async () => {
+    const { error } = await authClient.auth.signOut();
+    if (error) { $('#profile-message').textContent = 'Не удалось выйти. Попробуй ещё раз.'; return; }
+    profileModal.hidden = true; toast('Вы вышли из аккаунта');
+  });
   $('#profile-form').addEventListener('submit', async e => {
     e.preventDefault();
     if (!currentUser) return;
