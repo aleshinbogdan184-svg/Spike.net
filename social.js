@@ -83,7 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
 async function addProfileFollow(userId, container) {
   const { count, error } = await authClient.from('spike_follows').select('*', { count: 'exact', head: true }).eq('followed_id', userId);
   if (error || !container.isConnected) return;
-  const line = document.createElement('p'); line.textContent = `Подписчики: ${count || 0}`; container.appendChild(line);
+  const line = document.createElement('span'); line.className = 'profile-follow-count'; line.textContent = `${count || 0} подписчиков`; container.appendChild(line);
   if (!currentUser || currentUser.id === userId) return;
   const { data, error: lookupError } = await authClient.from('spike_follows').select('followed_id').eq('follower_id', currentUser.id).eq('followed_id', userId).maybeSingle();
   if (lookupError || !container.isConnected) return;
@@ -95,6 +95,6 @@ async function addProfileFollow(userId, container) {
     const result = following ? await query.delete().eq('follower_id', currentUser.id).eq('followed_id', userId) : await query.insert({ follower_id: currentUser.id, followed_id: userId });
     button.disabled = false;
     if (result.error) { toast('Не удалось изменить подписку', true); return; }
-    following = !following; button.textContent = following ? '✓ Подписан' : '＋ Подписаться'; line.textContent = `Подписчики: ${Math.max(0, (count || 0) + (following ? (data ? 0 : 1) : (data ? -1 : 0)))}`;
+    following = !following; button.textContent = following ? '✓ Подписан' : '＋ Подписаться'; line.textContent = `${Math.max(0, (count || 0) + (following ? (data ? 0 : 1) : (data ? -1 : 0)))} подписчиков`;
   });
 }
