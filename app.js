@@ -394,6 +394,7 @@ function cardHTML(it, index) {
           <span class="source-pill">${escapeHTML(it.source || "ссылка")}</span>
         </div>
         <h3 class="card-title">${escapeHTML(it.title)}</h3>
+        ${it.author && it.authorId ? `<button class="profile-link card-author" type="button" data-user-profile="${escapeHTML(it.authorId)}">от ${escapeHTML(it.author)}</button>` : '<span class="card-author">от гостя</span>'}
         <div class="card-meta">
           ${it.year ? `<span>${escapeHTML(it.year)}</span>` : ""}
           <span>👁 ${fmtNum(it.views)}</span>

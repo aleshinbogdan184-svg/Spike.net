@@ -55,7 +55,7 @@ async function refreshShared() {
     items = posts.map(post => {
       const source = detectSource(post.url);
       return { id: post.id, title: post.title, url: post.url, type: source.type, source: source.source,
-        ytId: source.ytId, desc: post.description, poster: post.poster, year: '', tags: [], cover: '',
+        ytId: source.ytId, desc: post.description, poster: post.poster, year: '', tags: [], cover: '', authorId: post.user_id || null, author: profileMap.get(post.user_id)?.nickname || '',
         likes: likeCounts.get(post.id) || 0, views: viewCounts.get(post.id) || 0, watched: false, createdAt: new Date(post.created_at).getTime(),
         comments: commentsByPost.get(post.id) || [] };
     });
@@ -64,6 +64,8 @@ async function refreshShared() {
     document.body.classList.toggle('reactions-unavailable', !reactionsReady);
     renderAll();
     renderExtras();
+    const match = location.hash.match(/^#post=([0-9a-f-]{36})$/i);
+    if (match && items.some(item => item.id === match[1]) && viewId !== match[1]) { history.replaceState(null, '', location.pathname + location.search); openView(match[1]); }
   } catch (error) {
     sharedReady = false;
     items = [];
@@ -117,6 +119,13 @@ async function loadBookmarks() {
   renderExtras();
 }
 
+async function postHeaders() {
+  if (!currentUser || !authClient) return { Prefer: 'return=minimal' };
+  const { data: { session } } = await authClient.auth.getSession();
+  if (!session) throw new Error('Сессия истекла');
+  return { Prefer: 'return=minimal', Authorization: `Bearer ${session.access_token}` };
+}
+
 addFromLink = async function () {
   const input = $('#link-input');
   const raw = input.value.trim();
@@ -135,7 +144,7 @@ addFromLink = async function () {
     }
     if (!title && source.type === 'game') title = slugTitle(url);
     if (!title) title = ({ youtube: 'Видео YouTube', twitch: 'Клип или трансляция Twitch', game: 'Игра Steam', music: `Музыка · ${source.source}`, film: 'Кино · Кинопоиск' })[source.type] || 'Публикация';
-    await sharedRequest('/spike_posts', { method: 'POST', headers: { Prefer: 'return=minimal' }, body: JSON.stringify({ title: title.slice(0, 140), url, poster: '', description: '' }) });
+    await sharedRequest('/spike_posts', { method: 'POST', headers: await postHeaders(), body: JSON.stringify({ title: title.slice(0, 140), url, poster: '', description: '' }) });
     if (input.value.trim() === raw) input.value = '';
     await refreshShared();
     const sourceChip = $(`#chips-type [data-type="${source.type}"]`);
@@ -154,7 +163,7 @@ submitForm = async function (e) {
   if (!title || !url || detectSource(url).type === 'other') { toast('Укажи название и ссылку поддерживаемого сервиса', true); return; }
   if (poster && !/^https?:\/\//i.test(poster)) { toast('Ссылка на обложку должна начинаться с https://', true); return; }
   try {
-    await sharedRequest('/spike_posts', { method: 'POST', headers: { Prefer: 'return=minimal' }, body: JSON.stringify({ title, url, poster, description: $('#f-desc').value.trim() }) });
+    await sharedRequest('/spike_posts', { method: 'POST', headers: await postHeaders(), body: JSON.stringify({ title, url, poster, description: $('#f-desc').value.trim() }) });
     closeAdd(); await refreshShared(); toast('Добавлено в общую ленту');
   } catch { toast('Не удалось добавить публикацию', true); }
 };
@@ -193,6 +202,16 @@ openView = function (id) {
   const report = document.createElement('button'); report.className = 'view-action'; report.type = 'button'; report.textContent = '⚑ Пожаловаться';
   $('.view-actions', $('#view-body')).appendChild(report);
   report.addEventListener('click', () => openReportForm(id));
+  const share = document.createElement('button'); share.className = 'view-action'; share.type = 'button'; share.textContent = '↗ Поделиться';
+  $('.view-actions', $('#view-body')).appendChild(share);
+  share.addEventListener('click', async () => {
+    const url = new URL(location.href); url.hash = `post=${encodeURIComponent(id)}`;
+    try {
+      if (navigator.share) await navigator.share({ title: items.find(item => item.id === id)?.title || 'Spike', url: url.href });
+      else if (navigator.clipboard) { await navigator.clipboard.writeText(url.href); toast('Ссылка скопирована'); }
+      else window.prompt('Скопируй ссылку:', url.href);
+    } catch (error) { if (error.name !== 'AbortError') window.prompt('Скопируй ссылку:', url.href); }
+  });
   const replacement = form.cloneNode(true);
   form.replaceWith(replacement);
   const nickname = document.createElement('input');
@@ -394,9 +413,11 @@ document.addEventListener('DOMContentLoaded', () => {
       if (!profile) { body.textContent = 'Профиль не найден.'; return; }
       const count = items.flatMap(item => item.comments).filter(comment => comment.userId === link.dataset.userProfile).length;
       const badges = []; if (count >= 1) badges.push('🏆 Первый комментарий'); if (count >= 10) badges.push('🏆 Общительный');
-      body.innerHTML = `<div class="profile-preview">${profile.avatar_path ? `<img src="${escapeHTML(avatarUrl(profile.avatar_path))}" alt="">` : '✦'}</div><h3>${escapeHTML(profile.nickname)}</h3><strong>Достижения</strong><p>${badges.length ? badges.join(' · ') : 'Пока нет открытых достижений.'}</p><p>Список публикаций пока недоступен: авторы старых карточек не сохранялись.</p>`;
+      const ownPosts = items.filter(item => item.authorId === link.dataset.userProfile);
+      body.innerHTML = `<div class="profile-preview">${profile.avatar_path ? `<img src="${escapeHTML(avatarUrl(profile.avatar_path))}" alt="">` : '✦'}</div><h3>${escapeHTML(profile.nickname)}</h3><strong>Достижения</strong><p>${badges.length ? badges.join(' · ') : 'Пока нет открытых достижений.'}</p><strong>Публикации</strong>${ownPosts.length ? ownPosts.map(post => `<button class="btn btn-ghost" type="button" data-profile-post="${escapeHTML(post.id)}">${escapeHTML(post.title)}</button>`).join('') : '<p>Новых публикаций пока нет. Старые карточки не были привязаны к автору.</p>'}`;
     } catch { body.textContent = 'Не удалось загрузить профиль.'; }
   });
+  $('#public-profile-body').addEventListener('click', e => { const button = e.target.closest('[data-profile-post]'); if (button) { $('#public-profile-modal').hidden = true; openView(button.dataset.profilePost); } });
   $('#reports-list').addEventListener('click', async e => {
     const open = e.target.closest('[data-report-open]');
     if (open) { $('#reports-modal').hidden = true; openView(open.dataset.reportOpen); return; }
