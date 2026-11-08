@@ -1339,3 +1339,8 @@ body[data-view="achievements"] { --theme-rgb: 112, 188, 77; --theme-light: #d1ff
 #feed-grid .video-card-body { min-height: 120px; }
 .category-icon.yt { background: #ed334d !important; }.category-icon.twitch { background: #9146ff !important; }.category-icon.steam { background: #2476bd !important; }.category-icon.music { background: #e6b72a !important; }.category-icon.kino { background: #f77c24 !important; }
 .hype-king { max-width: 720px; margin: 0 auto 22px; padding: 12px 16px; color: #ffe8a1; background: #3a2914; border: 2px solid #e4b848; box-shadow: 4px 4px #090710; }.hype-king .profile-link { color: #ffe8a1; font-size: 14px; }.profile-avatar-wrap { position: relative; width: 76px; margin-top: 15px; }.profile-crown { position: absolute; top: -23px; left: 20px; z-index: 1; font-size: 26px; }
+.energy-meter { display: flex; align-items: center; gap: 8px; color: #aaa0c4; font-size: 10px; }.energy-bars { display: inline-flex; gap: 3px; }.energy-bars i { width: 12px; height: 5px; background: #423750; }.heat-1 .energy-bars i:first-child, .heat-2 .energy-bars i:nth-child(-n+2), .heat-3 .energy-bars i { background: #ad8aff; }
+.video-card.heat-1 { border-color: #7656c8; box-shadow: 0 0 8px #7656c84d; }.video-card.heat-2 { border-color: #9c70f1; box-shadow: 0 0 14px #9c70f166; }.video-card.heat-3 { border-color: #c5a5ff; box-shadow: 0 0 20px #a779ff99; }
+@media (hover: hover) { .video-card.heat-2:hover, .video-card.heat-3:hover { animation: heatPulse 1.8s ease-in-out infinite alternate; } }
+@keyframes heatPulse { to { box-shadow: 0 0 24px #b999ffbb; } }
+@media (prefers-reduced-motion: reduce) { .video-card.heat-2:hover, .video-card.heat-3:hover { animation: none; } }

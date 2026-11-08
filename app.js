@@ -378,8 +378,9 @@ function typePill(type) {
 
 function cardHTML(it, index) {
   const isLiked = liked.has(it.id);
+  const heat = it.views >= 50 ? 3 : it.views >= 10 ? 2 : it.views >= 1 ? 1 : 0;
   return `
-    <article class="video-card" data-id="${it.id}" style="animation-delay:${clamp(index, 0, 12) * 30}ms">
+    <article class="video-card heat-${heat}" data-id="${escapeHTML(it.id)}" style="animation-delay:${clamp(index, 0, 12) * 30}ms">
       <button class="thumb" data-watch="${escapeHTML(it.id)}" type="button" aria-label="Открыть ${escapeHTML(it.title)} на сайте ${escapeHTML(it.source || 'источника')}">
         ${thumbHTML(it)}
         <div class="overlay"></div>
@@ -400,6 +401,7 @@ function cardHTML(it, index) {
           <span>👁 ${fmtNum(it.views)}</span>
           <span>${timeAgo(it.createdAt)}</span>
         </div>
+        <div class="energy-meter" title="На основе общего числа просмотров карточки">⚡ Активность · ${fmtNum(it.views)} просмотров <span class="energy-bars" aria-hidden="true"><i></i><i></i><i></i></span></div>
         ${it.tags.length ? `<div class="card-tags">${it.tags.slice(0, 4).map((t) => `<span class="card-tag">#${escapeHTML(t)}</span>`).join("")}</div>` : ""}
         <div class="video-card-foot">
           <button class="card-foot-btn bookmark-btn" data-bookmark="${escapeHTML(it.id)}" type="button" title="Сохранить в закладки">☆</button>
