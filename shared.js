@@ -7,6 +7,8 @@ let authClient = null;
 const SPIKE_OWNER = '4120e992-bcb9-45e4-9822-609948510d9c';
 let isOwner = false;
 let currentUser = null;
+let currentProfile = null;
+const avatarUrl = path => path ? `${SPIKE_API.replace('/rest/v1', '')}/storage/v1/object/public/spike-avatars/${encodeURIComponent(path.split('/')[0])}/avatar` : '';
 let reactionsReady = false;
 const viewedThisSession = new Set();
 
@@ -29,8 +31,10 @@ async function refreshShared() {
   try {
     const [posts, comments] = await Promise.all([
       sharedRequest('/spike_posts?select=*&order=created_at.desc&limit=200'),
-      sharedRequest('/spike_comments?select=post_id,body,author_name,created_at&order=created_at.asc&limit=2000'),
+      sharedRequest('/spike_comments?select=post_id,body,author_name,user_id,created_at&order=created_at.asc&limit=2000'),
     ]);
+    const profiles = await sharedRequest('/spike_profiles?select=user_id,nickname,avatar_path&limit=10000');
+    const profileMap = new Map(profiles.map(p => [p.user_id, p]));
     let likes = [], views = [];
     try {
       [likes, views] = await Promise.all([sharedRequest('/spike_likes?select=post_id,user_id&limit=10000'), sharedRequest('/spike_views?select=post_id&limit=10000')]);
@@ -40,7 +44,7 @@ async function refreshShared() {
     const likeCounts = new Map(), viewCounts = new Map(), commentsByPost = new Map();
     likes.forEach(like => likeCounts.set(like.post_id, (likeCounts.get(like.post_id) || 0) + 1));
     views.forEach(view => viewCounts.set(view.post_id, (viewCounts.get(view.post_id) || 0) + 1));
-    comments.forEach(c => { if (!commentsByPost.has(c.post_id)) commentsByPost.set(c.post_id, []); commentsByPost.get(c.post_id).push({ text: c.body, author: c.author_name || 'Гость' }); });
+    comments.forEach(c => { if (!commentsByPost.has(c.post_id)) commentsByPost.set(c.post_id, []); const p = profileMap.get(c.user_id); commentsByPost.get(c.post_id).push({ text: c.body, author: p?.nickname || c.author_name || 'Гость', avatar: avatarUrl(p?.avatar_path) }); });
     items = posts.map(post => {
       const source = detectSource(post.url);
       return { id: post.id, title: post.title, url: post.url, type: source.type, source: source.source,
@@ -89,17 +93,21 @@ openView = function (id) {
   nickname.className = 'input comment-nickname'; nickname.name = 'nickname';
   nickname.maxLength = 30; nickname.placeholder = 'Твой ник'; nickname.required = true;
   nickname.value = localStorage.getItem('spike.nickname') || '';
+  if (currentUser) { nickname.value = currentProfile?.nickname || ''; nickname.readOnly = true; nickname.placeholder = 'Сначала создай профиль'; nickname.required = false; }
   replacement.prepend(nickname);
   replacement.addEventListener('submit', async e => {
     e.preventDefault();
     const input = replacement.elements.comment;
     const body = input.value.trim();
     const author = nickname.value.trim();
+    if (currentUser && !currentProfile) { toast('Сначала создай профиль', true); $('#profile-modal').hidden = false; return; }
     if (!body || !author || !sharedReady) return;
     const button = replacement.querySelector('button');
     button.disabled = true;
     try {
-      await sharedRequest('/spike_comments', { method: 'POST', headers: { Prefer: 'return=minimal' }, body: JSON.stringify({ post_id: id, body, author_name: author }) });
+      const session = currentUser ? (await authClient.auth.getSession()).data.session : null;
+      if (currentUser && !session) throw new Error('Сессия истекла');
+      await sharedRequest('/spike_comments', { method: 'POST', headers: { Prefer: 'return=minimal', ...(session ? { Authorization: `Bearer ${session.access_token}` } : {}) }, body: JSON.stringify({ post_id: id, body, author_name: author }) });
       localStorage.setItem('spike.nickname', author);
       await refreshShared(); openView(id); toast('Комментарий добавлен');
     } catch (error) {
@@ -200,10 +208,46 @@ document.addEventListener('DOMContentLoaded', () => {
   authClient.auth.onAuthStateChange((_event, session) => {
     user = session?.user || null;
     currentUser = user;
+    currentProfile = null;
+    $('#profile-button').hidden = !user;
     isOwner = user?.id === SPIKE_OWNER;
     button.textContent = user ? 'Выйти' : 'Войти';
     $('#view-delete').hidden = !isOwner;
-    setTimeout(() => refreshShared(), 0);
+    setTimeout(async () => {
+      if (user) {
+        const { data } = await authClient.from('spike_profiles').select('*').eq('user_id', user.id).maybeSingle();
+        if (currentUser?.id !== user.id) return;
+        currentProfile = data;
+      }
+      refreshShared();
+    }, 0);
+  });
+  const profileModal = $('#profile-modal');
+  function showProfile() {
+    $('#profile-nickname').value = currentProfile?.nickname || '';
+    $('#profile-avatar').value = '';
+    $('#profile-message').textContent = '';
+    const preview = $('#profile-preview'); preview.textContent = '';
+    if (currentProfile?.avatar_path) { const img = document.createElement('img'); img.src = avatarUrl(currentProfile.avatar_path) + '?v=' + Date.now(); img.alt = ''; preview.appendChild(img); } else preview.textContent = '✦';
+    profileModal.hidden = false;
+  }
+  $('#profile-button').addEventListener('click', showProfile);
+  $('#profile-close').addEventListener('click', () => { profileModal.hidden = true; });
+  $('#profile-form').addEventListener('submit', async e => {
+    e.preventDefault();
+    if (!currentUser) return;
+    const nickname = $('#profile-nickname').value.trim(); const file = $('#profile-avatar').files[0]; const msg = $('#profile-message');
+    if (nickname.length < 2 || nickname.length > 24) { msg.textContent = 'Ник должен содержать от 2 до 24 символов.'; return; }
+    if (file && (file.size > 1048576 || !['image/png','image/jpeg','image/webp'].includes(file.type))) { msg.textContent = 'Выбери PNG, JPEG или WebP размером до 1 МБ.'; return; }
+    const submit = e.currentTarget.querySelector('[type="submit"]'); submit.disabled = true; msg.textContent = 'Сохраняем…';
+    try {
+      let path = currentProfile?.avatar_path || null;
+      if (file) { path = `${currentUser.id}/avatar`; const { error } = await authClient.storage.from('spike-avatars').upload(path, file, { upsert: true, contentType: file.type }); if (error) throw error; }
+      const { data, error } = await authClient.from('spike_profiles').upsert({ user_id: currentUser.id, nickname, avatar_path: path }).select().single();
+      if (error) throw error;
+      currentProfile = data; profileModal.hidden = true; await refreshShared(); toast('Профиль сохранён');
+    } catch (error) { console.error('Ошибка профиля:', error); msg.textContent = error.code === '23505' ? 'Этот ник уже занят.' : 'Не удалось сохранить профиль. Проверь настройки базы и формат изображения.'; }
+    finally { submit.disabled = false; }
   });
   button.addEventListener('click', async () => {
     if (user) { await authClient.auth.signOut(); toast('Вы вышли'); return; }

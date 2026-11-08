@@ -1253,3 +1253,8 @@ body[data-view="trends"] .aurora, body[data-view="categories"] .aurora { opacity
 .video-card, .trend-item, .list-item { animation: none; }
 .video-card, .trend-item, .cat-card { content-visibility: auto; contain-intrinsic-size: auto 300px; }
 @media (max-width: 760px) { .theme-art-icon, .theme-art-icon svg, .category-icon svg { animation: none; } .bg::after { display: none; } }
+
+.profile-preview { width: 76px; height: 76px; display: grid; place-items: center; background: #56358c; border: 3px solid #d1aaff; box-shadow: 4px 4px #08040f; font-size: 32px; overflow: hidden; }
+.profile-preview img { width: 100%; height: 100%; object-fit: cover; image-rendering: pixelated; }
+.comment-avatar { width: 32px; height: 32px; object-fit: cover; float: left; margin-right: 10px; border: 2px solid #a783e9; image-rendering: pixelated; }
+.comment-avatar-fallback { display: grid; place-items: center; background: #56358c; }

@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Russo+One&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=perf9" />
+  <link rel="stylesheet" href="style.css?v=profiles11" />
 </head>
 <body>
   <!-- ====== ФОН ====== -->
@@ -48,6 +48,7 @@
 
     <div class="topbar-right">
       <button class="btn btn-ghost" id="auth-button" type="button">Войти</button>
+      <button class="btn btn-ghost" id="profile-button" type="button" hidden>Профиль</button>
       <div class="stats">
         <div class="stat"><span id="stat-total">0</span><span class="stat-label">видео</span></div>
         <div class="stat"><span id="stat-views">0</span><span class="stat-label">просмотров</span></div>
@@ -289,10 +290,17 @@
       </form>
     </div>
   </div>
+  <div class="modal-back" id="profile-modal" hidden><div class="modal" role="dialog" aria-modal="true" aria-labelledby="profile-title">
+    <div class="modal-head"><h2 class="modal-title" id="profile-title">Мой профиль</h2><button class="btn btn-ghost btn-sm" type="button" id="profile-close">✕</button></div>
+    <form class="modal-body" id="profile-form"><div class="profile-preview" id="profile-preview">✦</div>
+      <label class="field">Уникальный ник <input class="input" id="profile-nickname" minlength="2" maxlength="24" required></label>
+      <label class="field">Аватар: PNG, JPEG или WebP до 1 МБ <input class="input" type="file" id="profile-avatar" accept="image/png,image/jpeg,image/webp"></label>
+      <p class="auth-message" id="profile-message" role="status"></p><button class="btn btn-primary" type="submit">Сохранить профиль</button>
+    </form></div></div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-  <script src="app.js?v=perf9"></script>
+  <script src="app.js?v=profiles11"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="shared.js?v=spike123net10"></script>
+  <script src="shared.js?v=profiles11"></script>
 </body>
 </html>
