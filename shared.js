@@ -34,7 +34,7 @@ async function refreshShared() {
   try {
     const [posts, comments] = await Promise.all([
       sharedRequest('/spike_posts?select=*&order=created_at.desc&limit=200'),
-      sharedRequest('/spike_comments?select=post_id,body,author_name,user_id,created_at&order=created_at.asc&limit=2000'),
+      sharedRequest('/spike_comments?select=id,parent_id,post_id,body,author_name,user_id,created_at&order=created_at.asc&limit=2000'),
     ]);
     const profiles = await sharedRequest('/spike_profiles?select=user_id,nickname,avatar_path&limit=10000');
     const profileMap = new Map(profiles.map(p => [p.user_id, p]));
@@ -47,7 +47,7 @@ async function refreshShared() {
     const likeCounts = new Map(), viewCounts = new Map(), commentsByPost = new Map();
     likes.forEach(like => likeCounts.set(like.post_id, (likeCounts.get(like.post_id) || 0) + 1));
     views.forEach(view => viewCounts.set(view.post_id, (viewCounts.get(view.post_id) || 0) + 1));
-    comments.forEach(c => { if (!commentsByPost.has(c.post_id)) commentsByPost.set(c.post_id, []); const p = profileMap.get(c.user_id); commentsByPost.get(c.post_id).push({ text: c.body, userId: c.user_id, author: p?.nickname || c.author_name || 'Гость', avatar: avatarUrl(p?.avatar_path), developer: !!c.user_id && SPIKE_DEVELOPERS.has(c.user_id) }); });
+    comments.forEach(c => { if (!commentsByPost.has(c.post_id)) commentsByPost.set(c.post_id, []); const p = profileMap.get(c.user_id); commentsByPost.get(c.post_id).push({ id: c.id, parentId: c.parent_id, text: c.body, userId: c.user_id, author: p?.nickname || c.author_name || 'Гость', avatar: avatarUrl(p?.avatar_path), developer: !!c.user_id && SPIKE_DEVELOPERS.has(c.user_id) }); });
     items = posts.map(post => {
       const source = detectSource(post.url);
       return { id: post.id, title: post.title, url: post.url, type: source.type, source: source.source,
@@ -118,6 +118,21 @@ openView = function (id) {
   }
   const form = $('#comment-form');
   if (!form) return;
+  let replyTo = null;
+  const replyHint = document.createElement('p'); replyHint.className = 'field-hint'; form.before(replyHint);
+  $('#view-body').querySelectorAll('[data-reply]').forEach(button => button.addEventListener('click', () => { replyTo = button.dataset.reply; replyHint.textContent = `Ответ для ${button.dataset.author} — нажми здесь, чтобы отменить`; replacement.elements.comment.focus(); }));
+  replyHint.addEventListener('click', () => { replyTo = null; replyHint.textContent = ''; });
+  const report = document.createElement('button'); report.className = 'view-action'; report.type = 'button'; report.textContent = '⚑ Пожаловаться';
+  $('.view-actions', $('#view-body')).appendChild(report);
+  report.addEventListener('click', async () => {
+    const reason = prompt('Почему вы жалуетесь на публикацию? (от 3 до 500 символов)');
+    if (reason === null) return;
+    if (reason.trim().length < 3 || reason.trim().length > 500) { toast('Укажи причину от 3 до 500 символов', true); return; }
+    report.disabled = true;
+    try { await sharedRequest('/spike_reports', { method: 'POST', headers: { Prefer: 'return=minimal' }, body: JSON.stringify({ post_id: id, reason: reason.trim() }) }); toast('Жалоба отправлена'); }
+    catch { toast('Не удалось отправить жалобу', true); }
+    finally { report.disabled = false; }
+  });
   const replacement = form.cloneNode(true);
   form.replaceWith(replacement);
   const nickname = document.createElement('input');
@@ -138,7 +153,7 @@ openView = function (id) {
     try {
       const session = currentUser ? (await authClient.auth.getSession()).data.session : null;
       if (currentUser && !session) throw new Error('Сессия истекла');
-      await sharedRequest('/spike_comments', { method: 'POST', headers: { Prefer: 'return=minimal', ...(session ? { Authorization: `Bearer ${session.access_token}` } : {}) }, body: JSON.stringify({ post_id: id, body, author_name: author }) });
+      await sharedRequest('/spike_comments', { method: 'POST', headers: { Prefer: 'return=minimal', ...(session ? { Authorization: `Bearer ${session.access_token}` } : {}) }, body: JSON.stringify({ post_id: id, body, author_name: author, parent_id: replyTo }) });
       localStorage.setItem('spike.nickname', author);
       await refreshShared(); openView(id); toast('Комментарий добавлен');
     } catch (error) {
@@ -262,6 +277,7 @@ document.addEventListener('DOMContentLoaded', () => {
     isOwner = !!user && SPIKE_DEVELOPERS.has(user.id);
     button.textContent = user ? 'Выйти' : 'Войти';
     $('#view-delete').hidden = !isOwner;
+    $('#reports-button').hidden = !isOwner;
     setTimeout(async () => {
       if (user) {
         const { data } = await authClient.from('spike_profiles').select('*').eq('user_id', user.id).maybeSingle();
@@ -273,6 +289,22 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 0);
   });
   const profileModal = $('#profile-modal');
+  async function showReports() {
+    const list = $('#reports-list'); $('#reports-modal').hidden = false; list.textContent = 'Загрузка…';
+    const { data, error } = await authClient.from('spike_reports').select('id,post_id,reason,created_at').order('created_at', { ascending: false }).limit(100);
+    if (error) { list.textContent = 'Не удалось загрузить жалобы. Проверь настройки доступа.'; return; }
+    list.innerHTML = data.length ? data.map(row => `<div class="comment"><strong>${escapeHTML(items.find(item => item.id === row.post_id)?.title || 'Публикация')}</strong><p>${escapeHTML(row.reason)}</p><button class="btn btn-ghost" type="button" data-report-open="${escapeHTML(row.post_id)}">Открыть</button> <button class="btn btn-ghost" type="button" data-report-dismiss="${escapeHTML(row.id)}">Убрать жалобу</button></div>`).join('') : '<p>Жалоб пока нет.</p>';
+  }
+  $('#reports-button').addEventListener('click', showReports);
+  $('#reports-close').addEventListener('click', () => { $('#reports-modal').hidden = true; });
+  $('#reports-list').addEventListener('click', async e => {
+    const open = e.target.closest('[data-report-open]');
+    if (open) { $('#reports-modal').hidden = true; openView(open.dataset.reportOpen); return; }
+    const dismiss = e.target.closest('[data-report-dismiss]');
+    if (!dismiss || !confirm('Убрать жалобу из списка? Публикация останется.')) return;
+    const { error } = await authClient.from('spike_reports').delete().eq('id', dismiss.dataset.reportDismiss);
+    if (error) toast('Не удалось убрать жалобу', true); else showReports();
+  });
   function showProfile() {
     $('#profile-title').textContent = SPIKE_DEVELOPERS.has(currentUser?.id) ? 'Мой профиль · РАЗРАБОТЧИК' : 'Мой профиль';
     $('#profile-nickname').value = currentProfile?.nickname || '';
