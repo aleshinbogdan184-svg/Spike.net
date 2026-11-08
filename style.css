@@ -1222,3 +1222,23 @@ body { background: #100821; font-family: 'Russo One', sans-serif; }
 .card-title, .hero-sub, .input, .textarea, .comment { line-height: 1.55; }
 @media (max-width: 640px) { .hero-title { font-size: 19px; }.hero { padding: 22px 18px; }.section-title { font-size: 11px; } }
 @media (prefers-reduced-motion: reduce) { .category-icon svg, .theme-art-icon svg { animation: none; } }
+
+/* Отдельные объёмные экраны трендов и категорий */
+body[data-view="trends"], body[data-view="categories"] { --theme-rgb: 146, 77, 255; --theme-light: #e3c8ff; }
+.view-intro { position: relative; display: flex; align-items: center; gap: 24px; min-height: 150px; margin: 8px 0 34px; padding: 26px 32px; overflow: hidden; border: 3px solid #a984e6; background: linear-gradient(120deg,#29165a,#13122a); box-shadow: 6px 6px 0 #070411,10px 10px 0 #6540a955, inset 2px 2px #ffffff18; }
+.view-intro::after { content: ''; position: absolute; right: 8%; width: 180px; height: 180px; border: 3px solid #c18aff45; transform: rotate(35deg); box-shadow: 20px 20px 0 #9c62ff14, -20px -20px 0 #aa73ff12; pointer-events: none; }
+.view-intro-icon { flex-shrink: 0; display: grid; place-items: center; width: 68px; height: 68px; background: linear-gradient(135deg,#b87aff,#6632ca); border: 3px solid #e0baff; box-shadow: 5px 5px 0 #170d2e,0 0 28px #a34bff70; font-size: 36px; color: white; }
+.view-intro h1 { margin: 10px 0; font-family: 'Press Start 2P','Russo One',sans-serif; font-size: clamp(22px,3vw,32px); text-shadow: 3px 3px #3f246a,6px 6px #08030f; }.view-intro p { margin: 0; color: #c7b9df; font-size: 12px; line-height: 1.6; }.view-eyebrow { color: #d3a7ff; font-size: 10px; letter-spacing: .16em; }
+.trend-list { perspective: 1000px; gap: 20px; }.trend-item { overflow: visible; transform-style: preserve-3d; transition: transform .25s,box-shadow .25s; box-shadow: 6px 6px 0 #070411,10px 10px 0 #7944ba66; }.trend-item:hover { transform: translateY(-7px) rotateX(3deg); box-shadow: 8px 13px 0 #070411,12px 17px 0 #7944ba66,0 0 32px #aa55ff55; }.trend-thumb { margin-top: 0; border-radius: 0; overflow: hidden; }.trend-rank { border-radius: 0; width: 36px; height: 36px; border: 2px solid #fff; box-shadow: 3px 3px #0b0615; }.trend-body { padding: 15px; }.trend-stats { padding: 8px 15px 14px; }
+.cat-grid { perspective: 1000px; gap: 18px; }.cat-card { transition: transform .2s,box-shadow .2s; }.cat-card:hover { transform: translateY(-5px) rotateX(3deg); box-shadow: 7px 9px 0 #070411,10px 12px 0 #7944ba66; }
+body[data-view="trends"] .aurora, body[data-view="categories"] .aurora { opacity: .06; }
+@media (max-width: 640px) { .view-intro { gap: 14px; padding: 20px 16px; }.view-intro-icon { width: 50px; height: 50px; font-size: 25px; }.view-intro h1 { font-size: 18px; }.view-intro::after { right: -100px; } }
+@media (prefers-reduced-motion: reduce) { .trend-item:hover, .cat-card:hover { transform: none; } }
+
+/* Неоновая ретро-сцена вместо клетчатого фона */
+.bg { background: radial-gradient(ellipse at 50% 8%,rgba(var(--theme-rgb),.2),transparent 45%), linear-gradient(180deg,#100a22 0%,#0a0b18 65%,#100a22 100%); }
+.bg::before { inset: -20%; opacity: .6; background: radial-gradient(circle at 18% 22%,#ffffffaa 0 1px,transparent 2px), radial-gradient(circle at 75% 30%,#ba9cffaa 0 1px,transparent 2px), radial-gradient(circle at 40% 70%,#ffffff88 0 1px,transparent 2px); background-size: 220px 190px,310px 250px,260px 230px; }
+.bg::after { width: 32vw; height: 32vw; min-width: 260px; min-height: 260px; right: -5%; top: 10%; opacity: .4; border: 2px solid rgba(var(--theme-rgb),.2); background: radial-gradient(circle at 32% 25%,rgba(var(--theme-rgb),.3),transparent 46%), linear-gradient(135deg,#211244,#080916); box-shadow: inset -35px -35px 70px #000a,0 0 100px rgba(var(--theme-rgb),.18); }
+.grid-bg { inset: 45% -35% -35%; opacity: .26; background-image: linear-gradient(rgba(var(--theme-rgb),.35) 1px,transparent 1px),linear-gradient(90deg,rgba(var(--theme-rgb),.35) 1px,transparent 1px); background-size: 95px 95px; transform: perspective(420px) rotateX(65deg); transform-origin: center bottom; mask-image: linear-gradient(transparent,#000); }
+.noise { opacity: .09; }
+@media (prefers-reduced-motion: reduce) { .bg::before { animation: none; } }
