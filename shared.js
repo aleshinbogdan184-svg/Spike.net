@@ -40,7 +40,7 @@ async function refreshShared() {
       sharedRequest('/spike_posts?select=*&order=created_at.desc&limit=200'),
       sharedRequest('/spike_comments?select=id,parent_id,post_id,body,author_name,user_id,created_at&order=created_at.asc&limit=2000'),
     ]);
-    const profiles = await sharedRequest('/spike_profiles?select=user_id,nickname,avatar_path&limit=10000');
+    const profiles = await sharedRequest('/spike_profiles?select=user_id,nickname,avatar_path,frame_style,accent_style&limit=10000');
     const profileMap = new Map(profiles.map(p => [p.user_id, p]));
     let likes = [], views = [];
     try { commentLikes = await sharedRequest('/spike_comment_likes?select=comment_id,user_id&limit=10000'); commentLikesReady = true; }
@@ -54,7 +54,7 @@ async function refreshShared() {
     likes.forEach(like => likeCounts.set(like.post_id, (likeCounts.get(like.post_id) || 0) + 1));
     likes.forEach(like => { if (like.created_at && new Date(like.created_at).getTime() >= Date.now() - 7 * 86400000) weeklyCounts.set(like.post_id, (weeklyCounts.get(like.post_id) || 0) + 1); });
     views.forEach(view => viewCounts.set(view.post_id, (viewCounts.get(view.post_id) || 0) + 1));
-    comments.forEach(c => { if (!commentsByPost.has(c.post_id)) commentsByPost.set(c.post_id, []); const p = profileMap.get(c.user_id); commentsByPost.get(c.post_id).push({ id: c.id, parentId: c.parent_id, text: c.body, userId: c.user_id, author: p?.nickname || c.author_name || 'Гость', avatar: avatarUrl(p?.avatar_path), developer: !!c.user_id && SPIKE_DEVELOPERS.has(c.user_id) }); });
+    comments.forEach(c => { if (!commentsByPost.has(c.post_id)) commentsByPost.set(c.post_id, []); const p = profileMap.get(c.user_id); commentsByPost.get(c.post_id).push({ id: c.id, parentId: c.parent_id, text: c.body, userId: c.user_id, author: p?.nickname || c.author_name || 'Гость', avatar: avatarUrl(p?.avatar_path), frame: p?.frame_style, accent: p?.accent_style, developer: !!c.user_id && SPIKE_DEVELOPERS.has(c.user_id) }); });
     items = posts.map(post => {
       const source = detectSource(post.url);
       return { id: post.id, title: post.title, url: post.url, type: source.type, source: source.source,
@@ -457,8 +457,8 @@ document.addEventListener('DOMContentLoaded', () => {
       const badges = []; if (count >= 1) badges.push('🏆 Первый комментарий'); if (count >= 10) badges.push('🏆 Общительный');
       const ownPosts = items.filter(item => item.authorId === link.dataset.userProfile);
       const king = hypeKing?.user_id === link.dataset.userProfile;
-      const frame = ['classic','spark','collector','legend'].includes(profile.frame_style) ? profile.frame_style : 'classic';
-      const accent = ['violet','cyan','gold'].includes(profile.accent_style) ? profile.accent_style : 'violet';
+      const frame = ['classic','spark','collector','legend','comet','neon','orbit','heart','voice','starfish','sponge','banana'].includes(profile.frame_style) ? profile.frame_style : 'classic';
+      const accent = ['violet','cyan','gold','rose','lime','coral','ice'].includes(profile.accent_style) ? profile.accent_style : 'violet';
       body.innerHTML = `<div class="public-profile profile-accent-${accent}"><div class="profile-avatar-wrap">${king ? '<span class="profile-crown">👑</span>' : ''}<div class="profile-preview profile-frame-${frame}">${profile.avatar_path ? `<img src="${escapeHTML(avatarUrl(profile.avatar_path))}" alt="">` : '✦'}</div></div><h3>${escapeHTML(profile.nickname)} ${king ? '👑 Король трендов' : ''}</h3><strong>Достижения</strong><p>${badges.length ? badges.join(' · ') : 'Пока нет открытых достижений.'}</p><strong>Публикации</strong>${ownPosts.length ? ownPosts.map(post => `<button class="btn btn-ghost" type="button" data-profile-post="${escapeHTML(post.id)}">${escapeHTML(post.title)}</button>`).join('') : '<p>Новых публикаций пока нет. Старые карточки не были привязаны к автору.</p>'}</div>`;
     } catch { body.textContent = 'Не удалось загрузить профиль.'; }
   });
@@ -476,12 +476,12 @@ document.addEventListener('DOMContentLoaded', () => {
     $('#profile-nickname').value = currentProfile?.nickname || '';
     $('#profile-frame').value = currentProfile?.frame_style || 'classic';
     $('#profile-accent').value = currentProfile?.accent_style || 'violet';
-    const locks = { spark: 'reply_1', collector: 'bookmark_10', legend: 'comment_25', cyan: 'like_5', gold: 'bookmark_5' };
+    const locks = { spark: 'reply_1', collector: 'bookmark_10', legend: 'comment_25', comet: 'comment_3', neon: 'like_5', orbit: 'bookmark_5', heart: 'like_10', voice: 'comment_10', starfish: 'reply_1', sponge: 'bookmark_5', banana: 'like_10', cyan: 'like_5', gold: 'bookmark_5', rose: 'reply_1', lime: 'bookmark_10', coral: 'comment_10', ice: 'like_10' };
     [$('#profile-frame'), $('#profile-accent')].forEach(select => [...select.options].forEach(option => { option.disabled = !!locks[option.value] && !earnedAchievements.has(locks[option.value]); }));
     $('#profile-avatar').value = '';
     $('#profile-message').textContent = '';
     const preview = $('#profile-preview'); preview.textContent = '';
-    preview.className = `profile-preview profile-frame-${['classic','spark','collector','legend'].includes(currentProfile?.frame_style) ? currentProfile.frame_style : 'classic'}`;
+    preview.className = `profile-preview profile-frame-${['classic','spark','collector','legend','comet','neon','orbit','heart','voice','starfish','sponge','banana'].includes(currentProfile?.frame_style) ? currentProfile.frame_style : 'classic'}`;
     if (currentProfile?.avatar_path) { const img = document.createElement('img'); img.src = avatarUrl(currentProfile.avatar_path) + '?v=' + Date.now(); img.alt = ''; preview.appendChild(img); } else preview.textContent = '✦';
     const rewards = { reply_1: 'Искра диалога · рамка «Искра»', bookmark_10: 'Архивариус · рамка «Коллекционер»', comment_25: 'Голос Spike · рамка «Легенда»', like_5: 'Ценитель · лазурный цвет', bookmark_5: 'Собиратель · золотой цвет' };
     const badges = Object.entries(rewards).filter(([code]) => earnedAchievements.has(code)).map(([, title]) => `🏆 ${title}`);

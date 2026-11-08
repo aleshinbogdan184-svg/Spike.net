@@ -1406,6 +1406,15 @@ body[data-view="achievements"] { --theme-rgb: 112, 188, 77; --theme-light: #d1ff
 .profile-frame-legend { border-color: #ffd273 !important; box-shadow: 0 0 0 3px #805b24,0 0 22px #ffc75a88; }
 .release-card ul { padding-left: 22px; }.release-card li strong { color: #eee5ff; }.release-callout { margin: 20px 0; padding: 14px; border-left: 3px solid var(--theme-light); background: rgba(var(--theme-rgb),.12); color: var(--theme-light); font-size: 13px; line-height: 1.6; }
 .public-profile { display: grid; justify-items: start; gap: 10px; }.public-profile h3 { color: var(--profile-accent,#d6bcff); }.profile-accent-cyan { --profile-accent: #9deeff; }.profile-accent-gold { --profile-accent: #ffdc80; }
+.profile-accent-rose,.comment-accent-rose { --profile-accent:#ff9dc9; }.profile-accent-lime,.comment-accent-lime { --profile-accent:#baff87; }.profile-accent-coral,.comment-accent-coral { --profile-accent:#ffa589; }.profile-accent-ice,.comment-accent-ice { --profile-accent:#c6f8ff; }.comment-accent-cyan { --profile-accent:#9deeff; }.comment-accent-gold { --profile-accent:#ffdc80; }
+.comment .profile-link { color: var(--profile-accent,#c9e9ff); }
+.comment-frame-spark .comment-avatar,.profile-frame-spark { border-color:#9deeff!important; box-shadow:0 0 10px #65dfff99; }
+.comment-frame-collector .comment-avatar,.comment-frame-orbit .comment-avatar,.profile-frame-orbit,.profile-frame-collector { border-color:#aaf591!important; box-shadow:0 0 10px #89ff8099; }
+.comment-frame-legend .comment-avatar,.profile-frame-legend { border-color:#ffd273!important; box-shadow:0 0 10px #ffc75a99; }
+.comment-frame-comet .comment-avatar,.profile-frame-comet { border-color:#ffe8ad!important; box-shadow:3px 3px 0 #f0924b; }
+.comment-frame-neon .comment-avatar,.profile-frame-neon { border-color:#80ffff!important; box-shadow:0 0 12px #24e9ff; }
+.comment-frame-heart .comment-avatar,.profile-frame-heart { border-color:#ff80bc!important; box-shadow:0 0 12px #ff448899; }
+.comment-frame-voice .comment-avatar,.profile-frame-voice { border-color:#e0b3ff!important; box-shadow:3px 3px 0 #934aff; }
 @media (max-width: 500px) { .profile-customize { grid-template-columns: 1fr; } #profile-form .modal-actions { flex-wrap: wrap; } }
 
 /* Spike 1.0 — компактный аркадный интерфейс */
