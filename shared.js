@@ -5,6 +5,7 @@ let sharedReady = false;
 const originalOpenView = openView;
 let authClient = null;
 const SPIKE_OWNER = '4120e992-bcb9-45e4-9822-609948510d9c';
+const SPIKE_DEVELOPERS = new Set([SPIKE_OWNER, 'eba02036-3e58-43ac-aa82-ac0a66afba6a']);
 let isOwner = false;
 let currentUser = null;
 let currentProfile = null;
@@ -44,7 +45,7 @@ async function refreshShared() {
     const likeCounts = new Map(), viewCounts = new Map(), commentsByPost = new Map();
     likes.forEach(like => likeCounts.set(like.post_id, (likeCounts.get(like.post_id) || 0) + 1));
     views.forEach(view => viewCounts.set(view.post_id, (viewCounts.get(view.post_id) || 0) + 1));
-    comments.forEach(c => { if (!commentsByPost.has(c.post_id)) commentsByPost.set(c.post_id, []); const p = profileMap.get(c.user_id); commentsByPost.get(c.post_id).push({ text: c.body, author: p?.nickname || c.author_name || 'Гость', avatar: avatarUrl(p?.avatar_path) }); });
+    comments.forEach(c => { if (!commentsByPost.has(c.post_id)) commentsByPost.set(c.post_id, []); const p = profileMap.get(c.user_id); commentsByPost.get(c.post_id).push({ text: c.body, author: p?.nickname || c.author_name || 'Гость', avatar: avatarUrl(p?.avatar_path), developer: !!c.user_id && SPIKE_DEVELOPERS.has(c.user_id) }); });
     items = posts.map(post => {
       const source = detectSource(post.url);
       return { id: post.id, title: post.title, url: post.url, type: source.type, source: source.source,
@@ -210,7 +211,7 @@ document.addEventListener('DOMContentLoaded', () => {
     currentUser = user;
     currentProfile = null;
     $('#profile-button').hidden = !user;
-    isOwner = user?.id === SPIKE_OWNER;
+    isOwner = !!user && SPIKE_DEVELOPERS.has(user.id);
     button.textContent = user ? 'Выйти' : 'Войти';
     $('#view-delete').hidden = !isOwner;
     setTimeout(async () => {
@@ -224,6 +225,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
   const profileModal = $('#profile-modal');
   function showProfile() {
+    $('#profile-title').textContent = SPIKE_DEVELOPERS.has(currentUser?.id) ? 'Мой профиль · РАЗРАБОТЧИК' : 'Мой профиль';
     $('#profile-nickname').value = currentProfile?.nickname || '';
     $('#profile-avatar').value = '';
     $('#profile-message').textContent = '';
