@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Russo+One&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=hero34" />
+  <link rel="stylesheet" href="style.css?v=release35" />
 </head>
 <body>
   <!-- ====== ФОН ====== -->
@@ -44,6 +44,7 @@
         <span class="tab-dot"></span>
       </button>
       <button class="tab" data-tab="categories" type="button">Категории</button>
+      <button class="tab" data-tab="updates" type="button">Обновления <span class="release-dot"></span></button>
       <button class="tab tab-compact" data-tab="bookmarks" type="button" title="Закладки" aria-label="Закладки">★</button>
       <button class="tab tab-compact" data-tab="achievements" type="button" title="Достижения" aria-label="Достижения">🏆</button>
     </nav>
@@ -83,7 +84,6 @@
       </div>
       <h1 class="hero-title">Не просто ссылка.<br><span class="gradient-anim">Твоя находка.</span></h1>
       <p class="hero-sub">В чате она потеряется. На Spike её увидят друзья и сообщество: сохраняй интересное, обсуждай и находи новое.</p>
-      <div class="hero-benefits" aria-label="Зачем добавлять ссылки на Spike"><span>▣ Не потеряется</span><span>♥ Получит реакции</span><span>✦ Найдёт своих</span></div>
 
       <div class="addbar">
         <span class="addbar-icon">
@@ -173,6 +173,7 @@
       </div>
       <div class="cat-grid" id="cat-grid"></div>
     </section>
+    <section class="tab-view" id="view-updates" hidden><div class="view-intro"><span class="view-intro-icon">✦</span><div><span class="view-eyebrow">SPIKE / НОВОСТИ</span><h1>Обновления</h1><p>Что нового на сайте.</p></div></div><article class="release-card"><div class="release-head"><span class="release-version">1.0</span><span class="release-tag">РЕЛИЗ</span></div><h2>Spike 1.0 — собираем находки вместе</h2><p>Первая версия Spike: место для ссылок, которые хочется сохранить и обсудить.</p><ul><li>Общая лента видео, игр, музыки и кино с категориями.</li><li>Комментарии, ответы и реакции сообщества.</li><li>Профили с ником и аватаром, закладки и достижения.</li><li>Жалобы и инструменты модерации.</li><li>Пиксельное оформление и адаптация для телефона.</li></ul><small>Некоторые возможности требуют входа и настроенной базы данных.</small></article></section>
     <section class="tab-view" id="view-bookmarks" hidden><div class="view-intro"><span class="view-intro-icon">★</span><div><h1>Закладки</h1><p>Твои сохранённые находки.</p></div></div><div id="bookmarks-message" class="empty-inner"></div><div class="grid" id="bookmarks-grid"></div></section>
     <section class="tab-view" id="view-achievements" hidden><div class="view-intro"><span class="view-intro-icon">🏆</span><div><h1>Достижения</h1><p>Твои первые шаги в Spike.</p></div></div><div id="achievements-grid" class="cat-grid"></div></section>
   </main>
