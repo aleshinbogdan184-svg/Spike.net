@@ -1349,6 +1349,22 @@ body[data-view="achievements"] { --theme-rgb: 112, 188, 77; --theme-light: #d1ff
 @keyframes heatPulse { to { box-shadow: 0 0 24px #b999ffbb; } }
 @media (prefers-reduced-motion: reduce) { .video-card.heat-2:hover, .video-card.heat-3:hover { animation: none; } }
 
+/* Spike 1.0: новая структура страниц */
+.site-layout { display: grid; grid-template-columns: 190px minmax(0,1fr) 230px; gap: 28px; width: min(1600px,100%); margin: 0 auto; padding: 28px clamp(16px,2vw,32px) 0; align-items: start; }
+.main { width: 100%; min-width: 0; max-width: none; margin: 0; padding: 0 0 70px; }
+.layout-sidebar, .layout-aside { position: sticky; top: 86px; min-width: 0; }
+.layout-sidebar { display: flex; flex-direction: column; gap: 5px; }
+.side-heading { display: flex; justify-content: space-between; margin: 8px 8px 14px; color: #827796; font-size: 10px; letter-spacing: .16em; }.side-heading span { color: #5f5271; }
+.layout-sidebar > button { display: flex; align-items: center; gap: 12px; width: 100%; border: 0; border-radius: 9px; padding: 11px 12px; background: transparent; color: #c4b9d5; text-align: left; font-size: 14px; transition: background .15s,color .15s; }.layout-sidebar > button:hover, .layout-sidebar > button:focus-visible { background: #ffffff0d; color: #fff; outline: 1px solid #ffffff24; }
+.side-note { margin: 26px 5px 0; padding: 15px 12px; border-left: 2px solid rgba(var(--theme-rgb),.7); color: #a59bb7; font-size: 11px; line-height: 1.6; }.side-note strong { color: var(--theme-light); letter-spacing: .1em; }.side-note p { margin-bottom: 0; }
+.layout-aside { display: flex; flex-direction: column; gap: 14px; }.side-widget { padding: 18px; border: 1px solid #ffffff1c; border-radius: 13px; background: linear-gradient(145deg,rgba(var(--theme-rgb),.16),#191524 75%); box-shadow: 0 12px 30px #0003; }.side-widget-alt { background: #191524; }.widget-label { color: var(--theme-light); font-size: 9px; letter-spacing: .12em; }.side-widget h2 { margin: 14px 0 8px; font-size: 16px; line-height: 1.4; }.side-widget p { color: #b9aec9; font-size: 11px; line-height: 1.7; }.side-cta { width: 100%; margin-top: 8px; padding: 10px; border: 1px solid rgba(var(--theme-rgb),.5); border-radius: 8px; background: rgba(var(--theme-rgb),.2); color: #fff; font-size: 11px; }.side-cta:hover { background: rgba(var(--theme-rgb),.35); }.side-cta.subtle { background: #ffffff08; border-color: #ffffff20; }.side-footer { color: #756a86; font-size: 9px; letter-spacing: .09em; line-height: 1.6; }.side-footer span { color: var(--theme-light); }
+.hero { min-height: 0; padding: 27px 30px; border: 0; border-radius: 14px; background: linear-gradient(110deg,rgba(var(--theme-rgb),.16),#181522 76%); box-shadow: none; }.hero::before { opacity: .05; }.hero::after { display: none; }.hero-title { font-size: clamp(18px,2vw,25px); }.hero-sub { max-width: 510px; font-size: 12px; }.theme-art { width: 160px; right: 7%; opacity: .7; }.theme-art-orbit, .theme-art::after { display: none; }.addbar { max-width: 580px; }
+.controls { border: 0; border-radius: 10px; background: #191622; box-shadow: none; }.control-label { font-size: 9px; }.feed-head { margin: 20px 0 16px; }
+#feed-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); max-width: none; gap: 16px; } #feed-grid .video-card { height: 100%; } #feed-grid .thumb { aspect-ratio: 16/9; max-height: none; } #feed-grid .video-card-body { min-height: 145px; }
+.view-intro { min-height: 120px; margin-top: 0; border: 0; border-radius: 14px; box-shadow: none; }.view-intro h1 { font-size: clamp(18px,2vw,25px); }.release-card { max-width: none; }
+@media (max-width: 1200px) { .site-layout { grid-template-columns: 165px minmax(0,1fr); }.layout-aside { display: none; } }
+@media (max-width: 760px) { .site-layout { display: block; padding: 16px 12px 0; }.layout-sidebar { display: none; }.main { padding: 0 0 50px; }.hero { padding: 22px 18px; }.theme-art { opacity: .15; right: -20px; } #feed-grid { grid-template-columns: 1fr; }.topbar { gap: 6px; } }
+
 /* Spike 1.0 — компактный аркадный интерфейс */
 .main { max-width: 1180px; padding-top: 24px; }
 .hero { min-height: 230px; padding: clamp(22px,3vw,38px); border: 1px solid rgba(var(--theme-rgb),.35); border-radius: 16px; background: linear-gradient(120deg,rgba(var(--theme-rgb),.18),#171322 70%); box-shadow: 0 16px 40px #0004; }

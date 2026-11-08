@@ -285,6 +285,9 @@ watchItem = function (id) {
 
 document.addEventListener('DOMContentLoaded', () => {
   $('#btn-moderate').hidden = true;
+  document.querySelectorAll('[data-layout-tab]').forEach(button => button.addEventListener('click', () => { const tab = $(`#tabs [data-tab="${button.dataset.layoutTab}"]`); if (tab) tab.click(); window.scrollTo({ top: 0, behavior: 'smooth' }); }));
+  $('#side-add').addEventListener('click', () => { $('#tabs [data-tab="feed"]').click(); $('#link-input').focus(); window.scrollTo({ top: 0, behavior: 'smooth' }); });
+  $('#side-random').addEventListener('click', () => { $('#tabs [data-tab="feed"]').click(); $('#random-post').click(); });
   $('#view-edit').hidden = true;
   $('#view-delete').hidden = true;
   const style = document.createElement('style');

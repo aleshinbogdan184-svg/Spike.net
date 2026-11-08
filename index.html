@@ -11,7 +11,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Russo+One&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=release35" />
+  <link rel="stylesheet" href="style.css?v=redesign36" />
 </head>
 <body>
   <!-- ====== ФОН ====== -->
@@ -66,6 +66,7 @@
   <div class="category-backdrop" id="category-backdrop" hidden></div>
 
   <!-- ====== ГЛАВНАЯ ====== -->
+  <div class="site-layout"><aside class="layout-sidebar" aria-label="Навигация по сайтy"><div class="side-heading">НАВИГАЦИЯ <span>01</span></div><button type="button" data-layout-tab="feed">⌂ <span>Лента</span></button><button type="button" data-layout-tab="trends">↗ <span>Тренды</span></button><button type="button" data-layout-tab="categories">▦ <span>Категории</span></button><button type="button" data-layout-tab="bookmarks">★ <span>Закладки</span></button><button type="button" data-layout-tab="achievements">✦ <span>Достижения</span></button><button type="button" data-layout-tab="updates">◈ <span>Обновления</span></button><div class="side-note"><strong>SPIKE / 1.0</strong><p>Твои находки заслуживают большего, чем затеряться в чате.</p></div></aside>
   <main class="main">
     <nav class="category-nav" aria-label="Категории приложений"><div class="chip-group" id="chips-type">
             <button class="chip active" data-type="all" type="button"><span class="category-icon">✦</span>Все</button>
@@ -173,10 +174,10 @@
       </div>
       <div class="cat-grid" id="cat-grid"></div>
     </section>
-    <section class="tab-view" id="view-updates" hidden><div class="view-intro"><span class="view-intro-icon">✦</span><div><span class="view-eyebrow">SPIKE / НОВОСТИ</span><h1>Обновления</h1><p>Что нового на сайте.</p></div></div><article class="release-card"><div class="release-head"><span class="release-version">1.0</span><span class="release-tag">РЕЛИЗ</span></div><h2>Spike 1.0 — собираем находки вместе</h2><p>Первая версия Spike: место для ссылок, которые хочется сохранить и обсудить.</p><ul><li>Общая лента видео, игр, музыки и кино с категориями.</li><li>Комментарии, ответы и реакции сообщества.</li><li>Профили с ником и аватаром, закладки и достижения.</li><li>Жалобы и инструменты модерации.</li><li>Пиксельное оформление и адаптация для телефона.</li></ul><small>Некоторые возможности требуют входа и настроенной базы данных.</small></article></section>
+    <section class="tab-view" id="view-updates" hidden><div class="view-intro"><span class="view-intro-icon">✦</span><div><span class="view-eyebrow">SPIKE / НОВОСТИ</span><h1>Обновления</h1><p>Что нового на сайте.</p></div></div><article class="release-card"><div class="release-head"><span class="release-version">1.0</span><span class="release-tag">РЕДИЗАЙН</span></div><h2>Spike 1.0 — новый взгляд на ленту</h2><p>Обновили интерфейс: находить, сохранять и обсуждать любимое стало удобнее.</p><ul><li>Новая навигация и компактная главная.</li><li>Карточки и разделы получили обновлённое оформление.</li><li>Боковые панели помогают ориентироваться на большом экране.</li><li>Обновлена адаптация для телефона и сохранён ретро-стиль.</li></ul><small>Некоторые возможности требуют входа и настроенной базы данных.</small></article></section>
     <section class="tab-view" id="view-bookmarks" hidden><div class="view-intro"><span class="view-intro-icon">★</span><div><h1>Закладки</h1><p>Твои сохранённые находки.</p></div></div><div id="bookmarks-message" class="empty-inner"></div><div class="grid" id="bookmarks-grid"></div></section>
     <section class="tab-view" id="view-achievements" hidden><div class="view-intro"><span class="view-intro-icon">🏆</span><div><h1>Достижения</h1><p>Твои первые шаги в Spike.</p></div></div><div id="achievements-grid" class="cat-grid"></div></section>
-  </main>
+  </main><aside class="layout-aside" aria-label="О Spike"><div class="side-widget"><span class="widget-label">✦ КАК ЭТО РАБОТАЕТ</span><h2>Находка ждёт своих</h2><p>Добавь ссылку, обсуди её и сохрани то, к чему захочешь вернуться.</p><button type="button" class="side-cta" id="side-add">＋ Предложить ссылку</button></div><div class="side-widget side-widget-alt"><span class="widget-label">✧ МАЛЕНЬКАЯ ПОДСКАЗКА</span><p>Не знаешь, что открыть? Попробуй случайную находку в ленте.</p><button type="button" class="side-cta subtle" id="side-random">🎲 Удиви меня</button></div><div class="side-footer">SPIKE.NET <span>✦</span> МЕСТО ДЛЯ НАХОДОК</div></aside></div>
   <footer class="site-footer"><div class="developers"><span>РАЗРАБОТЧИКИ</span><strong>splox <i>by</i> wyoka</strong></div></footer>
 
   <!-- ====== МОДАЛКА МОДЕРАЦИИ ====== -->
@@ -316,6 +317,6 @@
 
   <script src="app.js?v=energy33"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="shared.js?v=hero34"></script>
+  <script src="shared.js?v=redesign36"></script>
 </body>
 </html>
