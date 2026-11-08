@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Russo+One&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=cartoon43" />
+  <link rel="stylesheet" href="style.css?v=social44" />
 </head>
 <body>
   <!-- ====== ФОН ====== -->
@@ -40,6 +40,7 @@
 
     <nav class="tabs" id="tabs">
       <button class="tab active" data-tab="feed" type="button">Лента</button>
+      <button class="tab" data-tab="social" type="button">Посты</button>
       <button class="tab" data-tab="trends" type="button">
         Тренды
         <span class="tab-dot"></span>
@@ -175,6 +176,7 @@
       <div class="cat-grid" id="cat-grid"></div>
     </section>
     <section class="tab-view" id="view-updates" hidden><div class="view-intro"><span class="view-intro-icon">✦</span><div><span class="view-eyebrow">SPIKE / НОВОСТИ</span><h1>Обновления</h1><p>Что нового на сайте.</p></div></div><article class="release-card"><div class="release-head"><span class="release-version">1.0</span><span class="release-tag">РЕДИЗАЙН</span></div><h2>Spike 1.0 — новый взгляд на ленту</h2><p>Обновили интерфейс и инструменты для находок.</p><ul><li><strong>Ретро-редизайн:</strong> пиксельные иконки, цветовые темы и объёмные детали.</li><li><strong>Навигация и лента:</strong> выбор сервиса, компактные карточки и мобильная версия.</li><li><strong>Ссылки:</strong> автоматическое определение категории и возможность добавить карточку вручную.</li><li><strong>Сообщество:</strong> комментарии, ответы, лайки и просмотры карточек.</li><li><strong>Профили:</strong> более десяти рамок и цветов за достижения; выбранное оформление видно в комментариях.</li><li><strong>Находки:</strong> закладки и кнопка случайной публикации.</li><li><strong>Модерация:</strong> жалобы и инструменты владельцев.</li></ul><div class="release-callout">✦ Spike — место для находок, которыми хочется поделиться.</div><small>Некоторые возможности требуют входа и настройки базы. Постоянные достижения ещё подключаются.</small></article></section>
+    <section class="tab-view" id="view-social" hidden><div class="feed-head"><h1 class="section-title">Посты сообщества</h1><button class="btn btn-primary" id="social-create" type="button">＋ Новый пост</button></div><div class="chip-group"><button class="chip active" type="button" data-social-filter="all">Все</button><button class="chip" type="button" data-social-filter="following">Подписки</button></div><p id="social-status" class="field-hint"></p><div id="social-grid" class="social-grid"></div></section>
     <section class="tab-view" id="view-bookmarks" hidden><div class="view-intro"><span class="view-intro-icon">★</span><div><h1>Закладки</h1><p>Твои сохранённые находки.</p></div></div><div id="bookmarks-message" class="empty-inner"></div><div class="grid" id="bookmarks-grid"></div></section>
     <section class="tab-view" id="view-achievements" hidden><div class="view-intro"><span class="view-intro-icon">🏆</span><div><h1>Достижения</h1><p>Твои первые шаги в Spike.</p></div></div><div id="achievements-grid" class="cat-grid"></div></section>
   </main><aside class="layout-aside" aria-label="О Spike"><div class="side-widget"><span class="widget-label">✦ КАК ЭТО РАБОТАЕТ</span><h2>Находка ждёт своих</h2><p>Добавь ссылку, обсуди её и сохрани то, к чему захочешь вернуться.</p><button type="button" class="side-cta" id="side-add">＋ Предложить ссылку</button></div><div class="side-widget side-widget-alt"><span class="widget-label">✧ МАЛЕНЬКАЯ ПОДСКАЗКА</span><p>Не знаешь, что открыть? Попробуй случайную находку в ленте.</p><button type="button" class="side-cta subtle" id="side-random">🎲 Удиви меня</button></div><div class="side-footer">SPIKE.NET <span>✦</span> МЕСТО ДЛЯ НАХОДОК</div></aside></div>
@@ -314,10 +316,12 @@
   <div class="modal-back" id="reports-modal" hidden><div class="modal" role="dialog" aria-modal="true" aria-labelledby="reports-title"><div class="modal-head"><h2 class="modal-title" id="reports-title">Жалобы</h2><button class="btn btn-ghost btn-sm" id="reports-close" type="button">✕</button></div><p class="reports-help">Здесь видны жалобы для модераторов. Отправить новую можно кнопкой «Пожаловаться» сверху.</p><div class="modal-body" id="reports-list"></div></div></div>
   <div class="modal-back" id="report-form-modal" hidden><div class="modal" role="dialog" aria-modal="true" aria-labelledby="report-form-title"><div class="modal-head"><h2 class="modal-title" id="report-form-title">Отправить жалобу</h2><button class="btn btn-ghost btn-sm" id="report-form-close" type="button">✕</button></div><form class="modal-body" id="report-form"><label class="field">Публикация<select class="select" id="report-post" required></select></label><label class="field">Причина<textarea class="textarea" id="report-reason" minlength="3" maxlength="500" required placeholder="Опиши проблему"></textarea></label><p class="field-hint" id="report-form-message" role="status"></p><button class="btn btn-primary" type="submit">Отправить жалобу</button></form></div></div>
   <div class="modal-back" id="public-profile-modal" hidden><div class="modal" role="dialog" aria-modal="true" aria-labelledby="public-profile-title"><div class="modal-head"><h2 class="modal-title" id="public-profile-title">Профиль</h2><button class="btn btn-ghost btn-sm" id="public-profile-close" type="button">✕</button></div><div class="modal-body" id="public-profile-body"></div></div></div>
+  <div class="modal-back" id="social-modal" hidden><div class="modal" role="dialog" aria-modal="true" aria-labelledby="social-title"><div class="modal-head"><h2 class="modal-title" id="social-title">Новый пост</h2><button class="btn btn-ghost" id="social-close" type="button">✕</button></div><form id="social-form" class="modal-body"><label class="field">Заголовок<input class="input" id="social-title-input" maxlength="140" required></label><label class="field">Категория<select class="select" id="social-category"><option value="meme">Мем</option><option value="mod">Мод</option><option value="topic">Обсуждение</option><option value="other">Другое</option></select></label><label class="field">Текст<textarea class="textarea" id="social-body" maxlength="3000"></textarea></label><label class="field">Ссылка на изображение (необязательно)<input class="input" id="social-image" type="url" maxlength="600" placeholder="https://..."></label><p id="social-error" class="field-hint" role="status"></p><button class="btn btn-primary" type="submit">Опубликовать</button></form></div></div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
   <script src="app.js?v=rewards42"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="shared.js?v=cartoon43"></script>
+  <script src="shared.js?v=social44"></script>
+  <script src="social.js?v=social44"></script>
 </body>
 </html>
