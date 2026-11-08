@@ -68,6 +68,26 @@ async function refreshShared() {
   }
 }
 
+function myAchievements() {
+  const comments = items.flatMap(item => item.comments).filter(comment => comment.userId === currentUser?.id);
+  const make = (name, description, value, target, available = true) => ({ name, description, value, target, available, done: available && value >= target });
+  return [
+    make('Первый комментарий', 'Оставь комментарий', comments.length, 1),
+    make('Общительный', 'Оставь 10 комментариев', comments.length, 10),
+    make('Первая закладка', 'Сохрани публикацию', bookmarkIds.size, 1, bookmarkReady),
+    make('Знакомство', 'Создай профиль', currentProfile ? 1 : 0, 1),
+    make('Своя аватарка', 'Добавь аватар', currentProfile?.avatar_path ? 1 : 0, 1),
+    make('Голос сообщества', 'Оставь 3 комментария', comments.length, 3),
+    make('Мастер общения', 'Оставь 25 комментариев', comments.length, 25),
+    make('Коллекционер', 'Сохрани 5 публикаций', bookmarkIds.size, 5, bookmarkReady),
+    make('Хранитель находок', 'Сохрани 10 публикаций', bookmarkIds.size, 10, bookmarkReady),
+    make('Первый лайк', 'Поставь лайк', liked.size, 1, reactionsReady),
+    make('Ценитель', 'Поставь 5 лайков', liked.size, 5, reactionsReady),
+    make('Щедрое сердце', 'Поставь 10 лайков', liked.size, 10, reactionsReady),
+    make('В диалоге', 'Ответь на комментарий', comments.filter(comment => comment.parentId).length, 1),
+  ];
+}
+
 function renderExtras() {
   const grid = $('#bookmarks-grid'), message = $('#bookmarks-message');
   if (!grid || !message) return;
@@ -81,9 +101,7 @@ function renderExtras() {
   });
   const achievements = $('#achievements-grid');
   if (!currentUser) { achievements.innerHTML = '<p>Войди, чтобы увидеть достижения.</p>'; return; }
-  const mine = items.flatMap(item => item.comments).filter(comment => comment.userId === currentUser.id).length;
-  const badges = [ ['Первый комментарий', 'Оставь комментарий под публикацией', mine >= 1], ['Общительный', 'Оставь 10 комментариев', mine >= 10], ['Первая закладка', 'Сохрани публикацию', bookmarkReady && bookmarkIds.size >= 1] ];
-  achievements.innerHTML = badges.map(([title, description, done]) => `<div class="cat-card achievement"><span>${done ? '🏆' : '🔒'}</span><h3>${escapeHTML(title)}</h3><p>${escapeHTML(description)}</p><small>${done ? 'Открыто' : 'Пока закрыто'}</small></div>`).join('');
+  achievements.innerHTML = myAchievements().map(b => `<div class="cat-card achievement"><span>${b.done ? '🏆' : '🔒'}</span><h3>${escapeHTML(b.name)}</h3><p>${escapeHTML(b.description)}</p><small>${!b.available ? 'Данные недоступны' : b.done ? 'Открыто' : `${Math.min(b.value, b.target)} / ${b.target}`}</small></div>`).join('');
 }
 
 async function loadBookmarks() {
@@ -338,11 +356,7 @@ document.addEventListener('DOMContentLoaded', () => {
     $('#profile-message').textContent = '';
     const preview = $('#profile-preview'); preview.textContent = '';
     if (currentProfile?.avatar_path) { const img = document.createElement('img'); img.src = avatarUrl(currentProfile.avatar_path) + '?v=' + Date.now(); img.alt = ''; preview.appendChild(img); } else preview.textContent = '✦';
-    const count = items.flatMap(item => item.comments).filter(comment => comment.userId === currentUser?.id).length;
-    const badges = [];
-    if (count >= 1) badges.push('🏆 Первый комментарий');
-    if (count >= 10) badges.push('🏆 Общительный');
-    if (bookmarkReady && bookmarkIds.size) badges.push('🏆 Первая закладка');
+    const badges = myAchievements().filter(b => b.done).map(b => `🏆 ${b.name}`);
     $('#profile-achievements').textContent = badges.length ? badges.join(' · ') : 'Пока нет открытых достижений.';
     profileModal.hidden = false;
   }
