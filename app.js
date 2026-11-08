@@ -426,9 +426,9 @@ function cardHTML(it, index) {
 }
 
 function trendsHTML() {
-  const top = [...items].sort((a, b) => b.likes - a.likes || b.views - a.views).slice(0, 12);
+  const top = items.filter((it) => it.createdAt >= Date.now() - 7 * 86400000).sort((a, b) => b.likes - a.likes || b.views - a.views).slice(0, 12);
   if (!top.length) {
-    return `<div class="empty-inner" style="grid-column:1/-1;"><p>Пока нет видео — добавь ссылку</p></div>`;
+    return `<div class="empty-inner" style="grid-column:1/-1;"><p>За последние семь дней публикаций пока нет</p></div>`;
   }
   return top.map((it, i) => `
     <article class="trend-item" data-open="${it.id}" style="animation-delay:${i * 30}ms">
@@ -794,7 +794,7 @@ function openView(id) {
       </div>
       <section class="comments">
         <h3>Комментарии · ${(it.comments || []).length}</h3>
-        <div class="comment-list">${(it.comments || []).map((c) => `<div class="comment ${c.parentId ? 'comment-reply' : ''}">${c.avatar ? `<img class="comment-avatar" src="${escapeHTML(c.avatar)}" alt="">` : '<span class="comment-avatar comment-avatar-fallback">✦</span>'}<strong class="comment-author ${c.developer ? 'developer-name' : ''}">${escapeHTML(c.author || 'Гость')}</strong>${c.developer ? ' <span class="developer-badge">✦ РАЗРАБОТЧИК</span>' : ''}<br>${c.parentId ? `<small>↳ Ответ: ${escapeHTML((it.comments || []).find(parent => parent.id === c.parentId)?.author || 'комментарий')}</small><br>` : ''}${escapeHTML(c.text)}${!c.parentId && c.id ? `<br><button type="button" class="card-foot-btn" data-reply="${escapeHTML(c.id)}" data-author="${escapeHTML(c.author || 'Гость')}">Ответить</button>` : ''}</div>`).join("") || '<p class="comment-empty">Пока нет комментариев. Начни обсуждение!</p>'}</div>
+        <div class="comment-list">${(it.comments || []).map((c) => `<div class="comment ${c.parentId ? 'comment-reply' : ''}">${c.avatar ? `<img class="comment-avatar" src="${escapeHTML(c.avatar)}" alt="">` : '<span class="comment-avatar comment-avatar-fallback">✦</span>'}${c.userId ? `<button type="button" class="profile-link ${c.developer ? 'developer-name' : ''}" data-user-profile="${escapeHTML(c.userId)}">${escapeHTML(c.author || 'Гость')}</button>` : `<strong class="comment-author">${escapeHTML(c.author || 'Гость')}</strong>`}${c.developer ? ' <span class="developer-badge">✦ РАЗРАБОТЧИК</span>' : ''}<br>${c.parentId ? `<small>↳ Ответ: ${escapeHTML((it.comments || []).find(parent => parent.id === c.parentId)?.author || 'комментарий')}</small><br>` : ''}${escapeHTML(c.text)}${!c.parentId && c.id ? `<br><button type="button" class="card-foot-btn" data-reply="${escapeHTML(c.id)}" data-author="${escapeHTML(c.author || 'Гость')}">Ответить</button>` : ''}</div>`).join("") || '<p class="comment-empty">Пока нет комментариев. Начни обсуждение!</p>'}</div>
         <form id="comment-form" class="comment-form"><input class="input" name="comment" maxlength="500" placeholder="Написать комментарий…" required><button class="btn btn-primary" type="submit">Отправить</button></form>
       </section>
     </div>`;
