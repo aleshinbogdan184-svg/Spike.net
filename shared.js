@@ -148,6 +148,13 @@ document.addEventListener('DOMContentLoaded', () => {
     music: '<svg viewBox="0 0 40 40" aria-hidden="true"><path fill="#ffd329" d="M20 1l2.6 12L30 3l-3 12 12-5-9 9 10 3-12 2 7 11-11-7-4 12-3-12-11 7 7-11-12-2 11-3L4 10l12 5L12 3l7 10z"/></svg>',
     film: '<svg viewBox="0 0 40 40" aria-hidden="true"><rect width="40" height="40" rx="10" fill="#111"/><path fill="#ff7200" d="M8 5h6v13L23 5h8L19 19l18-9-14 12 16 2-16 2 14 9-18-6 12 9h-8l-9-12v12H8z"/></svg>'
   };
+  // Низкое разрешение и прямоугольные пиксели вместо сглаженных логотипов.
+  const pixel = (content) => `<svg viewBox="0 0 16 16" shape-rendering="crispEdges" aria-hidden="true">${content}</svg>`;
+  icons.youtube = pixel('<path fill="#09090e" d="M2 3h12v1h1v8h-1v1H2v-1H1V4h1z"/><path fill="#fff" d="M6 5h2v1h2v1h2v2h-2v1H8v1H6z"/>');
+  icons.twitch = pixel('<path fill="#09090e" d="M2 1h13v10h-2v2h-3l-3 3v-3H2z"/><path fill="#fff" d="M4 3h9v7h-2v1H8l-2 2v-2H4z"/><path fill="#09090e" d="M7 5h1v4H7zm3 0h1v4h-1z"/>');
+  icons.game = pixel('<path fill="#09090e" d="M4 1h8v1h2v2h1v8h-1v2h-2v1H4v-1H2v-2H1V4h1V2h2z"/><path fill="#fff" d="M10 3h3v1h1v3h-1v1h-3V7H9V4h1zm0 1v3h3V4zM2 9h3v1h2v1h2V9h2v1h1v3h-1v1H8v-1H7v-1H5v-1H3v-1H2z"/>');
+  icons.music = pixel('<path fill="#ffd32c" stroke="#09090e" stroke-width=".7" d="M7 0h2v5l3-3 1 1-2 3 5-1v2l-4 1 4 2-1 2-4-2 2 4-2 1-3-4-1 5H6l1-5-4 3-1-2 3-3-5 1V8l5-1-4-2 1-2 4 2z"/>');
+  icons.film = pixel('<path fill="#08080c" d="M4 1h8v1h2v2h1v8h-1v2h-2v1H4v-1H2v-2H1V4h1V2h2z"/><path fill="#ff7900" d="M4 3h2v4h1V6h1V5h1V4h1V3h2v1h-1v1h-1v1H9v1h4v2H9v1h1v1h1v1h1v1h-2v-1H9v-1H8v-1H7V9H6v4H4z"/><path fill="#ffcc16" d="M11 11h1v1h1v1h-2z"/>');
   const themes = {
     all: ['Собирай <span class="gradient-anim">тренды</span> из ссылок', 'Делись видео, играми, музыкой и фильмами. Всё интересное — в одной ленте.'],
     youtube: ['Видео <span class="gradient-anim">YouTube</span>', 'Делись любимыми видео, находи новых авторов и обсуждай интересное с друзьями.'],

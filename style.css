@@ -1193,3 +1193,32 @@ body { --bg: #090818; letter-spacing: .01em; }
 .like-btn { border: 1px solid #ffffff1c; background: #ffffff08; box-shadow: 2px 3px 0 #0008, inset 0 1px #ffffff20; }
 .theme-art-orbit { border-radius: 2px; box-shadow: 8px 8px 0 rgba(var(--theme-rgb),.12), inset 4px 4px 0 rgba(var(--theme-rgb),.08); }
 .theme-art-icon { filter: drop-shadow(5px 6px 0 rgba(var(--theme-rgb),.3)) drop-shadow(0 0 22px rgba(var(--theme-rgb),.65)); }
+
+/* PIXEL WORLD — объёмный игровой интерфейс */
+:root { --surface: rgba(25,18,52,.9); --border: #76649d; --text: #f8efff; --muted: #c2b5da; --muted-2: #a999c6; }
+body { background: #100821; font-family: 'Russo One', sans-serif; }
+.bg { background: radial-gradient(circle at 70% 8%,rgba(var(--theme-rgb),.32),transparent 43%),linear-gradient(160deg,#211044,#0e0b1d 65%); }
+.bg::before { content: ''; position: absolute; inset: 0; opacity: .35; background-image: linear-gradient(90deg,#9b6dff18 50%,transparent 50%),linear-gradient(#b28aff12 50%,transparent 50%); background-size: 48px 48px; }
+.topbar { border-bottom: 3px solid #8d5ddd; background: rgba(18,11,33,.96); box-shadow: 0 5px 0 #05020d,0 10px 24px #0008; }
+.hero, .controls, .video-card, .empty-inner, .modal, .cat-card, .trend-item, .developers { border: 3px solid #8e72c3; border-radius: 2px; background-color: rgba(27,18,50,.94); box-shadow: 5px 5px 0 #08040f,8px 8px 0 rgba(var(--theme-rgb),.28), inset 3px 3px 0 #ffffff0d; }
+.hero { background-image: linear-gradient(120deg,rgba(var(--theme-rgb),.26),rgba(22,13,40,.96)); }
+.hero-title, .section-title, .modal-title, .sidebar-brand { font-family: 'Press Start 2P','Russo One',sans-serif; line-height: 1.5; }
+.hero-title { font-size: clamp(20px,2.6vw,34px); text-shadow: 4px 4px 0 #21103c, 7px 7px 0 rgba(var(--theme-rgb),.4); }
+.section-title, .modal-title { font-size: 13px; }
+.btn, .tab, .chip, .view-action, .card-foot-btn, .icon-btn, .input, .select, .textarea, .addbar, .category-dropdown, .count-pill { border-radius: 2px; border: 2px solid #8170a9; box-shadow: 3px 3px 0 #05030b, inset 2px 2px 0 #ffffff18; }
+.btn:hover, .tab:hover, .chip:hover, .view-action:hover { transform: translate(-2px,-2px); box-shadow: 5px 5px 0 #05030b, 0 0 18px rgba(var(--theme-rgb),.45); }
+.btn:active, .tab:active, .chip:active { transform: translate(2px,2px); box-shadow: 1px 1px 0 #05030b; }
+.btn-primary, .tab.active { background: linear-gradient(135deg,rgb(var(--theme-rgb)),#6339b8); color: #fff; }
+.category-dropdown { padding: 8px; background: #1c1231; border: 3px solid #a783e9; box-shadow: 6px 6px 0 #08030e; }
+.category-dropdown #chips-type .chip { border: 2px solid transparent; border-radius: 0; box-shadow: none; }
+.category-dropdown #chips-type .chip:hover { border-color: #a783e9; background: #ffffff17; transform: translateX(3px); }
+.category-icon { border-radius: 0; width: 36px; height: 36px; padding: 2px; background: #8e62e0 !important; box-shadow: 3px 3px 0 #08030e; }
+.category-icon svg, .theme-art-icon svg { shape-rendering: crispEdges; image-rendering: pixelated; animation: pixelBob 2.6s steps(4,end) infinite alternate; }
+.category-dropdown .chip:nth-child(2) svg { animation-delay: -.4s; }.category-dropdown .chip:nth-child(3) svg { animation-delay: -.8s; }.category-dropdown .chip:nth-child(4) svg { animation-delay: -1.2s; }.category-dropdown .chip:nth-child(5) svg { animation-delay: -1.6s; }.category-dropdown .chip:nth-child(6) svg { animation-delay: -2s; }
+@keyframes pixelBob { from { transform: translateY(0); } to { transform: translateY(-4px); } }
+.theme-art-icon svg { filter: drop-shadow(6px 6px 0 #09040e) drop-shadow(0 0 14px rgba(var(--theme-rgb),.8)); }
+.thumb, .thumb-img-wrap, .view-thumb { border-radius: 0; }.video-card:hover { transform: translate(-3px,-4px); box-shadow: 8px 9px 0 #08040f,11px 12px 0 rgba(var(--theme-rgb),.35); }
+.logo-icon { border-radius: 0; border: 2px solid #d2adff; box-shadow: 3px 3px 0 #07020d; }.logo-icon img { image-rendering: pixelated; }
+.card-title, .hero-sub, .input, .textarea, .comment { line-height: 1.55; }
+@media (max-width: 640px) { .hero-title { font-size: 19px; }.hero { padding: 22px 18px; }.section-title { font-size: 11px; } }
+@media (prefers-reduced-motion: reduce) { .category-icon svg, .theme-art-icon svg { animation: none; } }
