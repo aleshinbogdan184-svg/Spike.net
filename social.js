@@ -3,6 +3,7 @@ let socialFilter = 'all';
 let socialRows = [];
 let followRows = [];
 let socialProfiles = new Map();
+let socialLikes = [], socialReposts = [];
 
 async function loadSocial() {
   const status = $('#social-status');
@@ -14,6 +15,9 @@ async function loadSocial() {
       sharedRequest('/spike_profiles?select=user_id,nickname,avatar_path&limit=10000'),
     ]);
     socialRows = posts; followRows = follows; socialProfiles = new Map(profiles.map(profile => [profile.user_id, profile]));
+    const reactions = await Promise.allSettled([sharedRequest('/spike_social_likes?select=post_id,user_id&limit=10000'), sharedRequest('/spike_social_reposts?select=post_id,user_id&limit=10000')]);
+    socialLikes = reactions[0].status === 'fulfilled' ? reactions[0].value : [];
+    socialReposts = reactions[1].status === 'fulfilled' ? reactions[1].value : [];
     renderSocial();
   } catch (error) { console.error('Посты недоступны:', error); status.textContent = 'Посты пока недоступны: проверь настройки базы.'; }
 }
@@ -30,7 +34,8 @@ function renderSocial() {
     const image = /^https?:\/\//i.test(row.image_url) ? row.image_url : '';
     const owner = currentUser && (currentUser.id === row.author_id || SPIKE_DEVELOPERS.has(currentUser.id));
     const isFollowing = following.has(row.author_id);
-    return `<article class="social-card">${image ? `<button class="social-cover-button" type="button" data-social-open="${escapeHTML(row.id)}"><img class="social-image" src="${escapeHTML(image)}" alt="Открыть пост" loading="lazy" referrerpolicy="no-referrer" onerror="this.hidden=true"></button>` : '<div class="social-placeholder">✦</div>'}<div class="social-body"><div class="social-meta"><button class="profile-link" type="button" data-user-profile="${escapeHTML(row.author_id)}">${escapeHTML(profile?.nickname || 'Пользователь')}</button><span>${escapeHTML(labels[row.category] || 'Пост')}</span></div><h2>${escapeHTML(row.title)}</h2><p>${escapeHTML(row.body)}</p><div class="social-actions"><button class="btn btn-primary" type="button" data-social-open="${escapeHTML(row.id)}">Открыть · 💬</button>${currentUser && currentUser.id !== row.author_id ? `<button class="btn btn-ghost" type="button" data-follow="${escapeHTML(row.author_id)}">${isFollowing ? '✓ Подписан' : '＋ Подписаться'}</button>` : ''}${owner ? `<button class="btn btn-ghost btn-danger" type="button" data-social-delete="${escapeHTML(row.id)}">Удалить</button>` : ''}<small>${timeAgo(new Date(row.created_at).getTime())}</small></div></div></article>`;
+    const likes = socialLikes.filter(x => x.post_id === row.id), reposts = socialReposts.filter(x => x.post_id === row.id);
+    return `<article class="social-card">${image ? `<button class="social-cover-button" type="button" data-social-open="${escapeHTML(row.id)}"><img class="social-image" src="${escapeHTML(image)}" alt="Открыть пост" loading="lazy" referrerpolicy="no-referrer" onerror="this.hidden=true"></button>` : '<div class="social-placeholder">✦</div>'}<div class="social-body"><div class="social-meta"><button class="profile-link" type="button" data-user-profile="${escapeHTML(row.author_id)}">${escapeHTML(profile?.nickname || 'Пользователь')}</button><span>${escapeHTML(labels[row.category] || 'Пост')}</span></div><h2>${escapeHTML(row.title)}</h2><p>${escapeHTML(row.body)}</p><div class="social-actions"><button class="btn btn-primary" type="button" data-social-open="${escapeHTML(row.id)}">Открыть · 💬</button><button class="btn btn-ghost" type="button" data-social-like="${escapeHTML(row.id)}">${likes.some(x => x.user_id === currentUser?.id) ? '♥' : '♡'} ${likes.length}</button><button class="btn btn-ghost" type="button" data-social-repost="${escapeHTML(row.id)}">${reposts.some(x => x.user_id === currentUser?.id) ? '✓' : '↻'} ${reposts.length}</button>${currentUser && currentUser.id !== row.author_id ? `<button class="btn btn-ghost" type="button" data-follow="${escapeHTML(row.author_id)}">${isFollowing ? '✓ Подписан' : '＋ Подписаться'}</button>` : ''}${owner ? `<button class="btn btn-ghost btn-danger" type="button" data-social-delete="${escapeHTML(row.id)}">Удалить</button>` : ''}<small>${timeAgo(new Date(row.created_at).getTime())}</small></div></div></article>`;
   }).join('');
 }
 
@@ -61,10 +66,16 @@ async function openSocialPost(id) {
 
 async function addSocialProfilePosts(userId, container) {
   try {
-    const rows = await sharedRequest(`/spike_social_posts?author_id=eq.${encodeURIComponent(userId)}&select=id,title,body,image_url,created_at&order=created_at.desc&limit=50`);
+    const [rows, repostRows] = await Promise.all([
+      sharedRequest(`/spike_social_posts?author_id=eq.${encodeURIComponent(userId)}&select=id,title,body,image_url,created_at&order=created_at.desc&limit=50`),
+      sharedRequest(`/spike_social_reposts?user_id=eq.${encodeURIComponent(userId)}&select=post_id,created_at&order=created_at.desc&limit=50`).catch(() => [])
+    ]);
     if (!container.isConnected) return;
     const section = document.createElement('section'); section.className = 'public-profile-section';
-    section.innerHTML = `<strong>Посты автора</strong>${rows.length ? rows.map(row => `<button class="btn btn-ghost profile-social-post" type="button" data-profile-social="${escapeHTML(row.id)}">${escapeHTML(row.title)}</button>`).join('') : '<p>Постов пока нет.</p>'}`;
+    const ids = repostRows.map(row => row.post_id);
+    const repostPosts = ids.length ? await sharedRequest(`/spike_social_posts?id=in.(${ids.map(encodeURIComponent).join(',')})&select=id,title&limit=50`) : [];
+    if (!container.isConnected) return;
+    section.innerHTML = `<strong>Посты автора</strong>${rows.length ? rows.map(row => `<button class="btn btn-ghost profile-social-post" type="button" data-profile-social="${escapeHTML(row.id)}">${escapeHTML(row.title)}</button>`).join('') : '<p>Постов пока нет.</p>'}<strong>Репосты</strong>${repostPosts.length ? repostPosts.map(row => `<button class="btn btn-ghost profile-social-post" type="button" data-profile-social="${escapeHTML(row.id)}">↻ ${escapeHTML(row.title)}</button>`).join('') : '<p>Репостов пока нет.</p>'}`;
     container.appendChild(section);
     section.addEventListener('click', async e => { const button = e.target.closest('[data-profile-social]'); if (!button) return; await loadSocial(); $('#public-profile-modal').hidden = true; openSocialPost(button.dataset.profileSocial); });
   } catch { /* Профиль остаётся доступен, даже если посты недоступны. */ }
@@ -72,7 +83,7 @@ async function addSocialProfilePosts(userId, container) {
 
 document.addEventListener('DOMContentLoaded', () => {
   const updates = $('#view-updates .release-card ul');
-  if (updates) { const item = document.createElement('li'); item.innerHTML = '<strong>Посты и подписки:</strong> новый дизайн сообщества, загрузка изображений с устройства, подписки через профиль и лента постов авторов.'; updates.appendChild(item); }
+  if (updates) { const item = document.createElement('li'); item.innerHTML = '<strong>Посты и профили:</strong> комментарии, лайки, репосты, подписки и раздел репостов в профиле.'; updates.appendChild(item); }
   const sidebar = $('.layout-sidebar');
   const sideButton = document.createElement('button'); sideButton.type = 'button'; sideButton.innerHTML = '▤ <span>Посты</span>';
   sideButton.addEventListener('click', () => { $('#tabs [data-tab="social"]').click(); window.scrollTo({ top: 0, behavior: 'smooth' }); });
@@ -101,6 +112,15 @@ document.addEventListener('DOMContentLoaded', () => {
     $('#social-modal').hidden = true; await loadSocial(); toast('Пост опубликован');
   });
   $('#social-grid').addEventListener('click', async e => {
+    const reaction = e.target.closest('[data-social-like], [data-social-repost]');
+    if (reaction) {
+      if (!currentUser || !authClient) { toast('Войди, чтобы оценивать и делать репосты', true); return; }
+      const repost = reaction.hasAttribute('data-social-repost'); const id = repost ? reaction.dataset.socialRepost : reaction.dataset.socialLike;
+      const collection = repost ? socialReposts : socialLikes, table = repost ? 'spike_social_reposts' : 'spike_social_likes';
+      const exists = collection.some(x => x.post_id === id && x.user_id === currentUser.id); reaction.disabled = true;
+      const query = authClient.from(table); const result = exists ? await query.delete().eq('post_id', id).eq('user_id', currentUser.id) : await query.insert({ post_id: id, user_id: currentUser.id });
+      if (result.error) { reaction.disabled = false; toast('Не удалось сохранить действие', true); } else await loadSocial(); return;
+    }
     const open = e.target.closest('[data-social-open]');
     if (open) { openSocialPost(open.dataset.socialOpen); return; }
     const follow = e.target.closest('[data-follow]');
