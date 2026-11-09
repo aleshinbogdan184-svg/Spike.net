@@ -1783,3 +1783,51 @@ body[data-view]:not([data-view="feed"]) .feed-masthead, body[data-view]:not([dat
 .comment-actions .card-foot-btn { min-height: 30px; }
 .comment-empty { padding: 16px 0; color: #b9a9c4; font: 13px/1.5 Inter, sans-serif; }
 @media (max-width: 560px) { .comments .comment-reply { margin-left: 24px; } .comments .comment-form .btn { margin-left: auto; } }
+
+/* Profile rewards use bounded, scrollable native lists instead of a huge popup. */
+.profile-customize select[size] { height: 156px; min-height: 156px; padding: 5px; overflow-y: auto; background: #100d17; font: 13px/1.4 Inter, sans-serif; }
+.profile-customize select[size] option { padding: 9px 8px; color: #eee7f5; background: #181320; }
+.profile-customize select[size] option:disabled { color: #81758e; }
+.profile-customize select[size] option:checked { color: #17210c; background: #c2ee79; }
+/* Mobile navigation wraps so every section stays visible without sideways scrolling. */
+@media (max-width: 760px) {
+  .topbar { position: relative; display: flex; flex-wrap: wrap; align-items: center; padding: 10px 12px; }
+  .topbar .logo-menu { flex: 0 0 auto; }
+  .topbar-right { flex: 1 1 180px; min-width: 0; flex-wrap: wrap; justify-content: flex-end; }
+  .topbar-right .btn { min-height: 38px; }
+  .topbar .add-link-trigger { font-size: 11px; }
+  .topbar .tabs { order: 2; display: grid !important; grid-template-columns: repeat(3, minmax(0, 1fr)); width: 100%; overflow: visible; gap: 6px; padding: 8px 0 0; }
+  .topbar .tab { min-width: 0; width: 100%; padding: 8px 4px; font-size: 10px; text-align: center; }
+  .topbar .tab-compact { font-size: 15px; }
+  .site-layout { padding: 16px 12px 0; }
+  .feed-masthead h1 { overflow-wrap: anywhere; }
+  #chips-type { flex-wrap: wrap; overflow: visible; width: 100%; }
+  #chips-type .chip { flex: 1 1 120px; justify-content: flex-start; }
+  .controls { grid-template-columns: minmax(0, 1fr); }
+  .controls .control-group, .controls .control-search { grid-column: 1 / -1; }
+  .feed-head { flex-wrap: wrap; }
+  .feed-head #random-post { margin-left: 0; }
+  .modal-back { align-items: flex-start; padding: 8px; }
+  .modal { width: 100%; max-height: calc(100dvh - 16px); }
+  #profile-form { padding: 16px; }
+  .profile-customize { grid-template-columns: 1fr; }
+  .profile-customize select[size] { height: 140px; min-height: 140px; }
+}
+
+/* Keep profile sections at their natural height inside the scrolling modal. */
+#profile-modal .modal { min-height: 0; }
+#profile-form { flex: 1 1 auto; min-height: 0; overflow-y: auto; overflow-x: hidden; }
+#profile-form > * { flex: 0 0 auto; min-width: 0; }
+#profile-form .own-profile-header { min-width: 0; }
+#profile-form .own-profile-stats { min-width: 0; overflow-wrap: anywhere; }
+#profile-form .own-profile-tabs { flex-wrap: wrap; overflow: visible; gap: 8px; }
+#profile-form .own-profile-tabs .chip { min-height: 38px; padding: 8px 12px; line-height: 1.3; }
+#profile-form .own-profile-content { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); grid-auto-rows: auto; align-content: start; }
+#profile-form .profile-post-tile { display: block; width: 100%; min-width: 0; height: auto; aspect-ratio: 3 / 4; }
+#profile-form .profile-post-tile img { display: block; }
+#profile-form .profile-edit { min-width: 0; }
+@media (max-width: 500px) {
+  #profile-form .own-profile-tabs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  #profile-form .own-profile-tabs .chip { width: 100%; min-width: 0; padding: 8px 4px; font-size: 10px; }
+  #profile-form .own-profile-content { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}

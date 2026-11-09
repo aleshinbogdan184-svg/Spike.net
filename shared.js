@@ -161,20 +161,24 @@ addFromLink = async function () {
   if (button.disabled) return;
   button.disabled = true;
   try {
-    let title = '';
+    let title = '', poster = '';
     if (source.ytId) {
       const meta = await Promise.race([youtubeMeta(source.ytId), new Promise(resolve => setTimeout(() => resolve({}), 2500))]);
       title = meta.title || '';
     }
+    if (source.source === 'Spotify' && !/^(?:https?:\/\/)?(?:www\.)?spotify\.link\//i.test(url)) {
+      const meta = await Promise.race([spotifyMeta(url), new Promise(resolve => setTimeout(() => resolve({}), 2500))]);
+      title = meta.title || ''; poster = meta.poster || '';
+    }
     if (!title && source.type === 'game') title = slugTitle(url);
     if (!title) title = ({ youtube: 'Видео YouTube', twitch: 'Клип или трансляция Twitch', game: 'Игра Steam', music: `Музыка · ${source.source}`, film: 'Кино · Кинопоиск' })[source.type] || 'Публикация';
-    await sharedRequest('/spike_posts', { method: 'POST', headers: await postHeaders(), body: JSON.stringify({ title: title.slice(0, 140), url, poster: '', description: '' }) });
+    await sharedRequest('/spike_posts', { method: 'POST', headers: await postHeaders(), body: JSON.stringify({ title: title.slice(0, 140), url, poster, description: '' }) });
     if (input.value.trim() === raw) input.value = '';
     await refreshShared();
     const sourceChip = $(`#chips-type [data-type="${source.type}"]`);
     if (sourceChip) sourceChip.click(); else { switchTab('feed'); renderFeed(); }
     toast(`Добавлено: ${source.source}`);
-  } catch (error) { console.error('Ошибка добавления:', error); toast('Не удалось добавить ссылку. Проверь настройки базы и подключение.', true); }
+  } catch (error) { console.error('Ошибка добавления:', error); toast(source.source === 'Spotify' && /spike_posts_url_check/i.test(error.message) ? 'Spotify не разрешён в базе. Выполни music-twitch-update.sql в Supabase.' : 'Не удалось добавить ссылку. Проверь настройки базы и подключение.', true); }
   finally { button.disabled = false; }
 };
 

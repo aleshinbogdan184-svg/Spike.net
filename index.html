@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Russo+One&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=comments65" />
+  <link rel="stylesheet" href="style.css?v=mobile67" />
 </head>
 <body>
   <!-- ====== ФОН ====== -->
@@ -315,7 +315,7 @@
       <div class="own-profile-tabs"><button type="button" class="chip active" data-own-tab="posts">Публикации</button><button type="button" class="chip" data-own-tab="reposts">Репосты</button><button type="button" class="chip" data-own-tab="likes">Лайки</button></div><div id="own-profile-content" class="own-profile-content">Загрузка…</div><details class="profile-edit"><summary>Настроить профиль</summary>
       <label class="field">Уникальный ник <input class="input" id="profile-nickname" minlength="2" maxlength="24" required></label>
       <label class="field">Аватар: PNG, JPEG или WebP до 1 МБ <input class="input" type="file" id="profile-avatar" accept="image/png,image/jpeg,image/webp"></label>
-      <div class="profile-customize"><label class="field">Рамка<select class="select" id="profile-frame"><option value="classic">Классика</option><option value="spark">Искра — первый ответ</option><option value="collector">Коллекционер — 10 закладок</option><option value="legend">Легенда — 25 комментариев</option><option value="comet">Комета — 3 комментария</option><option value="neon">Неон — 5 лайков</option><option value="orbit">Орбита — 5 закладок</option><option value="heart">Сердце — 10 лайков</option><option value="voice">Голос — 10 комментариев</option><option value="starfish">Морская звезда — первый ответ</option><option value="sponge">Морской пузырь — 5 закладок</option><option value="banana">Банановый заряд — 10 лайков</option></select></label><label class="field">Цвет<select class="select" id="profile-accent"><option value="violet">Фиолетовый</option><option value="cyan">Лазурный — 5 лайков</option><option value="gold">Золотой — 5 закладок</option><option value="rose">Розовый — первый ответ</option><option value="lime">Лайм — 10 закладок</option><option value="coral">Коралловый — 10 комментариев</option><option value="ice">Ледяной — 10 лайков</option></select></label></div><p class="field-hint">Награды открываются за достижения и остаются с тобой.</p>
+      <div class="profile-customize"><label class="field">Рамка<select class="select" id="profile-frame" size="4"><option value="classic">Классика</option><option value="spark">Искра — первый ответ</option><option value="collector">Коллекционер — 10 закладок</option><option value="legend">Легенда — 25 комментариев</option><option value="comet">Комета — 3 комментария</option><option value="neon">Неон — 5 лайков</option><option value="orbit">Орбита — 5 закладок</option><option value="heart">Сердце — 10 лайков</option><option value="voice">Голос — 10 комментариев</option><option value="starfish">Морская звезда — первый ответ</option><option value="sponge">Морской пузырь — 5 закладок</option><option value="banana">Банановый заряд — 10 лайков</option></select></label><label class="field">Цвет<select class="select" id="profile-accent" size="4"><option value="violet">Фиолетовый</option><option value="cyan">Лазурный — 5 лайков</option><option value="gold">Золотой — 5 закладок</option><option value="rose">Розовый — первый ответ</option><option value="lime">Лайм — 10 закладок</option><option value="coral">Коралловый — 10 комментариев</option><option value="ice">Ледяной — 10 лайков</option></select></label></div><p class="field-hint">Выбери рамку и цвет в списках. Закрытые награды откроются за достижения.</p>
       <div><strong>Мои достижения</strong><div id="profile-achievements" class="profile-achievements"></div></div>
       <p class="auth-message" id="profile-message" role="status"></p><div class="modal-actions"><button class="btn btn-ghost btn-danger" id="profile-signout" type="button">Выйти из аккаунта</button><button class="btn btn-primary" type="submit">Сохранить профиль</button></div></details>
     </form></div></div>
@@ -326,9 +326,9 @@
   <div class="modal-back" id="social-view-modal" hidden><div class="modal social-view-modal" role="dialog" aria-modal="true" aria-labelledby="social-view-title"><div class="modal-head"><h2 class="modal-title" id="social-view-title">Публикация</h2><button class="btn btn-ghost" id="social-view-close" type="button" aria-label="Закрыть">✕</button></div><div class="modal-body" id="social-view-body"></div></div></div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-  <script src="app.js?v=comments65"></script>
+  <script src="app.js?v=mobile67"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="shared.js?v=delete66"></script>
+  <script src="shared.js?v=mobile67"></script>
   <script src="social.js?v=delete66"></script>
 </body>
 </html>

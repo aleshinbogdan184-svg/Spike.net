@@ -557,7 +557,7 @@ async function spotifyMeta(url) {
     if (!res.ok) return {};
     const data = await res.json();
     const m = /Spotify Embed:\s*(.+?)"?\s*$/.exec(data.title || "");
-    return { title: (m ? m[1] : data.title || "").trim() };
+    return { title: (m ? m[1] : data.title || "").trim(), poster: /^https:\/\//i.test(data.thumbnail_url || '') ? data.thumbnail_url : '' };
   } catch { return {}; }
 }
 
