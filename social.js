@@ -66,16 +66,19 @@ async function openSocialPost(id) {
 
 async function addSocialProfilePosts(userId, container) {
   try {
-    const [rows, repostRows] = await Promise.all([
+    const [rows, repostRows, likeRows] = await Promise.all([
       sharedRequest(`/spike_social_posts?author_id=eq.${encodeURIComponent(userId)}&select=id,title,body,image_url,created_at&order=created_at.desc&limit=50`),
-      sharedRequest(`/spike_social_reposts?user_id=eq.${encodeURIComponent(userId)}&select=post_id,created_at&order=created_at.desc&limit=50`).catch(() => [])
+      sharedRequest(`/spike_social_reposts?user_id=eq.${encodeURIComponent(userId)}&select=post_id,created_at&order=created_at.desc&limit=50`).catch(() => []),
+      sharedRequest(`/spike_social_likes?user_id=eq.${encodeURIComponent(userId)}&select=post_id,created_at&order=created_at.desc&limit=50`).catch(() => [])
     ]);
     if (!container.isConnected) return;
     const section = document.createElement('section'); section.className = 'public-profile-section';
     const ids = repostRows.map(row => row.post_id);
     const repostPosts = ids.length ? await sharedRequest(`/spike_social_posts?id=in.(${ids.map(encodeURIComponent).join(',')})&select=id,title&limit=50`) : [];
+    const likeIds = likeRows.map(row => row.post_id);
+    const likedPosts = likeIds.length ? await sharedRequest(`/spike_social_posts?id=in.(${likeIds.map(encodeURIComponent).join(',')})&select=id,title&limit=50`) : [];
     if (!container.isConnected) return;
-    section.innerHTML = `<strong>Посты автора</strong>${rows.length ? rows.map(row => `<button class="btn btn-ghost profile-social-post" type="button" data-profile-social="${escapeHTML(row.id)}">${escapeHTML(row.title)}</button>`).join('') : '<p>Постов пока нет.</p>'}<strong>Репосты</strong>${repostPosts.length ? repostPosts.map(row => `<button class="btn btn-ghost profile-social-post" type="button" data-profile-social="${escapeHTML(row.id)}">↻ ${escapeHTML(row.title)}</button>`).join('') : '<p>Репостов пока нет.</p>'}`;
+    section.innerHTML = `<strong>Посты автора</strong>${rows.length ? rows.map(row => `<button class="btn btn-ghost profile-social-post" type="button" data-profile-social="${escapeHTML(row.id)}">${escapeHTML(row.title)}</button>`).join('') : '<p>Постов пока нет.</p>'}<strong>Репосты</strong>${repostPosts.length ? repostPosts.map(row => `<button class="btn btn-ghost profile-social-post" type="button" data-profile-social="${escapeHTML(row.id)}">↻ ${escapeHTML(row.title)}</button>`).join('') : '<p>Репостов пока нет.</p>'}<strong>Понравившиеся посты</strong>${likedPosts.length ? likedPosts.map(row => `<button class="btn btn-ghost profile-social-post" type="button" data-profile-social="${escapeHTML(row.id)}">♥ ${escapeHTML(row.title)}</button>`).join('') : '<p>Лайков пока нет.</p>'}`;
     container.appendChild(section);
     section.addEventListener('click', async e => { const button = e.target.closest('[data-profile-social]'); if (!button) return; await loadSocial(); $('#public-profile-modal').hidden = true; openSocialPost(button.dataset.profileSocial); });
   } catch { /* Профиль остаётся доступен, даже если посты недоступны. */ }
@@ -157,3 +160,54 @@ async function addProfileFollow(userId, container) {
     following = !following; button.textContent = following ? '✓ Подписан' : '＋ Подписаться'; line.textContent = `${Math.max(0, (count || 0) + (following ? (data ? 0 : 1) : (data ? -1 : 0)))} подписчиков`;
   });
 }
+
+let ownProfileTab = 'posts';
+let ownProfileData = null;
+async function loadOwnProfile() {
+  if (!currentUser || !authClient) return;
+  const id = currentUser.id, content = $('#own-profile-content'), stats = $('#own-profile-stats');
+  content.textContent = 'Загрузка…';
+  try {
+    const [posts, reposts, likes, replies, following, followers] = await Promise.all([
+      authClient.from('spike_social_posts').select('id,title').eq('author_id', id).order('created_at', { ascending: false }).limit(100),
+      authClient.from('spike_social_reposts').select('post_id').eq('user_id', id).limit(100),
+      authClient.from('spike_social_likes').select('post_id').eq('user_id', id).limit(100),
+      authClient.from('spike_comments').select('post_id,body').eq('user_id', id).not('parent_id', 'is', null).order('created_at', { ascending: false }).limit(100),
+      authClient.from('spike_follows').select('*', { count: 'exact', head: true }).eq('follower_id', id),
+      authClient.from('spike_follows').select('*', { count: 'exact', head: true }).eq('followed_id', id),
+    ]);
+    if (currentUser?.id !== id || $('#profile-modal').hidden) return;
+    ownProfileData = { posts, reposts, likes, replies };
+    stats.textContent = `${following.error ? '—' : following.count || 0} подписок · ${followers.error ? '—' : followers.count || 0} подписчиков · ${posts.error ? '—' : posts.data.length} постов`;
+    renderOwnProfile();
+  } catch { if (content.isConnected) content.textContent = 'Не удалось загрузить профиль.'; }
+}
+
+async function renderOwnProfile() {
+  const content = $('#own-profile-content'); if (!ownProfileData || !content) return;
+  const data = ownProfileData[ownProfileTab];
+  if (data.error) { content.textContent = 'Раздел временно недоступен.'; return; }
+  if (ownProfileTab === 'replies') {
+    content.innerHTML = data.data.length ? data.data.map(row => `<button type="button" class="btn btn-ghost" data-own-link="${escapeHTML(row.post_id)}">${escapeHTML(row.body)}</button>`).join('') : '<p>Ответов пока нет.</p>'; return;
+  }
+  let posts = data.data;
+  if (ownProfileTab !== 'posts') {
+    const ids = posts.map(row => row.post_id);
+    if (!ids.length) { content.textContent = 'Пока пусто.'; return; }
+    const result = await authClient.from('spike_social_posts').select('id,title').in('id', ids).limit(100);
+    if (ownProfileData[ownProfileTab] !== data || !content.isConnected) return;
+    if (result.error) { content.textContent = 'Не удалось загрузить посты.'; return; }
+    posts = result.data;
+  }
+  content.innerHTML = posts.length ? posts.map(row => `<button type="button" class="btn btn-ghost" data-own-social="${escapeHTML(row.id)}">${escapeHTML(row.title)}</button>`).join('') : '<p>Пока пусто.</p>';
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('[data-own-tab]').forEach(button => button.addEventListener('click', () => { ownProfileTab = button.dataset.ownTab; document.querySelectorAll('[data-own-tab]').forEach(b => b.classList.toggle('active', b === button)); renderOwnProfile(); }));
+  $('#own-profile-content').addEventListener('click', async e => {
+    const link = e.target.closest('[data-own-link]');
+    if (link) { $('#profile-modal').hidden = true; openView(link.dataset.ownLink); return; }
+    const post = e.target.closest('[data-own-social]');
+    if (post) { await loadSocial(); $('#profile-modal').hidden = true; openSocialPost(post.dataset.ownSocial); }
+  });
+});

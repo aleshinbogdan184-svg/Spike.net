@@ -497,6 +497,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const preview = $('#profile-preview'); preview.textContent = '';
     preview.className = `profile-preview profile-frame-${['classic','spark','collector','legend','comet','neon','orbit','heart','voice','starfish','sponge','banana'].includes(currentProfile?.frame_style) ? currentProfile.frame_style : 'classic'}`;
     if (currentProfile?.avatar_path) { const img = document.createElement('img'); img.src = avatarUrl(currentProfile.avatar_path) + '?v=' + Date.now(); img.alt = ''; preview.appendChild(img); } else preview.textContent = '✦';
+    $('#own-profile-name').textContent = currentProfile?.nickname || 'Создай профиль';
+    if (typeof loadOwnProfile === 'function') loadOwnProfile();
     const rewards = { reply_1: 'Искра диалога · рамка «Искра»', bookmark_10: 'Архивариус · рамка «Коллекционер»', comment_25: 'Голос Spike · рамка «Легенда»', like_5: 'Ценитель · лазурный цвет', bookmark_5: 'Собиратель · золотой цвет' };
     const badges = Object.entries(rewards).filter(([code]) => earnedAchievements.has(code)).map(([, title]) => `🏆 ${title}`);
     $('#profile-achievements').textContent = badges.length ? badges.join(' · ') : 'Пока нет открытых достижений.';
