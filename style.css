@@ -1761,3 +1761,25 @@ body[data-view]:not([data-view="feed"]) .feed-masthead, body[data-view]:not([dat
   .social-comment-compose .input { flex: 1 1 calc(100% - 52px); }
   .social-comment-compose .btn { margin-left: auto; }
 }
+
+/* Unified comment layout for link discussions and social posts. */
+.comments { margin-top: 24px; padding-top: 20px; border-top: 1px solid #534461; }
+.comments h3 { margin: 0 0 18px; font-size: 14px; }
+.comments .comment-form { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+.comments .comment-form .comment-nickname { flex: 1 1 140px; min-width: 0; }
+.comments .comment-form input[name="comment"] { flex: 3 1 220px; min-width: 0; }
+.comments .comment-form .input, .comments .comment-form .btn { min-height: 42px; }
+.comments .comment-list { display: block; }
+.comments .comment { display: flex; align-items: flex-start; gap: 12px; margin: 0; padding: 16px 0; border: 0; border-top: 1px solid #ffffff12; border-radius: 0; background: transparent; }
+.comments .comment-reply { margin-left: 42px; padding-left: 12px; border-left: 1px solid #705784; }
+.comments .comment-avatar { float: none; flex: 0 0 36px; width: 36px; height: 36px; margin: 0; border-radius: 50%; object-fit: cover; }
+.comment-avatar-fallback { display: grid; place-items: center; background: #38254b; color: #d3bbef; }
+.comment-content { flex: 1; min-width: 0; }
+.comment-meta { display: flex; align-items: baseline; flex-wrap: wrap; gap: 8px; }
+.comment-meta time { color: #a99bb5; font: 11px Inter, sans-serif; }
+.comment-reply-label { display: block; margin-top: 6px; color: #bbaacb; font: 12px Inter, sans-serif; }
+.comment-text { margin: 8px 0; color: #eee7f5; font: 14px/1.6 Inter, sans-serif; white-space: pre-wrap; overflow-wrap: anywhere; }
+.comment-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.comment-actions .card-foot-btn { min-height: 30px; }
+.comment-empty { padding: 16px 0; color: #b9a9c4; font: 13px/1.5 Inter, sans-serif; }
+@media (max-width: 560px) { .comments .comment-reply { margin-left: 24px; } .comments .comment-form .btn { margin-left: auto; } }

@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Russo+One&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=social64" />
+  <link rel="stylesheet" href="style.css?v=comments65" />
 </head>
 <body>
   <!-- ====== ФОН ====== -->
@@ -180,7 +180,7 @@
       </div>
       <div class="cat-grid" id="cat-grid"></div>
     </section>
-    <section class="tab-view" id="view-updates" hidden><div class="view-intro"><span class="view-intro-icon">✦</span><div><span class="view-eyebrow">SPIKE / НОВОСТИ</span><h1>Обновления</h1><p>Что нового на сайте.</p></div></div><article class="release-card"><div class="release-head"><span class="release-version">1.0</span><span class="release-tag">ОБНОВЛЕНИЕ ЛЕНТЫ</span></div><h2>Лента находок в новом стиле</h2><p>Сделали Spike удобнее и сохранили любимый пиксельный стиль.</p><ul><li><strong>Общая лента:</strong> видео, игры, музыка и кино теперь собраны на главной странице.</li><li><strong>Категории:</strong> выбирай нужный сервис над лентой — у каждого своя пиксельная иконка.</li><li><strong>Добавление ссылки:</strong> кнопка на боковой панели открывает форму, когда она нужна.</li><li><strong>Карточки:</strong> обновили оформление и добавили значки категорий рядом с названием сервиса.</li><li><strong>Интерфейс:</strong> убрали большие поясняющие блоки, освободили место для находок и обновили ретро-оформление.</li><li><strong>Навигация:</strong> боковая панель с разделами и доступ к профилю сохранены.</li></ul><div class="release-callout">✦ Находи интересное и делись им на Spike.</div></article></section>
+    <section class="tab-view" id="view-updates" hidden><div class="view-intro"><span class="view-intro-icon">✦</span><div><span class="view-eyebrow">SPIKE / НОВОСТИ</span><h1>Обновления</h1><p>Что нового на сайте.</p></div></div><article class="release-card"><div class="release-head"><span class="release-version">1.0</span><span class="release-tag">ОБНОВЛЕНИЕ ЛЕНТЫ</span></div><h2>Лента и обсуждения в новом стиле</h2><p>Обновили оформление Spike и сделали обсуждения удобнее, сохранив пиксельный стиль.</p><ul><li><strong>Общая лента:</strong> видео, игры, музыка и кино собраны на главной странице.</li><li><strong>Категории:</strong> выбирай нужный сервис над лентой — у каждого своя пиксельная иконка.</li><li><strong>Добавление ссылки:</strong> кнопка на боковой панели открывает форму, когда она нужна.</li><li><strong>Карточки:</strong> обновили оформление и добавили значки категорий рядом с названием сервиса.</li><li><strong>Просмотр постов:</strong> добавили шапку с аватаром автора, именем и временем публикации.</li><li><strong>Комментарии:</strong> привели обсуждения постов и ссылок к единому виду: аватары, имена, время и поле ввода перед лентой комментариев.</li><li><strong>Ответы и лайки:</strong> существующие ответы и лайки комментариев к ссылкам сохранены.</li><li><strong>Интерфейс:</strong> убрали большие поясняющие блоки и обновили ретро-оформление. Боковая панель и доступ к профилю сохранены.</li></ul><div class="release-callout">✦ Находи интересное, делись им и обсуждай на Spike.</div></article></section>
     <section class="tab-view" id="view-social" hidden><div class="social-header"><div><span class="social-eyebrow">SPIKE / СООБЩЕСТВО</span><h1>Твой уголок<br><em>интернета.</em></h1><p>Мемы, моды и мысли — делись тем, что стоит увидеть.</p><button class="btn btn-primary" id="social-create" type="button">＋ Создать пост</button></div><div class="social-hero-art" aria-hidden="true">✦</div></div><div class="social-toolbar"><div><h2>Свежие посты</h2><span>Что происходит в сообществе</span></div><div class="social-filters"><button class="chip active" type="button" data-social-filter="all">Все</button><button class="chip" type="button" data-social-filter="following">Подписки</button></div></div><p id="social-status" class="field-hint"></p><div id="social-grid" class="social-grid"></div></section>
     <section class="tab-view" id="view-bookmarks" hidden><div class="view-intro"><span class="view-intro-icon">★</span><div><h1>Закладки</h1><p>Твои сохранённые находки.</p></div></div><div id="bookmarks-message" class="empty-inner"></div><div class="grid" id="bookmarks-grid"></div></section>
     <section class="tab-view" id="view-achievements" hidden><div class="view-intro"><span class="view-intro-icon">🏆</span><div><h1>Достижения</h1><p>Твои первые шаги в Spike.</p></div></div><div id="achievements-grid" class="cat-grid"></div></section>
@@ -326,9 +326,9 @@
   <div class="modal-back" id="social-view-modal" hidden><div class="modal social-view-modal" role="dialog" aria-modal="true" aria-labelledby="social-view-title"><div class="modal-head"><h2 class="modal-title" id="social-view-title">Публикация</h2><button class="btn btn-ghost" id="social-view-close" type="button" aria-label="Закрыть">✕</button></div><div class="modal-body" id="social-view-body"></div></div></div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-  <script src="app.js?v=feed63"></script>
+  <script src="app.js?v=comments65"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="shared.js?v=feed63"></script>
+  <script src="shared.js?v=comments65"></script>
   <script src="social.js?v=social64"></script>
 </body>
 </html>

@@ -59,7 +59,7 @@ async function refreshShared() {
     likes.forEach(like => likeCounts.set(like.post_id, (likeCounts.get(like.post_id) || 0) + 1));
     likes.forEach(like => { if (like.created_at && new Date(like.created_at).getTime() >= Date.now() - 7 * 86400000) weeklyCounts.set(like.post_id, (weeklyCounts.get(like.post_id) || 0) + 1); });
     views.forEach(view => viewCounts.set(view.post_id, (viewCounts.get(view.post_id) || 0) + 1));
-    comments.forEach(c => { if (!commentsByPost.has(c.post_id)) commentsByPost.set(c.post_id, []); const p = profileMap.get(c.user_id); commentsByPost.get(c.post_id).push({ id: c.id, parentId: c.parent_id, text: c.body, userId: c.user_id, author: p?.nickname || c.author_name || 'Гость', avatar: avatarUrl(p?.avatar_path), frame: p?.frame_style, accent: p?.accent_style, developer: !!c.user_id && SPIKE_DEVELOPERS.has(c.user_id) }); });
+    comments.forEach(c => { if (!commentsByPost.has(c.post_id)) commentsByPost.set(c.post_id, []); const p = profileMap.get(c.user_id); commentsByPost.get(c.post_id).push({ id: c.id, parentId: c.parent_id, text: c.body, createdAt: c.created_at ? new Date(c.created_at).getTime() : null, userId: c.user_id, author: p?.nickname || c.author_name || 'Гость', avatar: avatarUrl(p?.avatar_path), frame: p?.frame_style, accent: p?.accent_style, developer: !!c.user_id && SPIKE_DEVELOPERS.has(c.user_id) }); });
     items = posts.map(post => {
       const source = detectSource(post.url);
       return { id: post.id, title: post.title, url: post.url, type: source.type, source: source.source,
@@ -201,7 +201,7 @@ openView = function (id) {
       const mine = commentLikes.some(like => like.comment_id === commentId && like.user_id === currentUser?.id);
       const button = document.createElement('button'); button.type = 'button'; button.className = `card-foot-btn comment-like ${mine ? 'liked' : ''}`;
       button.textContent = `${mine ? '♥' : '♡'} ${count}`; button.setAttribute('aria-label', `Лайки комментария: ${count}`);
-      element.appendChild(button);
+      (element.querySelector('.comment-actions') || element).appendChild(button);
       button.addEventListener('click', async () => {
         if (!currentUser || !authClient) { toast('Войди, чтобы лайкнуть комментарий', true); return; }
         button.disabled = true;
