@@ -5,6 +5,11 @@ let followRows = [];
 let socialProfiles = new Map();
 let socialLikes = [], socialReposts = [];
 
+function socialAvatar(profile) {
+  const url = avatarUrl(profile?.avatar_path);
+  return `<span class="social-avatar">${url ? `<img src="${escapeHTML(url)}" alt="" onerror="this.hidden=true">` : '✦'}</span>`;
+}
+
 async function loadSocial() {
   const status = $('#social-status');
   status.textContent = 'Загрузка…';
@@ -43,13 +48,14 @@ async function openSocialPost(id) {
   const row = socialRows.find(post => post.id === id); if (!row) return;
   const container = $('#social-view-body'), profile = socialProfiles.get(row.author_id);
   $('#social-view-modal').hidden = false;
-  container.innerHTML = `${/^https?:\/\//i.test(row.image_url) ? `<img class="social-view-image" src="${escapeHTML(row.image_url)}" alt="" referrerpolicy="no-referrer">` : ''}<button class="profile-link" type="button" data-user-profile="${escapeHTML(row.author_id)}">${escapeHTML(profile?.nickname || 'Пользователь')}</button><h2>${escapeHTML(row.title)}</h2><p class="social-view-text">${escapeHTML(row.body)}</p><h3>Комментарии</h3><div id="social-comments">Загрузка…</div><form id="social-comment-form" class="comment-form"><input class="input" name="body" maxlength="500" required placeholder="Написать комментарий"><button class="btn btn-primary" type="submit">Отправить</button></form><p class="field-hint">Для комментария нужен вход и профиль.</p>`;
+  container.innerHTML = `<div class="social-post-author"><button class="social-author-link" type="button" data-user-profile="${escapeHTML(row.author_id)}">${socialAvatar(profile)}<span><strong>${escapeHTML(profile?.nickname || 'Пользователь')}</strong><small>${timeAgo(new Date(row.created_at).getTime())}</small></span></button></div><h2 class="social-post-title">${escapeHTML(row.title)}</h2>${row.body ? `<p class="social-view-text">${escapeHTML(row.body)}</p>` : ''}${/^https?:\/\//i.test(row.image_url) ? `<img class="social-view-image" src="${escapeHTML(row.image_url)}" alt="Изображение публикации" referrerpolicy="no-referrer">` : ''}<section class="social-discussion"><h3>Комментарии <span id="social-comment-count"></span></h3><form id="social-comment-form" class="social-comment-compose">${socialAvatar(currentProfile)}<input class="input" name="body" maxlength="500" required aria-label="Написать комментарий" placeholder="Написать комментарий"><button class="btn btn-primary" type="submit">Отправить</button></form><p class="field-hint">Для комментария нужен вход и профиль.</p><div id="social-comments" aria-live="polite">Загрузка…</div></section>`;
   async function loadComments() {
     const target = $('#social-comments');
     try {
       const rows = await sharedRequest(`/spike_social_comments?post_id=eq.${encodeURIComponent(id)}&select=id,user_id,body,created_at&order=created_at.asc&limit=200`);
       if (!target.isConnected) return;
-      target.innerHTML = rows.length ? rows.map(c => `<div class="comment"><button class="profile-link" type="button" data-user-profile="${escapeHTML(c.user_id)}">${escapeHTML(socialProfiles.get(c.user_id)?.nickname || 'Пользователь')}</button><p>${escapeHTML(c.body)}</p></div>`).join('') : '<p class="field-hint">Пока нет комментариев.</p>';
+      $('#social-comment-count').textContent = rows.length ? `· ${rows.length}` : '';
+      target.innerHTML = rows.length ? rows.map(c => { const commenter = socialProfiles.get(c.user_id) || (currentUser?.id === c.user_id ? currentProfile : null); return `<article class="social-comment"><button class="social-comment-avatar" type="button" data-user-profile="${escapeHTML(c.user_id)}" aria-label="Открыть профиль ${escapeHTML(commenter?.nickname || 'пользователя')}">${socialAvatar(commenter)}</button><div class="social-comment-content"><div class="social-comment-meta"><button class="profile-link" type="button" data-user-profile="${escapeHTML(c.user_id)}">${escapeHTML(commenter?.nickname || 'Пользователь')}</button><time>${timeAgo(new Date(c.created_at).getTime())}</time></div><p>${escapeHTML(c.body)}</p></div></article>`; }).join('') : '<p class="social-comments-empty">Пока нет комментариев. Начни обсуждение!</p>';
     } catch { if (target.isConnected) target.textContent = 'Не удалось загрузить комментарии.'; }
   }
   $('#social-comment-form').addEventListener('submit', async e => {
