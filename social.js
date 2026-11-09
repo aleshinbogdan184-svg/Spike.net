@@ -55,9 +55,19 @@ async function openSocialPost(id) {
       const rows = await sharedRequest(`/spike_social_comments?post_id=eq.${encodeURIComponent(id)}&select=id,user_id,body,created_at&order=created_at.asc&limit=200`);
       if (!target.isConnected) return;
       $('#social-comment-count').textContent = rows.length ? `· ${rows.length}` : '';
-      target.innerHTML = rows.length ? rows.map(c => { const commenter = socialProfiles.get(c.user_id) || (currentUser?.id === c.user_id ? currentProfile : null); return `<article class="social-comment"><button class="social-comment-avatar" type="button" data-user-profile="${escapeHTML(c.user_id)}" aria-label="Открыть профиль ${escapeHTML(commenter?.nickname || 'пользователя')}">${socialAvatar(commenter)}</button><div class="social-comment-content"><div class="social-comment-meta"><button class="profile-link" type="button" data-user-profile="${escapeHTML(c.user_id)}">${escapeHTML(commenter?.nickname || 'Пользователь')}</button><time>${timeAgo(new Date(c.created_at).getTime())}</time></div><p>${escapeHTML(c.body)}</p></div></article>`; }).join('') : '<p class="social-comments-empty">Пока нет комментариев. Начни обсуждение!</p>';
+      target.innerHTML = rows.length ? rows.map(c => { const commenter = socialProfiles.get(c.user_id) || (currentUser?.id === c.user_id ? currentProfile : null); return `<article class="social-comment"><button class="social-comment-avatar" type="button" data-user-profile="${escapeHTML(c.user_id)}" aria-label="Открыть профиль ${escapeHTML(commenter?.nickname || 'пользователя')}">${socialAvatar(commenter)}</button><div class="social-comment-content"><div class="social-comment-meta"><button class="profile-link" type="button" data-user-profile="${escapeHTML(c.user_id)}">${escapeHTML(commenter?.nickname || 'Пользователь')}</button><time>${timeAgo(new Date(c.created_at).getTime())}</time></div><p>${escapeHTML(c.body)}</p>${currentUser?.id === c.user_id ? `<button class="card-foot-btn comment-delete" type="button" data-social-comment-delete="${escapeHTML(c.id)}">Удалить</button>` : ''}</div></article>`; }).join('') : '<p class="social-comments-empty">Пока нет комментариев. Начни обсуждение!</p>';
     } catch { if (target.isConnected) target.textContent = 'Не удалось загрузить комментарии.'; }
   }
+  $('#social-comments').addEventListener('click', async e => {
+    const button = e.target.closest('[data-social-comment-delete]');
+    if (!button || !currentUser || !authClient || !confirm('Удалить свой комментарий?')) return;
+    button.disabled = true;
+    try {
+      const { data, error } = await authClient.from('spike_social_comments').delete().eq('id', button.dataset.socialCommentDelete).eq('user_id', currentUser.id).select('id');
+      if (error || !data?.length) throw error || new Error('Удаление не разрешено');
+      await loadComments(); toast('Комментарий удалён');
+    } catch { button.disabled = false; toast('Не удалось удалить комментарий', true); }
+  });
   $('#social-comment-form').addEventListener('submit', async e => {
     e.preventDefault();
     if (!currentUser || !authClient || !currentProfile) { toast('Войди и создай профиль, чтобы комментировать', true); return; }

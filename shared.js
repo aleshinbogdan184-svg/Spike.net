@@ -194,6 +194,26 @@ submitForm = async function (e) {
 
 openView = function (id) {
   originalOpenView(id);
+  const currentItem = items.find(item => item.id === id);
+  if (currentUser && authClient && currentItem) {
+    $('#view-body').querySelectorAll('[data-comment-id]').forEach(element => {
+      const comment = (currentItem.comments || []).find(c => c.id === element.dataset.commentId);
+      if (!comment || comment.userId !== currentUser.id) return;
+      const button = document.createElement('button');
+      button.type = 'button'; button.className = 'card-foot-btn comment-delete'; button.textContent = 'Удалить';
+      (element.querySelector('.comment-actions') || element).appendChild(button);
+      button.addEventListener('click', async () => {
+        const hasReplies = (currentItem.comments || []).some(c => c.parentId === comment.id);
+        if (!confirm(hasReplies ? 'Удалить комментарий? Ответы на него тоже будут удалены.' : 'Удалить свой комментарий?')) return;
+        button.disabled = true;
+        try {
+          const { data, error } = await authClient.from('spike_comments').delete().eq('id', comment.id).eq('user_id', currentUser.id).select('id');
+          if (error || !data?.length) throw error || new Error('Удаление не разрешено');
+          await refreshShared(); if (viewId === id) openView(id); toast('Комментарий удалён');
+        } catch { button.disabled = false; toast('Не удалось удалить комментарий. Проверь настройки Supabase.', true); }
+      });
+    });
+  }
   if (commentLikesReady) {
     $('#view-body').querySelectorAll('[data-comment-id]').forEach(element => {
       const commentId = element.dataset.commentId;
