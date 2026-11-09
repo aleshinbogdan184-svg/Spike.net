@@ -92,7 +92,7 @@ async function addSocialProfilePosts(userId, container) {
 
 document.addEventListener('DOMContentLoaded', () => {
   const updates = $('#view-updates .release-card ul');
-  if (updates) { const item = document.createElement('li'); item.innerHTML = '<strong>Посты и профили:</strong> комментарии, лайки, репосты, подписки и раздел репостов в профиле.'; updates.appendChild(item); }
+  if (updates) { const item = document.createElement('li'); item.innerHTML = '<strong>Профили и посты:</strong> обновлённый профиль со вкладками публикаций, репостов и лайков; публичный огонёк ежедневных визитов, который меняется на 10, 50 и 100 днях; комментарии, лайки, репосты и подписки.'; updates.appendChild(item); }
   const sidebar = $('.layout-sidebar');
   const sideButton = document.createElement('button'); sideButton.type = 'button'; sideButton.innerHTML = '▤ <span>Посты</span>';
   sideButton.addEventListener('click', () => { $('#tabs [data-tab="social"]').click(); window.scrollTo({ top: 0, behavior: 'smooth' }); });
