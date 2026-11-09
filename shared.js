@@ -63,7 +63,7 @@ async function refreshShared() {
     items = posts.map(post => {
       const source = detectSource(post.url);
       return { id: post.id, title: post.title, url: post.url, type: source.type, source: source.source,
-        ytId: source.ytId, desc: post.description, poster: post.poster, year: '', tags: [], cover: '', authorId: post.user_id || null, author: profileMap.get(post.user_id)?.nickname || '',
+        ytId: source.ytId, desc: post.description, poster: post.poster, year: '', tags: [], cover: '', authorId: post.user_id || null, author: profileMap.get(post.user_id)?.nickname || '', authorAvatar: avatarUrl(profileMap.get(post.user_id)?.avatar_path),
         likes: likeCounts.get(post.id) || 0, weeklyLikes: weeklyCounts.get(post.id) || 0, views: viewCounts.get(post.id) || 0, watched: false, createdAt: new Date(post.created_at).getTime(),
         comments: commentsByPost.get(post.id) || [] };
     });

@@ -175,7 +175,7 @@ async function loadOwnProfile() {
   content.textContent = 'Загрузка…';
   try {
     const [posts, reposts, likes, following, followers, streak] = await Promise.all([
-      authClient.from('spike_social_posts').select('id,title').eq('author_id', id).order('created_at', { ascending: false }).limit(100),
+      authClient.from('spike_social_posts').select('id,title,body,image_url,category').eq('author_id', id).order('created_at', { ascending: false }).limit(100),
       authClient.from('spike_social_reposts').select('post_id').eq('user_id', id).limit(100),
       authClient.from('spike_social_likes').select('post_id').eq('user_id', id).limit(100),
       authClient.from('spike_follows').select('*', { count: 'exact', head: true }).eq('follower_id', id),
@@ -198,12 +198,12 @@ async function renderOwnProfile() {
   if (ownProfileTab !== 'posts') {
     const ids = posts.map(row => row.post_id);
     if (!ids.length) { content.textContent = 'Пока пусто.'; return; }
-    const result = await authClient.from('spike_social_posts').select('id,title').in('id', ids).limit(100);
+    const result = await authClient.from('spike_social_posts').select('id,title,body,image_url,category').in('id', ids).limit(100);
     if (ownProfileData[ownProfileTab] !== data || !content.isConnected) return;
     if (result.error) { content.textContent = 'Не удалось загрузить посты.'; return; }
     posts = result.data;
   }
-  content.innerHTML = posts.length ? posts.map(row => `<button type="button" class="btn btn-ghost" data-own-social="${escapeHTML(row.id)}">${escapeHTML(row.title)}</button>`).join('') : '<p>Пока пусто.</p>';
+  content.innerHTML = posts.length ? posts.map(row => `<button type="button" class="profile-post-tile" data-own-social="${escapeHTML(row.id)}">${/^https?:\/\//i.test(row.image_url || '') ? `<img src="${escapeHTML(row.image_url)}" alt="" loading="lazy" referrerpolicy="no-referrer">` : '<span class="profile-tile-placeholder">✦</span>'}<span class="profile-tile-title">${escapeHTML(row.title)}</span></button>`).join('') : '<p>Пока пусто.</p>';
 }
 
 document.addEventListener('DOMContentLoaded', () => {
