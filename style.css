@@ -1487,3 +1487,38 @@ body[data-view="achievements"] { --theme-rgb: 112, 188, 77; --theme-light: #d1ff
 }
 @media (max-width: 360px) { .topbar-right .btn { padding: 5px; font-size: 9px; }.hero-title { font-size: 16px; } }
 @media (prefers-reduced-motion: reduce) { .theme-art-icon, .theme-art-icon svg { animation: none; } }
+
+/* Arcade polish: pixel accents with comfortable, readable interface text. */
+.layout-sidebar { padding-right: 8px; }
+.layout-sidebar > button { min-height: 42px; border: 1px solid transparent; transition: background .16s, border-color .16s, transform .16s; }
+.layout-sidebar > button:hover, .layout-sidebar > button:focus-visible { background: rgba(var(--theme-rgb),.12); border-color: rgba(var(--theme-rgb),.32); transform: translateX(3px); }
+.side-note p { color: #c1b7d4; font-family: Inter, sans-serif; font-size: 12px; line-height: 1.6; }
+.hero { position: relative; overflow: hidden; border: 2px solid rgba(var(--theme-rgb),.5); border-radius: 6px; box-shadow: 5px 5px 0 #080610, 8px 8px 0 rgba(var(--theme-rgb),.16); }
+.hero-sub { color: #e0d9ed; font-family: Inter, sans-serif; font-size: 14px; line-height: 1.65; }
+.badge { letter-spacing: .08em; }
+.addbar { border-radius: 4px; background: #100d1b; box-shadow: 3px 3px 0 #080610; }
+.addbar:focus-within { border-color: var(--theme-light); box-shadow: 3px 3px 0 #080610, 0 0 0 3px rgba(var(--theme-rgb),.2); }
+.addbar-input { font-family: Inter, sans-serif; font-size: 14px; }
+.addbar-input::placeholder { color: #b5abc7; opacity: 1; }
+.manual-add { color: #c7bbd8; }
+.controls { border: 1px solid #554569; border-radius: 5px; background: #191522; box-shadow: 4px 4px 0 #080610; }
+.control-label { color: #c9bed7; letter-spacing: .06em; }
+.video-card { border-radius: 5px; border-color: #554569; box-shadow: 4px 4px 0 #080610; }
+.video-card:hover { border-color: var(--theme-light); box-shadow: 6px 7px 0 #080610, 8px 9px 0 rgba(var(--theme-rgb),.16); }
+.card-title { line-height: 1.5; }
+:where(button, a, input, select, textarea):focus-visible { outline: 2px solid #d3c0ff; outline-offset: 3px; }
+@media (max-width: 760px) {
+  .hero { padding: 22px 16px; }
+  .hero-sub { max-width: 100%; font-size: 14px; }
+  .addbar-input { font-size: 13px; }
+  .controls { gap: 12px; }
+}
+@media (max-width: 400px) {
+  .addbar { flex-wrap: wrap; }
+  .addbar-input { flex: 1 1 calc(100% - 42px); }
+  .addbar .btn { flex: 1 0 100%; min-height: 40px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .layout-sidebar > button { transition: none; }
+  .layout-sidebar > button:hover, .layout-sidebar > button:focus-visible, .video-card:hover { transform: none; }
+}
