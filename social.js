@@ -66,12 +66,18 @@ async function openSocialPost(id) {
 
 async function addSocialProfilePosts(userId, container) {
   try {
-    const [rows, repostRows, likeRows] = await Promise.all([
+    const [rows, repostRows, likeRows, streakRows] = await Promise.all([
       sharedRequest(`/spike_social_posts?author_id=eq.${encodeURIComponent(userId)}&select=id,title,body,image_url,created_at&order=created_at.desc&limit=50`),
       sharedRequest(`/spike_social_reposts?user_id=eq.${encodeURIComponent(userId)}&select=post_id,created_at&order=created_at.desc&limit=50`).catch(() => []),
-      sharedRequest(`/spike_social_likes?user_id=eq.${encodeURIComponent(userId)}&select=post_id,created_at&order=created_at.desc&limit=50`).catch(() => [])
+      sharedRequest(`/spike_social_likes?user_id=eq.${encodeURIComponent(userId)}&select=post_id,created_at&order=created_at.desc&limit=50`).catch(() => []),
+      sharedRequest(`/spike_streaks?user_id=eq.${encodeURIComponent(userId)}&select=streak,last_day`).catch(() => [])
     ]);
     if (!container.isConnected) return;
+    const streak = streakRows[0];
+    if (streak) {
+      const today = new Date().toISOString().slice(0,10), yesterday = new Date(Date.now()-86400000).toISOString().slice(0,10);
+      if (streak.last_day === today || streak.last_day === yesterday) { const badge = document.createElement('p'); badge.className = 'streak-badge'; badge.textContent = `${streak.streak >= 100 ? '🔥👑' : streak.streak >= 50 ? '🔥💎' : streak.streak >= 10 ? '🔥⭐' : '🔥'} ${streak.streak} дн. подряд`; container.prepend(badge); }
+    }
     const section = document.createElement('section'); section.className = 'public-profile-section';
     const ids = repostRows.map(row => row.post_id);
     const repostPosts = ids.length ? await sharedRequest(`/spike_social_posts?id=in.(${ids.map(encodeURIComponent).join(',')})&select=id,title&limit=50`) : [];
@@ -168,17 +174,18 @@ async function loadOwnProfile() {
   const id = currentUser.id, content = $('#own-profile-content'), stats = $('#own-profile-stats');
   content.textContent = 'Загрузка…';
   try {
-    const [posts, reposts, likes, replies, following, followers] = await Promise.all([
+    const [posts, reposts, likes, following, followers, streak] = await Promise.all([
       authClient.from('spike_social_posts').select('id,title').eq('author_id', id).order('created_at', { ascending: false }).limit(100),
       authClient.from('spike_social_reposts').select('post_id').eq('user_id', id).limit(100),
       authClient.from('spike_social_likes').select('post_id').eq('user_id', id).limit(100),
-      authClient.from('spike_comments').select('post_id,body').eq('user_id', id).not('parent_id', 'is', null).order('created_at', { ascending: false }).limit(100),
       authClient.from('spike_follows').select('*', { count: 'exact', head: true }).eq('follower_id', id),
       authClient.from('spike_follows').select('*', { count: 'exact', head: true }).eq('followed_id', id),
+      authClient.from('spike_streaks').select('streak,last_day').eq('user_id', id).maybeSingle(),
     ]);
     if (currentUser?.id !== id || $('#profile-modal').hidden) return;
-    ownProfileData = { posts, reposts, likes, replies };
-    stats.textContent = `${following.error ? '—' : following.count || 0} подписок · ${followers.error ? '—' : followers.count || 0} подписчиков · ${posts.error ? '—' : posts.data.length} постов`;
+    ownProfileData = { posts, reposts, likes };
+    const days = !streak.error && streak.data ? streak.data.streak : null;
+    stats.textContent = `${following.error ? '—' : following.count || 0} подписок · ${followers.error ? '—' : followers.count || 0} подписчиков · ${posts.error ? '—' : posts.data.length} постов${days === null ? '' : ` · ${days >= 100 ? '🔥👑' : days >= 50 ? '🔥💎' : days >= 10 ? '🔥⭐' : '🔥'} ${days} дн.`}`;
     renderOwnProfile();
   } catch { if (content.isConnected) content.textContent = 'Не удалось загрузить профиль.'; }
 }
@@ -187,9 +194,6 @@ async function renderOwnProfile() {
   const content = $('#own-profile-content'); if (!ownProfileData || !content) return;
   const data = ownProfileData[ownProfileTab];
   if (data.error) { content.textContent = 'Раздел временно недоступен.'; return; }
-  if (ownProfileTab === 'replies') {
-    content.innerHTML = data.data.length ? data.data.map(row => `<button type="button" class="btn btn-ghost" data-own-link="${escapeHTML(row.post_id)}">${escapeHTML(row.body)}</button>`).join('') : '<p>Ответов пока нет.</p>'; return;
-  }
   let posts = data.data;
   if (ownProfileTab !== 'posts') {
     const ids = posts.map(row => row.post_id);

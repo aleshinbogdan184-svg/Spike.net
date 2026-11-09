@@ -435,6 +435,7 @@ document.addEventListener('DOMContentLoaded', () => {
     $('#reports-button').hidden = !isOwner;
     setTimeout(async () => {
       if (user) {
+        await authClient.rpc('spike_checkin');
         const { data } = await authClient.from('spike_profiles').select('*').eq('user_id', user.id).maybeSingle();
         if (currentUser?.id !== user.id) return;
         currentProfile = data;
