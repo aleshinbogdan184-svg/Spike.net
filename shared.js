@@ -310,6 +310,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
   moveNavigation();
+  const addTrigger = $('.add-link-trigger');
+  addTrigger.addEventListener('click', () => { $('#tabs [data-tab="feed"]').click(); $('.hero').hidden = false; $('#link-input').focus(); });
+  $('.submit-close').addEventListener('click', () => { $('.hero').hidden = true; addTrigger.focus(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('.hero').hidden) { $('.hero').hidden = true; addTrigger.focus(); } });
   desktopLayout.addEventListener('change', moveNavigation);
   document.querySelectorAll('[data-layout-tab]').forEach(button => button.addEventListener('click', () => { const tab = $(`#tabs [data-tab="${button.dataset.layoutTab}"]`); if (tab) tab.click(); window.scrollTo({ top: 0, behavior: 'smooth' }); }));
   $('#side-add').addEventListener('click', () => { $('#tabs [data-tab="feed"]').click(); $('#link-input').focus(); window.scrollTo({ top: 0, behavior: 'smooth' }); });
@@ -367,8 +371,6 @@ function openReportForm(id = '') {
 
 document.addEventListener('DOMContentLoaded', () => {
   const categoryNav = $('#chips-type');
-  $('#sidebar-categories').appendChild(categoryNav);
-  categoryNav.querySelector('[data-type="all"]').hidden = true;
   const icons = {
     youtube: '<svg viewBox="0 0 40 40" aria-hidden="true"><rect x="2" y="6" width="36" height="28" rx="8" fill="currentColor"/><path d="M17 13v14l11-7z" fill="#fff"/></svg>',
     twitch: '<svg viewBox="0 0 40 40" aria-hidden="true"><path fill="#9146ff" d="M6 3h31v23L27 36H18l-6 4v-4H6z"/><path fill="white" d="M12 7h21v17l-6 6h-7l-4 4v-4h-4z"/><path stroke="#9146ff" stroke-width="3" d="M20 12v10m7-10v10"/></svg>',
@@ -397,7 +399,7 @@ document.addEventListener('DOMContentLoaded', () => {
     $('#theme-art-icon').innerHTML = icons[type] || '✦';
     $('.hero-title').innerHTML = title;
     $('.hero-sub').textContent = description;
-    $('#link-input').placeholder = type === 'all' ? 'Ссылка на видео, игру, музыку или кино' : `Вставь ссылку: ${type === 'twitch' ? 'Twitch' : type === 'game' ? 'Steam' : type === 'music' ? 'Spotify, SoundCloud или Яндекс Музыка' : type === 'film' ? 'Кинопоиск' : 'YouTube'}`;
+    $('#link-input').placeholder = 'Вставь ссылку';
   }
   const menu = $('#sidebar-categories'), toggle = $('#category-toggle'), backdrop = $('#category-backdrop');
   function setMenu(open, restoreFocus = false) {
@@ -410,8 +412,9 @@ document.addEventListener('DOMContentLoaded', () => {
   categoryNav.querySelectorAll('[data-type]').forEach(button => {
     const icon = button.querySelector('.category-icon');
     if (icons[button.dataset.type]) icon.innerHTML = icons[button.dataset.type];
-    button.addEventListener('click', () => { setTheme(button.dataset.type); switchTab('feed'); setMenu(false); });
+    button.addEventListener('click', () => { setTheme(button.dataset.type); switchTab('feed'); });
   });
+  categoryNav.querySelector('[data-type="all"]').click();
   $('#tabs [data-tab="feed"]').addEventListener('click', () => { categoryNav.querySelector('[data-type="all"]').click(); });
   toggle.addEventListener('click', () => setMenu(toggle.getAttribute('aria-expanded') !== 'true'));
   backdrop.addEventListener('click', () => setMenu(false, true));

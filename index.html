@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Russo+One&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=arcade61" />
+  <link rel="stylesheet" href="style.css?v=feed63" />
 </head>
 <body>
   <!-- ====== ФОН ====== -->
@@ -51,6 +51,7 @@
     </nav>
 
     <div class="topbar-right">
+      <button class="btn btn-primary add-link-trigger" type="button">＋ Добавить ссылку</button>
       <button class="btn btn-ghost" id="auth-button" type="button">Войти</button>
       <button class="btn btn-ghost" id="profile-button" type="button" hidden>Профиль</button>
       <button class="btn btn-ghost" id="reports-button" type="button" hidden>Жалобы</button>
@@ -69,6 +70,7 @@
   <!-- ====== ГЛАВНАЯ ====== -->
   <div class="site-layout"><aside class="layout-sidebar" aria-label="Навигация по сайту"><div class="side-heading">НАВИГАЦИЯ <span>01</span></div><button type="button" data-layout-tab="feed">⌂ <span>Лента</span></button><button type="button" data-layout-tab="trends">↗ <span>Тренды</span></button><button type="button" data-layout-tab="bookmarks">★ <span>Закладки</span></button><button type="button" data-layout-tab="achievements">✦ <span>Достижения</span></button><button type="button" data-layout-tab="updates">◈ <span>Обновления</span></button><div class="side-note"><strong>SPIKE / 1.0</strong><p>Твои находки заслуживают большего, чем затеряться в чате.</p></div></aside>
   <main class="main">
+    <div class="feed-masthead"><div><span class="feed-kicker">SPIKE / ОБЩАЯ ЛЕНТА</span><h1>Лента находок<span>_</span></h1><p>Видео, игры, музыка и кино от сообщества.</p></div></div>
     <nav class="category-nav" aria-label="Категории приложений"><div class="chip-group" id="chips-type">
             <button class="chip active" data-type="all" type="button"><span class="category-icon">✦</span>Все</button>
             <button class="chip" data-type="youtube" type="button"><span class="category-icon yt">▶</span>YouTube</button>
@@ -78,7 +80,9 @@
             <button class="chip" data-type="film" type="button"><span class="category-icon kino">К</span>Spike Кино</button>
           </div></nav>
     <!-- HERO -->
-    <section class="hero">
+    <section class="hero" aria-label="Добавить ссылку" hidden>
+      <h2 class="submit-heading">＋ Добавить ссылку</h2>
+      <button type="button" class="submit-close" aria-label="Закрыть">✕</button>
       <div class="theme-art" aria-hidden="true"><div class="theme-art-orbit"></div><div class="theme-art-icon" id="theme-art-icon">✦</div></div>
       <div class="badge">
         <span class="badge-dot"></span>
@@ -322,9 +326,9 @@
   <div class="modal-back" id="social-view-modal" hidden><div class="modal social-view-modal" role="dialog" aria-modal="true" aria-labelledby="social-view-title"><div class="modal-head"><h2 class="modal-title" id="social-view-title">Публикация</h2><button class="btn btn-ghost" id="social-view-close" type="button" aria-label="Закрыть">✕</button></div><div class="modal-body" id="social-view-body"></div></div></div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-  <script src="app.js?v=tiles57"></script>
+  <script src="app.js?v=feed63"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="shared.js?v=tiles57"></script>
+  <script src="shared.js?v=feed63"></script>
   <script src="social.js?v=tiles57"></script>
 </body>
 </html>

@@ -373,7 +373,9 @@ function thumbStyle(it) {
 
 function typePill(type) {
   const t = TYPES[type] || TYPES.other;
-  return `<span class="type-pill type-${type}">${t.icon} ${escapeHTML(t.label)}</span>`;
+  const icon = document.querySelector(`#chips-type [data-type="${type}"] .category-icon`);
+  const iconHTML = icon ? icon.innerHTML : t.icon;
+  return `<span class="type-pill type-${escapeHTML(type)}"><span class="card-type-icon" aria-hidden="true">${iconHTML}</span> ${escapeHTML(t.label)}</span>`;
 }
 
 function cardHTML(it, index) {
@@ -898,7 +900,7 @@ async function addFromLink() {
 function switchTab(name) {
   $$("#tabs .tab").forEach((b) => b.classList.toggle("active", b.dataset.tab === name));
   $$(".tab-view").forEach((v) => { v.hidden = v.id !== `view-${name}`; });
-  $(".hero").hidden = name !== "feed";
+  $(".hero").hidden = true;
   document.body.dataset.view = name;
 }
 
