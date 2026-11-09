@@ -30,8 +30,44 @@ function renderSocial() {
     const image = /^https?:\/\//i.test(row.image_url) ? row.image_url : '';
     const owner = currentUser && (currentUser.id === row.author_id || SPIKE_DEVELOPERS.has(currentUser.id));
     const isFollowing = following.has(row.author_id);
-    return `<article class="social-card">${image ? `<img class="social-image" src="${escapeHTML(image)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.hidden=true">` : '<div class="social-placeholder">✦</div>'}<div class="social-body"><div class="social-meta"><button class="profile-link" type="button" data-user-profile="${escapeHTML(row.author_id)}">${escapeHTML(profile?.nickname || 'Пользователь')}</button><span>${escapeHTML(labels[row.category] || 'Пост')}</span></div><h2>${escapeHTML(row.title)}</h2><p>${escapeHTML(row.body)}</p><div class="social-actions">${currentUser && currentUser.id !== row.author_id ? `<button class="btn btn-ghost" type="button" data-follow="${escapeHTML(row.author_id)}">${isFollowing ? '✓ Подписан' : '＋ Подписаться'}</button>` : ''}${owner ? `<button class="btn btn-ghost btn-danger" type="button" data-social-delete="${escapeHTML(row.id)}">Удалить</button>` : ''}<small>${timeAgo(new Date(row.created_at).getTime())}</small></div></div></article>`;
+    return `<article class="social-card">${image ? `<button class="social-cover-button" type="button" data-social-open="${escapeHTML(row.id)}"><img class="social-image" src="${escapeHTML(image)}" alt="Открыть пост" loading="lazy" referrerpolicy="no-referrer" onerror="this.hidden=true"></button>` : '<div class="social-placeholder">✦</div>'}<div class="social-body"><div class="social-meta"><button class="profile-link" type="button" data-user-profile="${escapeHTML(row.author_id)}">${escapeHTML(profile?.nickname || 'Пользователь')}</button><span>${escapeHTML(labels[row.category] || 'Пост')}</span></div><h2>${escapeHTML(row.title)}</h2><p>${escapeHTML(row.body)}</p><div class="social-actions"><button class="btn btn-primary" type="button" data-social-open="${escapeHTML(row.id)}">Открыть · 💬</button>${currentUser && currentUser.id !== row.author_id ? `<button class="btn btn-ghost" type="button" data-follow="${escapeHTML(row.author_id)}">${isFollowing ? '✓ Подписан' : '＋ Подписаться'}</button>` : ''}${owner ? `<button class="btn btn-ghost btn-danger" type="button" data-social-delete="${escapeHTML(row.id)}">Удалить</button>` : ''}<small>${timeAgo(new Date(row.created_at).getTime())}</small></div></div></article>`;
   }).join('');
+}
+
+async function openSocialPost(id) {
+  const row = socialRows.find(post => post.id === id); if (!row) return;
+  const container = $('#social-view-body'), profile = socialProfiles.get(row.author_id);
+  $('#social-view-modal').hidden = false;
+  container.innerHTML = `${/^https?:\/\//i.test(row.image_url) ? `<img class="social-view-image" src="${escapeHTML(row.image_url)}" alt="" referrerpolicy="no-referrer">` : ''}<button class="profile-link" type="button" data-user-profile="${escapeHTML(row.author_id)}">${escapeHTML(profile?.nickname || 'Пользователь')}</button><h2>${escapeHTML(row.title)}</h2><p class="social-view-text">${escapeHTML(row.body)}</p><h3>Комментарии</h3><div id="social-comments">Загрузка…</div><form id="social-comment-form" class="comment-form"><input class="input" name="body" maxlength="500" required placeholder="Написать комментарий"><button class="btn btn-primary" type="submit">Отправить</button></form><p class="field-hint">Для комментария нужен вход и профиль.</p>`;
+  async function loadComments() {
+    const target = $('#social-comments');
+    try {
+      const rows = await sharedRequest(`/spike_social_comments?post_id=eq.${encodeURIComponent(id)}&select=id,user_id,body,created_at&order=created_at.asc&limit=200`);
+      if (!target.isConnected) return;
+      target.innerHTML = rows.length ? rows.map(c => `<div class="comment"><button class="profile-link" type="button" data-user-profile="${escapeHTML(c.user_id)}">${escapeHTML(socialProfiles.get(c.user_id)?.nickname || 'Пользователь')}</button><p>${escapeHTML(c.body)}</p></div>`).join('') : '<p class="field-hint">Пока нет комментариев.</p>';
+    } catch { if (target.isConnected) target.textContent = 'Не удалось загрузить комментарии.'; }
+  }
+  $('#social-comment-form').addEventListener('submit', async e => {
+    e.preventDefault();
+    if (!currentUser || !authClient || !currentProfile) { toast('Войди и создай профиль, чтобы комментировать', true); return; }
+    const input = e.currentTarget.elements.body, text = input.value.trim(); if (!text) return;
+    const button = e.currentTarget.querySelector('button'); button.disabled = true;
+    const { error } = await authClient.from('spike_social_comments').insert({ post_id: id, user_id: currentUser.id, body: text });
+    button.disabled = false; if (error) { toast('Не удалось отправить комментарий', true); return; }
+    input.value = ''; await loadComments();
+  });
+  loadComments();
+}
+
+async function addSocialProfilePosts(userId, container) {
+  try {
+    const rows = await sharedRequest(`/spike_social_posts?author_id=eq.${encodeURIComponent(userId)}&select=id,title,body,image_url,created_at&order=created_at.desc&limit=50`);
+    if (!container.isConnected) return;
+    const section = document.createElement('section'); section.className = 'public-profile-section';
+    section.innerHTML = `<strong>Посты автора</strong>${rows.length ? rows.map(row => `<button class="btn btn-ghost profile-social-post" type="button" data-profile-social="${escapeHTML(row.id)}">${escapeHTML(row.title)}</button>`).join('') : '<p>Постов пока нет.</p>'}`;
+    container.appendChild(section);
+    section.addEventListener('click', async e => { const button = e.target.closest('[data-profile-social]'); if (!button) return; await loadSocial(); $('#public-profile-modal').hidden = true; openSocialPost(button.dataset.profileSocial); });
+  } catch { /* Профиль остаётся доступен, даже если посты недоступны. */ }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -45,6 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('[data-social-filter]').forEach(button => button.addEventListener('click', () => { socialFilter = button.dataset.socialFilter; document.querySelectorAll('[data-social-filter]').forEach(b => b.classList.toggle('active', b === button)); renderSocial(); }));
   $('#social-create').addEventListener('click', () => { if (!currentUser) { toast('Войди, чтобы создать пост', true); return; } if (!currentProfile) { toast('Сначала создай профиль', true); return; } $('#social-form').reset(); $('#social-error').textContent = ''; $('#social-modal').hidden = false; });
   $('#social-close').addEventListener('click', () => { $('#social-modal').hidden = true; });
+  $('#social-view-close').addEventListener('click', () => { $('#social-view-modal').hidden = true; });
   $('#social-form').addEventListener('submit', async e => {
     e.preventDefault(); if (!currentUser || !authClient) return;
     const title = $('#social-title-input').value.trim(), body = $('#social-body').value.trim(), image = $('#social-image').value.trim(), file = $('#social-file').files[0];
@@ -64,6 +101,8 @@ document.addEventListener('DOMContentLoaded', () => {
     $('#social-modal').hidden = true; await loadSocial(); toast('Пост опубликован');
   });
   $('#social-grid').addEventListener('click', async e => {
+    const open = e.target.closest('[data-social-open]');
+    if (open) { openSocialPost(open.dataset.socialOpen); return; }
     const follow = e.target.closest('[data-follow]');
     if (follow && currentUser && authClient) {
       follow.disabled = true; const id = follow.dataset.follow;

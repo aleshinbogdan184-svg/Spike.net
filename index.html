@@ -12,7 +12,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Russo+One&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=mobile50" />
+  <link rel="stylesheet" href="style.css?v=social51" />
 </head>
 <body>
   <!-- ====== ФОН ====== -->
@@ -318,11 +318,12 @@
   <div class="modal-back" id="report-form-modal" hidden><div class="modal" role="dialog" aria-modal="true" aria-labelledby="report-form-title"><div class="modal-head"><h2 class="modal-title" id="report-form-title">Отправить жалобу</h2><button class="btn btn-ghost btn-sm" id="report-form-close" type="button">✕</button></div><form class="modal-body" id="report-form"><label class="field">Публикация<select class="select" id="report-post" required></select></label><label class="field">Причина<textarea class="textarea" id="report-reason" minlength="3" maxlength="500" required placeholder="Опиши проблему"></textarea></label><p class="field-hint" id="report-form-message" role="status"></p><button class="btn btn-primary" type="submit">Отправить жалобу</button></form></div></div>
   <div class="modal-back" id="public-profile-modal" hidden><div class="modal" role="dialog" aria-modal="true" aria-labelledby="public-profile-title"><div class="modal-head"><h2 class="modal-title" id="public-profile-title">Профиль</h2><button class="btn btn-ghost btn-sm" id="public-profile-close" type="button">✕</button></div><div class="modal-body" id="public-profile-body"></div></div></div>
   <div class="modal-back" id="social-modal" hidden><div class="modal" role="dialog" aria-modal="true" aria-labelledby="social-title"><div class="modal-head"><h2 class="modal-title" id="social-title">Новый пост</h2><button class="btn btn-ghost" id="social-close" type="button">✕</button></div><form id="social-form" class="modal-body"><label class="field">Заголовок<input class="input" id="social-title-input" maxlength="140" required></label><label class="field">Категория<select class="select" id="social-category"><option value="meme">Мем</option><option value="mod">Мод</option><option value="topic">Обсуждение</option><option value="other">Другое</option></select></label><label class="field">Текст<textarea class="textarea" id="social-body" maxlength="3000" placeholder="Расскажи о находке или вставь ссылку на мод"></textarea></label><label class="field">Изображение с устройства (PNG, JPEG, WebP до 3 МБ)<input class="input" id="social-file" type="file" accept="image/png,image/jpeg,image/webp"></label><label class="field">Или ссылка на изображение<input class="input" id="social-image" type="url" maxlength="600" placeholder="https://..."></label><p id="social-error" class="field-hint" role="status"></p><button class="btn btn-primary" type="submit">Опубликовать</button></form></div></div>
+  <div class="modal-back" id="social-view-modal" hidden><div class="modal social-view-modal" role="dialog" aria-modal="true" aria-labelledby="social-view-title"><div class="modal-head"><h2 class="modal-title" id="social-view-title">Публикация</h2><button class="btn btn-ghost" id="social-view-close" type="button" aria-label="Закрыть">✕</button></div><div class="modal-body" id="social-view-body"></div></div></div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
   <script src="app.js?v=rewards42"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="shared.js?v=retry49"></script>
-  <script src="social.js?v=profile47"></script>
+  <script src="shared.js?v=social51"></script>
+  <script src="social.js?v=social51"></script>
 </body>
 </html>
