@@ -368,7 +368,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const style = document.createElement('style');
   style.textContent = '[data-watched] { display:none !important; }';
   document.head.appendChild(style);
-  refreshShared();
+  if (!window.supabase) refreshShared();
   $('#report-new-button').addEventListener('click', () => openReportForm());
   $('#report-form-close').addEventListener('click', () => { $('#report-form-modal').hidden = true; });
   $('#report-form').addEventListener('submit', async e => {

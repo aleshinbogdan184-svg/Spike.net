@@ -18,15 +18,15 @@ async function loadSocial() {
   const status = $('#social-status');
   status.textContent = 'Загрузка…';
   try {
-    const [posts, follows, profiles] = await Promise.all([
+    const [posts, follows, profiles, likes, reposts] = await Promise.all([
       sharedRequest('/spike_social_posts?select=*&order=created_at.desc&limit=100'),
       sharedRequest('/spike_follows?select=follower_id,followed_id&limit=10000'),
       sharedRequest('/spike_profiles?select=user_id,nickname,avatar_path&limit=10000'),
+      sharedRequest('/spike_social_likes?select=post_id,user_id&limit=10000').catch(() => []),
+      sharedRequest('/spike_social_reposts?select=post_id,user_id&limit=10000').catch(() => []),
     ]);
     socialRows = posts; followRows = follows; socialProfiles = new Map(profiles.map(profile => [profile.user_id, profile]));
-    const reactions = await Promise.allSettled([sharedRequest('/spike_social_likes?select=post_id,user_id&limit=10000'), sharedRequest('/spike_social_reposts?select=post_id,user_id&limit=10000')]);
-    socialLikes = reactions[0].status === 'fulfilled' ? reactions[0].value : [];
-    socialReposts = reactions[1].status === 'fulfilled' ? reactions[1].value : [];
+    socialLikes = likes; socialReposts = reposts;
     renderSocial();
   } catch (error) { console.error('Посты недоступны:', error); status.textContent = 'Посты пока недоступны: проверь настройки базы.'; }
 }
