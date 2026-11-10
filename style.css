@@ -1850,6 +1850,67 @@ body::before { content:""; position:fixed; z-index:-4; inset:-18%; pointer-event
 @media(max-width:420px),(prefers-reduced-motion:reduce){.scene-3d,.grid-bg{display:none}.bg .aurora,.bg .glow,#particles{display:none}.main>.hero,.video-card,.social-card,.trend-item,.cat-card{backdrop-filter:none;box-shadow:3px 3px #030504}}
 @media(prefers-reduced-motion:reduce){body:before,.scene-orb,.scene-ring,.scene-card,.trailer-orbit{animation:none!important}.video-card:hover,.social-card:hover,.trend-item:hover,.cat-card:hover{transform:none}}
 
+/* =========================================================
+   SPIKE ARCADE — retro game platform theme
+   ========================================================= */
+:root {
+  --bg: #090b12;
+  --surface: #111624;
+  --surface-2: #171d2d;
+  --border: #303b5b;
+  --border-strong: #59698f;
+  --text: #f4f2ff;
+  --muted: #a7abc1;
+  --muted-2: #707894;
+  --v: #b8ff55;
+  --v2: #e2ff9a;
+  --c: #55e6ff;
+  --p: #d875ff;
+  --a: #ffc857;
+  --red: #ff637d;
+  --grad: linear-gradient(135deg, #b8ff55, #55e6ff);
+  --pixel: 'Press Start 2P', monospace;
+  --font: Inter, system-ui, sans-serif;
+}
+html { background: #090b12; }
+body { background: #090b12; font-family: var(--font); }
+body::before { content: ''; position: fixed; inset: 0; z-index: -4; pointer-events: none; background: linear-gradient(#ffffff06 1px, transparent 1px), linear-gradient(90deg, #ffffff06 1px, transparent 1px), radial-gradient(ellipse at 50% 0, #1d2850 0, transparent 55%), #090b12; background-size: 32px 32px, 32px 32px, auto, auto; }
+.bg { background: transparent; }.grid-bg { display: none; }.noise { opacity: .09; }
+.scene-3d { display: none; }.aurora,.glow { display: none; }
+
+/* Arcade HUD header */
+.topbar { min-height: 68px; padding: 10px clamp(14px, 4vw, 48px); background: #0c101beF; border-bottom: 2px solid #303b5b; box-shadow: 0 4px 0 #05060b; backdrop-filter: none; }
+.logo { gap: 10px; }.logo-icon { width: 38px; height: 38px; border: 2px solid var(--v); border-radius: 3px; background: #192238; box-shadow: 3px 3px 0 #43542a; }.logo-icon img { image-rendering: pixelated; }.logo-text { color: #fff; background: none; -webkit-text-fill-color: initial; font-family: var(--pixel); font-size: 13px; letter-spacing: -.04em; }.logo-dot { color: var(--v); font-family: var(--font); font-size: 11px; }
+.tabs { gap: 5px; margin-left: 22px; }.tab { min-height: 38px; padding: 8px 13px; border: 1px solid transparent; border-radius: 2px; color: var(--muted); font-family: var(--pixel); font-size: 9px; text-transform: uppercase; }.tab:hover { color: #fff; border-color: var(--border-strong); background: #202944; }.tab.active { color: #111609; background: var(--v); border-color: var(--v2); box-shadow: 3px 3px 0 #4f7032; }
+.btn { min-height: 36px; border: 1px solid var(--border-strong); border-radius: 2px; background: #151c2c; color: #eef0ff; box-shadow: 2px 2px 0 #05060b; }.btn:hover { border-color: var(--c); background: #202a42; }.btn-primary { background: var(--v); border-color: var(--v2); color: #121a0a; box-shadow: 3px 3px 0 #4b672e; }.btn-primary:hover { background: var(--v2); color: #121a0a; }
+.stats { border-color: var(--border); }.stat span:first-child { color: var(--v); font-family: var(--pixel); font-size: 10px; }.stat-label { color: var(--muted-2); font-family: var(--pixel); font-size: 7px; }
+
+/* Main platform map */
+.site-layout { width: min(1480px, calc(100% - 40px)); max-width: none; grid-template-columns: 214px minmax(0, 1fr); gap: 30px; padding-top: 28px; }.layout-sidebar { padding: 4px 18px 20px 0; border-right: 2px solid #27314b; }.side-heading { margin-bottom: 14px; color: var(--c); font-family: var(--pixel); font-size: 8px; letter-spacing: .08em; }.side-heading span { color: var(--a); }
+.layout-sidebar > button { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 44px; margin: 4px 0; padding: 10px; border: 1px solid transparent; border-radius: 2px; color: var(--muted); font-family: var(--pixel); font-size: 9px; text-align: left; }.layout-sidebar > button:hover,.layout-sidebar > button:focus-visible { border-color: var(--c); background: #55e6ff12; color: #fff; transform: translateX(3px); }.side-note { margin-top: 26px; padding: 15px; border: 2px solid #46567b; border-radius: 2px; background: #131a2a; box-shadow: 4px 4px 0 #05060b; }.side-note strong { color: var(--v); font-family: var(--pixel); font-size: 9px; }.side-note p { color: var(--muted); font-size: 11px; line-height: 1.55; }
+.main { max-width: none; padding: 0 0 72px; }
+
+/* Mission header */
+.feed-masthead { position: relative; padding: 12px 0 24px; border-bottom: 2px solid #303b5b; }.feed-masthead::after { content: 'LEVEL 01  //  DISCOVERY MODE'; position: absolute; right: 0; bottom: 28px; color: var(--a); font-family: var(--pixel); font-size: 8px; }.feed-kicker { color: var(--c); font-family: var(--pixel); font-size: 8px; letter-spacing: .1em; }.feed-masthead h1 { margin: 15px 0 10px; font-family: var(--pixel); font-size: clamp(22px, 3.5vw, 43px); line-height: 1.5; letter-spacing: 0; text-shadow: 4px 4px 0 #25335c; }.feed-masthead h1 span { color: var(--v); }.feed-masthead p { color: var(--muted); font-size: 13px; }
+.category-nav { margin: 18px 0 0; } #chips-type { gap: 8px; padding: 4px 0 10px; } #chips-type .chip { min-height: 44px; padding: 5px 13px 5px 6px; border: 1px solid var(--border); border-radius: 2px; background: var(--surface); color: var(--muted); font-family: var(--pixel); font-size: 8px; } #chips-type .chip.active { color: #121a0a !important; background: var(--v) !important; border-color: var(--v2); box-shadow: 3px 3px 0 #4a6730; } #chips-type .category-icon { width: 30px; height: 30px; border-radius: 1px; background: #26324f; }
+
+/* Add mission panel */
+.main > .hero { max-width: 720px; margin: 20px 0; padding: 20px; border: 2px solid #59698f; border-radius: 2px; background: #121a2b; box-shadow: 5px 5px 0 #05060b; backdrop-filter: none; }.hero .theme-art,.hero .badge,.hero .hero-title,.hero .hero-sub { display: none; }.submit-heading { margin: 0 0 14px; color: var(--v); font-family: var(--pixel); font-size: 10px; }.addbar { max-width: none; min-height: 52px; padding: 6px; border: 1px solid var(--c); border-radius: 2px; background: #080d18; box-shadow: 3px 3px 0 #05060b; }.addbar-icon { width: 34px; height: 34px; border-radius: 1px; background: var(--c); color: #07131a; }.addbar-input { font-size: 13px; }.local-notice { color: var(--muted-2); font-size: 10px; }
+
+/* Game panels and cards */
+.controls { margin-top: 26px; padding: 14px; border: 2px solid var(--border); border-radius: 2px; background: var(--surface); box-shadow: 4px 4px 0 #05060b; backdrop-filter: none; }.control-label { color: var(--c); font-family: var(--pixel); font-size: 8px; }.input,.select,.textarea { border: 1px solid var(--border-strong); border-radius: 2px; background: #090e19; color: #fff; }.input:focus,.select:focus,.textarea:focus { border-color: var(--v); box-shadow: 0 0 0 2px #b8ff5533; }
+.feed-head { margin: 28px 0 16px; }.section-title { color: #fff; font-family: var(--pixel); font-size: 13px; letter-spacing: 0; }.section-title svg { color: var(--v); }.count-pill { border: 1px solid var(--border); border-radius: 2px; color: var(--c); font-family: var(--pixel); font-size: 8px; }
+#feed-grid { gap: 18px; grid-template-columns: repeat(auto-fill,minmax(min(100%,285px),1fr)); }.video-card,.social-card,.trend-item,.cat-card { border: 2px solid var(--border); border-radius: 2px; background: #121827; box-shadow: 5px 5px 0 #05060b; backdrop-filter: none; }.video-card:hover,.social-card:hover,.trend-item:hover,.cat-card:hover { border-color: var(--v); box-shadow: 6px 7px 0 #05060b, 0 0 22px #b8ff5522; transform: translateY(-3px); }.video-card .thumb { border-bottom: 2px solid var(--border); border-radius: 0; }.video-card-body { padding: 15px; }.card-title { color: #fff; font-size: 14px; line-height: 1.5; }.card-meta { color: var(--muted); font-size: 11px; }.card-tag { color: var(--c) !important; }.video-card-foot { border-color: var(--border); }.card-foot-btn { min-height: 32px; border: 1px solid var(--border); border-radius: 2px; background: #1a2338; color: var(--muted); }.card-foot-btn:hover { border-color: var(--c); color: #fff; }.like-btn.liked { color: var(--red); }.type-pill { color: #dce1f5; }
+.view-intro,.social-header { border: 2px solid var(--border-strong); border-radius: 2px; background: #121a2b; box-shadow: 5px 5px 0 #05060b; }.view-intro-icon { border-radius: 1px; background: var(--v); color: #111609; }.release-card,.modal { border: 2px solid var(--border-strong); border-radius: 2px; background: #121827; box-shadow: 6px 6px 0 #05060b; }
+
+/* Pixel trailer */
+.trailer-backdrop { background: #070a12; }.trailer-backdrop::before { background: radial-gradient(circle at 50% 50%,#b8ff55,transparent 12%),radial-gradient(circle at 20% 20%,#55e6ff,transparent 24%); opacity: .12; filter: none; }.trailer-stage { border: 2px solid var(--border-strong); border-radius: 2px; background: #0e1524; box-shadow: 8px 8px 0 #03040a; backdrop-filter: none; }.trailer-stage::after { content: 'SPIKE ARCADE // INSERT COIN'; color: var(--v); font-family: var(--pixel); font-size: 8px; }.trailer-overline { color: var(--c); font-family: var(--pixel); font-size: 8px; }.trailer-scene h2,.trailer-finish h2 { font-family: var(--pixel); font-size: clamp(26px,5vw,58px); line-height: 1.5; letter-spacing: 0; text-shadow: 4px 4px 0 #26355c; }.trailer-scene h2 em { color: var(--v); }.trailer-mark { border-radius: 2px; background: var(--v); box-shadow: 7px 7px 0 #536b35; }.trailer-progress i.is-active { background: var(--v); }.trailer-orbit { border-color: var(--c); animation: none; }.trailer-orbit::after { background: var(--v); box-shadow: 0 0 30px var(--v); }.trailer-start { border-radius: 2px; }
+
+@media(max-width:900px){.site-layout{width:calc(100% - 28px);grid-template-columns:170px minmax(0,1fr);gap:22px}.feed-masthead::after{display:none}.scene-3d{display:none}}
+@media(max-width:760px){.topbar{padding:9px 10px}.site-layout{display:block;width:calc(100% - 22px);padding-top:16px}.layout-sidebar{display:none}.feed-masthead h1{font-size:23px}.controls{margin-top:18px}.video-card{box-shadow:3px 3px 0 #05060b}.trailer-stage{min-height:calc(100vh - 20px);width:calc(100vw - 20px);padding:24px}.trailer-scene,.trailer-finish{inset:24px}.trailer-scene h2,.trailer-finish h2{font-size:clamp(22px,7vw,38px)}}
+@media(max-width:430px){.topbar .tabs{gap:3px}.topbar .tab{padding:7px 8px;font-size:7px}.feed-masthead h1{font-size:20px}#chips-type .chip{font-size:7px}.addbar{flex-wrap:wrap}.addbar-input{flex:1 1 calc(100% - 44px)}.addbar .btn{flex:1 0 100%}}
+@media(prefers-reduced-motion:reduce){.video-card:hover,.social-card:hover,.trend-item:hover,.cat-card:hover{transform:none}}
+
 /* Performance mode: depth without a permanent GPU workout. */
 body::before { animation: none; }
 .bg .aurora, .bg .glow, .bg::before, .bg::after, .noise { display: none; }
