@@ -1064,9 +1064,14 @@ function initParticles() {
   }
 
   resize(); make(); loop();
-  window.addEventListener("resize", () => { resize(); make(); });
+  let resizeFrame = 0;
+  window.addEventListener("resize", () => {
+    cancelAnimationFrame(resizeFrame);
+    resizeFrame = requestAnimationFrame(() => { resize(); make(); });
+  }, { passive: true });
   document.addEventListener("visibilitychange", () => {
-    if (document.hidden) cancelAnimationFrame(raf); else loop();
+    if (document.hidden) cancelAnimationFrame(raf);
+    else { cancelAnimationFrame(raf); loop(); }
   });
 }
 
@@ -1079,4 +1084,7 @@ function init() {
   // Статичные фоновые звёзды заменяют постоянную перерисовку canvas.
 }
 
+document.addEventListener("visibilitychange", () => {
+  document.documentElement.classList.toggle("page-hidden", document.hidden);
+});
 document.addEventListener("DOMContentLoaded", init);

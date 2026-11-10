@@ -1850,3 +1850,55 @@ body::before { content:""; position:fixed; z-index:-4; inset:-18%; pointer-event
 @media(max-width:420px),(prefers-reduced-motion:reduce){.scene-3d,.grid-bg{display:none}.bg .aurora,.bg .glow,#particles{display:none}.main>.hero,.video-card,.social-card,.trend-item,.cat-card{backdrop-filter:none;box-shadow:3px 3px #030504}}
 @media(prefers-reduced-motion:reduce){body:before,.scene-orb,.scene-ring,.scene-card,.trailer-orbit{animation:none!important}.video-card:hover,.social-card:hover,.trend-item:hover,.cat-card:hover{transform:none}}
 
+/* Performance mode: depth without a permanent GPU workout. */
+body::before { animation: none; }
+.bg .aurora, .bg .glow, .bg::before, .bg::after, .noise { display: none; }
+.topbar, .main > .hero, .controls, .video-card, .social-card, .trend-item,
+.cat-card, .view-intro, .social-header, .release-card, .modal, .scene-card,
+.trailer-stage, .developers, .views-badge, .watched-badge {
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+.main > .hero, .controls, .video-card, .social-card, .trend-item,
+.cat-card, .view-intro, .social-header, .release-card, .modal { background: #101a14f5; }
+.trailer-stage { background: #0c150ff7; }
+.trailer-backdrop::before { filter: none; }
+.scene-orb { filter: none; box-shadow: inset -24px -18px 32px #0008; }
+.scene-card { box-shadow: 0 8px 20px #0005; animation: none; }
+.scene-ring { animation: none; }
+.scene-orb { animation: lightweightFloat 14s ease-in-out infinite alternate; }
+@keyframes lightweightFloat { to { transform: translate3d(12px, -12px, 0); } }
+.category-icon svg, .theme-art-icon, .theme-art-icon svg,
+.video-card.heat-2:hover, .video-card.heat-3:hover { animation: none; }
+.video-card, .social-card, .trend-item, .cat-card { box-shadow: 0 3px 10px #0004; }
+.video-card:hover, .social-card:hover, .trend-item:hover, .cat-card:hover {
+  box-shadow: 0 3px 10px #0004;
+  transform: translateY(-2px);
+}
+.video-card, .social-card { transition: transform .18s ease, border-color .18s ease; }
+html.page-hidden *, html.page-hidden *::before, html.page-hidden *::after,
+body.trailer-open .bg *, body.trailer-open::before {
+  animation-play-state: paused !important;
+}
+body.trailer-open { overflow: hidden; }
+@media (prefers-reduced-motion: reduce) {
+  .scene-orb { animation: none !important; }
+}
+.scene-3d { contain: layout paint; }
+.scene-orb, .scene-ring, .scene-card { will-change: transform; }
+@media (max-width: 900px) {
+  .scene-3d { opacity: .18; }
+  .scene-orb { filter: none; box-shadow: 0 0 35px #b8ed6a18; }
+  .scene-card { backdrop-filter: none; box-shadow: 0 10px 25px #0006; }
+  .scene-ring { animation-duration: 45s; }
+}
+@media (max-width: 600px) {
+  .scene-3d { display: none; }
+  .bg .aurora, .bg .glow { display: none; }
+  .grid-bg { transform: none; opacity: .08; }
+  .main > .hero, .video-card, .social-card, .trend-item, .cat-card, .controls { backdrop-filter: none; -webkit-backdrop-filter: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .scene-orb, .scene-ring, .scene-card { will-change: auto; }
+}
+
