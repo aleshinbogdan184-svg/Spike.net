@@ -472,17 +472,24 @@ document.addEventListener('DOMContentLoaded', () => {
     currentProfile = null;
     earnedAchievements = new Set();
     $('#profile-button').hidden = !user;
+    $('#account-toggle').hidden = !user;
+    $('#account-menu').hidden = true;
     isOwner = !!user && SPIKE_DEVELOPERS.has(user.id);
     button.textContent = 'Войти';
     button.hidden = !!user;
     $('#view-delete').hidden = !isOwner;
     $('#reports-button').hidden = !isOwner;
+    $('#account-reports').hidden = !isOwner;
     setTimeout(async () => {
       if (user) {
         await authClient.rpc('spike_checkin');
         const { data } = await authClient.from('spike_profiles').select('*').eq('user_id', user.id).maybeSingle();
         if (currentUser?.id !== user.id) return;
         currentProfile = data;
+        const avatarButton = $('#account-toggle');
+        avatarButton.textContent = '';
+        if (data?.avatar_path) { const img = document.createElement('img'); img.src = avatarUrl(data.avatar_path) + '?v=' + Date.now(); img.alt = ''; avatarButton.appendChild(img); }
+        else avatarButton.textContent = (data?.nickname || '✦').slice(0, 1).toUpperCase();
         const result = await authClient.from('spike_achievements').select('code').eq('user_id', user.id);
         if (currentUser?.id !== user.id) return;
         if (!result.error) earnedAchievements = new Set(result.data.map(row => row.code));
@@ -546,6 +553,7 @@ document.addEventListener('DOMContentLoaded', () => {
     preview.className = `profile-preview profile-frame-${['classic','spark','collector','legend','comet','neon','orbit','heart','voice','starfish','sponge','banana'].includes(currentProfile?.frame_style) ? currentProfile.frame_style : 'classic'}`;
     if (currentProfile?.avatar_path) { const img = document.createElement('img'); img.src = avatarUrl(currentProfile.avatar_path) + '?v=' + Date.now(); img.alt = ''; preview.appendChild(img); } else preview.textContent = '✦';
     $('#own-profile-name').textContent = currentProfile?.nickname || 'Создай профиль';
+    profileModal.hidden = false;
     if (typeof loadOwnProfile === 'function') loadOwnProfile();
     const rewards = { reply_1: 'Искра диалога · рамка «Искра»', bookmark_10: 'Архивариус · рамка «Коллекционер»', comment_25: 'Голос Spike · рамка «Легенда»', like_5: 'Ценитель · лазурный цвет', bookmark_5: 'Собиратель · золотой цвет' };
     const badges = Object.entries(rewards).filter(([code]) => earnedAchievements.has(code)).map(([, title]) => `🏆 ${title}`);
@@ -553,6 +561,15 @@ document.addEventListener('DOMContentLoaded', () => {
     profileModal.hidden = false;
   }
   $('#profile-button').addEventListener('click', showProfile);
+  const accountToggle = $('#account-toggle'), accountMenu = $('#account-menu');
+  const closeAccount = () => { accountMenu.hidden = true; accountToggle.setAttribute('aria-expanded', 'false'); };
+  accountToggle.addEventListener('click', () => { accountMenu.hidden = !accountMenu.hidden; accountToggle.setAttribute('aria-expanded', String(!accountMenu.hidden)); });
+  $('#profile-button').addEventListener('click', closeAccount);
+  $('#account-settings').addEventListener('click', () => { closeAccount(); showProfile(); $('.profile-edit').open = true; });
+  $('#account-reports').addEventListener('click', () => { closeAccount(); showReports(); });
+  $('#account-report-new').addEventListener('click', () => { closeAccount(); openReportForm(); });
+  document.addEventListener('click', e => { if (!e.target.closest('.account-menu-wrap')) closeAccount(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeAccount(); });
   $('#profile-close').addEventListener('click', () => { profileModal.hidden = true; });
   $('#profile-signout').addEventListener('click', async () => {
     const { error } = await authClient.auth.signOut();
@@ -571,7 +588,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (file) { path = `${currentUser.id}/avatar`; const { error } = await authClient.storage.from('spike-avatars').upload(path, file, { upsert: true, contentType: file.type }); if (error) throw error; }
       const { data, error } = await authClient.from('spike_profiles').upsert({ user_id: currentUser.id, nickname, avatar_path: path, frame_style: $('#profile-frame').value, accent_style: $('#profile-accent').value }).select().single();
       if (error) throw error;
-      currentProfile = data; profileModal.hidden = true; await refreshShared(); toast('Профиль сохранён');
+      currentProfile = data; const avatarButton = $('#account-toggle'); avatarButton.textContent = ''; if (data.avatar_path) { const img = document.createElement('img'); img.src = avatarUrl(data.avatar_path) + '?v=' + Date.now(); img.alt = ''; avatarButton.appendChild(img); } else avatarButton.textContent = (data.nickname || '✦').slice(0, 1).toUpperCase(); profileModal.hidden = true; await refreshShared(); toast('Профиль сохранён');
     } catch (error) { console.error('Ошибка профиля:', error); msg.textContent = error.code === '23505' ? 'Этот ник уже занят.' : 'Не удалось сохранить профиль. Проверь настройки базы и формат изображения.'; }
     finally { submit.disabled = false; }
   });

@@ -14,7 +14,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Press+Start+2P&family=Russo+One&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css?v=vice11-2" />
-  <link rel="stylesheet" href="sunset.css?v=2" />
+  <link rel="stylesheet" href="sunset.css?v=3" />
 </head>
 <body>
   <!-- ====== ФОН ====== -->
@@ -61,7 +61,7 @@
     <div class="topbar-right">
       <button class="btn btn-primary add-link-trigger" type="button">＋ Добавить ссылку</button>
       <button class="btn btn-ghost" id="auth-button" type="button">Войти</button>
-      <button class="btn btn-ghost" id="profile-button" type="button" hidden>Профиль</button>
+      <div class="account-menu-wrap"><button class="account-avatar" id="account-toggle" type="button" aria-label="Меню профиля" aria-expanded="false" hidden>✦</button><div class="account-menu" id="account-menu" hidden><button id="profile-button" type="button" hidden>Мой профиль</button><button id="account-settings" type="button">Настройки профиля</button><button id="account-reports" type="button" hidden>Жалобы модерации</button><button id="account-report-new" type="button">Отправить жалобу</button></div></div>
       <button class="btn btn-ghost" id="reports-button" type="button" hidden>Жалобы</button>
       <button class="btn btn-ghost report-compact" id="report-new-button" type="button" title="Пожаловаться" aria-label="Пожаловаться">⚑</button>
       <div class="stats">
@@ -79,7 +79,7 @@
   <div class="site-layout"><aside class="layout-sidebar" aria-label="Навигация по сайту"><div class="side-heading">НАВИГАЦИЯ <span>01</span></div><button type="button" data-layout-tab="feed">⌂ <span>Лента</span></button><button type="button" data-layout-tab="trends">↗ <span>Тренды</span></button><button type="button" data-layout-tab="bookmarks">★ <span>Закладки</span></button><button type="button" data-layout-tab="achievements">✦ <span>Достижения</span></button><button type="button" data-layout-tab="updates">◈ <span>Обновления</span></button><div class="side-note"><strong>SPIKE / 1.1</strong><p>Vice Spike уже в городе: собери награды и не пропусти забег.</p></div></aside>
   <main class="main">
     <section class="vice-event-banner" aria-label="Vice Spike событие">
-      <div class="vice-sun" aria-hidden="true"></div><div class="vice-palms" aria-hidden="true">♣</div>
+      <div class="vice-sun" aria-hidden="true"></div><svg class="sunset-palms" viewBox="0 0 300 240" aria-hidden="true"><g fill="#17152e"><path d="M182 245c-12-56-14-109-2-172l10 1c-9 67-6 119 8 171z"/><path d="M184 75C155 37 125 35 92 51c34-6 52 2 68 17-30-13-56-6-73 15 30-12 53-11 75-3-20 3-38 16-44 34 21-16 43-23 63-28 16 6 34 18 42 35 0-22-10-36-25-47 27 5 49 17 61 33-4-27-22-43-53-47 27-10 52-8 74 3-19-23-47-31-77-17 15-18 35-28 54-29-35-8-62 9-73 58z"/><path d="M52 245c-5-35-4-69 3-110l6 1c-5 39-5 75 2 109z"/><path d="M58 139c-18-24-38-26-57-15 19-3 31 2 40 10-17-5-30 0-39 13 16-8 30-8 43-4-11 5-19 12-22 23 12-10 23-14 34-17 12 5 21 12 26 22 0-13-6-23-15-30 16 3 29 10 36 20-2-16-13-26-32-28 17-6 31-4 44 2-11-14-29-19-48-11 11-11 20-16 32-17-21-5-36 5-42 32z"/></g></svg>
       <div class="vice-event-copy"><span>SPIKE PRESENTS · VICE CITY EVENT</span><h1>Лента находок<span>_</span></h1><p>Закат, неон и лучшие находки города. Ивент активен до 20 ноября.</p></div>
       <div class="vice-event-side"><strong id="vice-countdown">ЗАГРУЗКА…</strong><button class="btn btn-primary" id="vice-run-open" type="button">▶ VICE RUN</button></div>
     </section>
@@ -327,7 +327,7 @@
   <div class="modal-back" id="profile-modal" hidden><div class="modal" role="dialog" aria-modal="true" aria-labelledby="profile-title">
     <div class="modal-head"><h2 class="modal-title" id="profile-title">Мой профиль</h2><button class="btn btn-ghost btn-sm" type="button" id="profile-close">✕</button></div>
     <form class="modal-body" id="profile-form"><div class="own-profile-header"><div class="profile-preview" id="profile-preview">✦</div><h3 id="own-profile-name">Профиль</h3><div id="own-profile-stats" class="own-profile-stats">Загрузка…</div></div>
-      <div class="own-profile-tabs"><button type="button" class="chip active" data-own-tab="posts">Публикации</button><button type="button" class="chip" data-own-tab="reposts">Репосты</button><button type="button" class="chip" data-own-tab="likes">Лайки</button></div><div id="own-profile-content" class="own-profile-content">Загрузка…</div><details class="profile-edit"><summary>Настроить профиль</summary>
+      <div class="own-profile-tabs"><button type="button" class="chip active" data-own-tab="posts">Публикации</button><button type="button" class="chip" data-own-tab="saved">Сохранённые</button><button type="button" class="chip" data-own-tab="reposts">Репосты</button><button type="button" class="chip" data-own-tab="likes">Лайки</button></div><div id="own-profile-content" class="own-profile-content">Загрузка…</div><details class="profile-edit"><summary>Настроить профиль</summary>
       <label class="field">Уникальный ник <input class="input" id="profile-nickname" minlength="2" maxlength="24" required></label>
       <label class="field">Аватар: PNG, JPEG или WebP до 1 МБ <input class="input" type="file" id="profile-avatar" accept="image/png,image/jpeg,image/webp"></label>
       <div class="profile-customize"><label class="field">Рамка<select class="select" id="profile-frame" size="4"><option value="classic">Классика</option><option value="spark">Искра — первый ответ</option><option value="collector">Коллекционер — 10 закладок</option><option value="legend">Легенда — 25 комментариев</option><option value="comet">Комета — 3 комментария</option><option value="neon">Неон — 5 лайков</option><option value="orbit">Орбита — 5 закладок</option><option value="heart">Сердце — 10 лайков</option><option value="voice">Голос — 10 комментариев</option><option value="starfish">Морская звезда — первый ответ</option><option value="sponge">Морской пузырь — 5 закладок</option><option value="banana">Банановый заряд — 10 лайков</option></select></label><label class="field">Цвет<select class="select" id="profile-accent" size="4"><option value="violet">Фиолетовый</option><option value="cyan">Лазурный — 5 лайков</option><option value="gold">Золотой — 5 закладок</option><option value="rose">Розовый — первый ответ</option><option value="lime">Лайм — 10 закладок</option><option value="coral">Коралловый — 10 комментариев</option><option value="ice">Ледяной — 10 лайков</option></select></label></div><p class="field-hint">Выбери рамку и цвет в списках. Закрытые награды откроются за достижения.</p>
@@ -386,10 +386,10 @@
   </div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-  <script src="app.js?v=sunset2"></script>
+  <script src="app.js?v=sunset3"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="shared.js?v=sunset2"></script>
-  <script src="social.js?v=vice11-2"></script>
-  <script src="welcome.js?v=sunset2"></script>
+  <script src="shared.js?v=sunset3"></script>
+  <script src="social.js?v=sunset3"></script>
+  <script src="welcome.js?v=sunset3"></script>
 </body>
 </html>

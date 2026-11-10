@@ -43,6 +43,10 @@
   next.addEventListener('click', () => show(Math.min(scenes.length, index + 1)));
   document.querySelector('#events-vice-run')?.addEventListener('click', () => document.querySelector('#vice-run-open')?.click());
   document.querySelector('[data-layout-tab="bookmarks"]')?.remove();
+  const sidebarEvents = document.createElement('button');
+  sidebarEvents.type = 'button'; sidebarEvents.innerHTML = '✧ <span>Ивенты</span>';
+  sidebarEvents.addEventListener('click', () => { document.querySelector('#tabs [data-tab="events"]').click(); window.scrollTo({ top: 0, behavior: 'smooth' }); });
+  document.querySelector('.layout-sidebar')?.insertBefore(sidebarEvents, document.querySelector('[data-layout-tab="updates"]'));
   const eventView = document.querySelector('#view-events');
   if (eventView) {
     const challenge = document.createElement('section');
@@ -73,6 +77,9 @@
     release.className = 'release-card sunset-release';
     release.innerHTML = `<div class="release-head"><span class="release-version">НОВОЕ</span><span class="release-tag">VICE SPIKE / SUNSET</span></div><h2>Новый взгляд на Spike</h2><p>Обновили сайт в атмосфере Vice City: больше закатных оттенков, меньше визуального шума.</p><ul><li><strong>Редизайн:</strong> неоновые акценты, мягкие градиенты и более спокойный интерфейс.</li><li><strong>Посты:</strong> обновлённые карточки и более аккуратная лента сообщества.</li><li><strong>Ивенты:</strong> отдельная вкладка с Vice Spike, Vice Run и анонсом новогоднего события 20 ноября 2026 года. Подробности нового события появятся позже.</li><li><strong>Городской вызов:</strong> генератор случайных идей для знакомства с сайтом и ивентом — без начисления наград.</li><li><strong>Ознакомление:</strong> подробнее рассказали о возможностях Spike и добавили ручное переключение шагов.</li><li><strong>Закладки:</strong> убраны из интерфейса в пользу лайков. Ранее сохранённые данные не удаляются; связанные с закладками награды и оформление остаются архивными.</li></ul><div class="release-callout">✦ Заходи в раздел «Ивенты» и найди своё задание на сегодня.</div>`;
     updates.insertAdjacentElement('afterend', release);
+    const note = document.createElement('li'); note.innerHTML = '<strong>Новый профиль:</strong> сохранённые находки вернулись в профиль, настройки и жалобы перенесены в меню аватара. Карточки постов и комментарии обновлены, Vice Run стал немного сложнее.'; release.querySelector('ul').appendChild(note);
+    const oldNote = [...release.querySelectorAll('li')].find(li => li.textContent.startsWith('Закладки:'));
+    if (oldNote) oldNote.textContent = 'Сохранённые находки: нажми ☆ на карточке и открой вкладку «Сохранённые» в профиле.';
   }
   modal.addEventListener('click', e => { if (e.target === modal || e.target.classList.contains('trailer-backdrop')) close(); });
   document.addEventListener('keydown', e => { if (!modal.hidden && e.key === 'Escape') close(); });
