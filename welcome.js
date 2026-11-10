@@ -1,6 +1,8 @@
 /* Первый запуск Spike: короткий интерактивный трейлер без внешнего видеофайла. */
 (() => {
-  const KEY = 'spike.welcome.seen.v1';
+  const KEY = 'spike.welcome.seen.v2';
+  const readSeen = () => { try { return localStorage.getItem(KEY) === '1'; } catch { return false; } };
+  const markSeen = () => { try { localStorage.setItem(KEY, '1'); } catch {} };
   const modal = document.querySelector('#welcome-trailer');
   if (!modal) return;
   const scenes = [...modal.querySelectorAll('.trailer-scene')];
@@ -15,7 +17,7 @@
   function close() {
     clearTimeout(timer);
     modal.classList.add('is-closing');
-    localStorage.setItem(KEY, '1');
+    markSeen();
     setTimeout(() => { modal.hidden = true; modal.setAttribute('aria-hidden', 'true'); document.body.classList.remove('trailer-open'); }, 380);
   }
   function show(n) {
@@ -36,6 +38,7 @@
   again.addEventListener('click', () => show(0));
   modal.addEventListener('click', e => { if (e.target === modal || e.target.classList.contains('trailer-backdrop')) close(); });
   document.addEventListener('keydown', e => { if (!modal.hidden && e.key === 'Escape') close(); });
-  if (!localStorage.getItem(KEY)) setTimeout(open, 420);
+  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (!readSeen()) setTimeout(open, prefersReduced ? 80 : 420);
   window.showSpikeTrailer = open;
 })();
