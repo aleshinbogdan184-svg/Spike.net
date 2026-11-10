@@ -8,13 +8,14 @@
   <meta name="theme-color" content="#080b09" />
   <meta name="color-scheme" content="dark" />
   <meta name="format-detection" content="telephone=no" />
-  <link rel="icon" type="image/png" href="cactus.png?v=1" />
-  <link rel="apple-touch-icon" href="cactus.png?v=1" />
+  <link rel="icon" type="image/png" href="cactus.png" />
+  <link rel="apple-touch-icon" href="cactus.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Press+Start+2P&family=Russo+One&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css?v=vice11-2" />
-  <link rel="stylesheet" href="sunset.css?v=4" />
+  <link rel="stylesheet" href="sunset.css?v=20" />
 </head>
 <body>
   <!-- ====== ФОН ====== -->
@@ -47,8 +48,8 @@
     </div>
 
     <nav class="tabs" id="tabs">
-      <button class="tab active" data-tab="feed" type="button">Лента</button>
-      <button class="tab" data-tab="social" type="button">Посты</button>
+      <button class="tab" data-tab="feed" type="button">Видео</button>
+      <button class="tab active" data-tab="social" type="button">Лента</button>
       <button class="tab" data-tab="events" type="button">Ивенты</button>
       <button class="tab" data-tab="trends" type="button">
         Тренды
@@ -76,14 +77,8 @@
   <div class="category-backdrop" id="category-backdrop" hidden></div>
 
   <!-- ====== ГЛАВНАЯ ====== -->
-  <div class="site-layout"><aside class="layout-sidebar" aria-label="Навигация по сайту"><div class="side-heading">НАВИГАЦИЯ <span>01</span></div><button type="button" data-layout-tab="feed">⌂ <span>Лента</span></button><button type="button" data-layout-tab="trends">↗ <span>Тренды</span></button><button type="button" data-layout-tab="bookmarks">★ <span>Закладки</span></button><button type="button" data-layout-tab="achievements">✦ <span>Достижения</span></button><button type="button" data-layout-tab="updates">◈ <span>Обновления</span></button><div class="side-note"><strong>SPIKE / 1.1</strong><p>Vice Spike уже в городе: собери награды и не пропусти забег.</p></div></aside>
+  <div class="site-layout"><aside class="layout-sidebar" aria-label="Навигация по сайту"><div class="side-heading">НАВИГАЦИЯ <span>01</span></div><button type="button" data-layout-tab="feed">⌂ <span>Лента</span></button><button type="button" data-layout-tab="trends">↗ <span>Тренды</span></button><button type="button" data-layout-tab="bookmarks">★ <span>Закладки</span></button><button type="button" data-layout-tab="achievements">✦ <span>Достижения</span></button><button type="button" data-layout-tab="updates">◈ <span>Обновления</span></button></aside>
   <main class="main">
-    <section class="vice-event-banner" aria-label="Vice Spike событие">
-      <div class="vice-sun" aria-hidden="true"></div><svg class="sunset-palms" viewBox="0 0 300 240" aria-hidden="true"><g fill="#17152e"><path d="M182 245c-12-56-14-109-2-172l10 1c-9 67-6 119 8 171z"/><path d="M184 75C155 37 125 35 92 51c34-6 52 2 68 17-30-13-56-6-73 15 30-12 53-11 75-3-20 3-38 16-44 34 21-16 43-23 63-28 16 6 34 18 42 35 0-22-10-36-25-47 27 5 49 17 61 33-4-27-22-43-53-47 27-10 52-8 74 3-19-23-47-31-77-17 15-18 35-28 54-29-35-8-62 9-73 58z"/><path d="M52 245c-5-35-4-69 3-110l6 1c-5 39-5 75 2 109z"/><path d="M58 139c-18-24-38-26-57-15 19-3 31 2 40 10-17-5-30 0-39 13 16-8 30-8 43-4-11 5-19 12-22 23 12-10 23-14 34-17 12 5 21 12 26 22 0-13-6-23-15-30 16 3 29 10 36 20-2-16-13-26-32-28 17-6 31-4 44 2-11-14-29-19-48-11 11-11 20-16 32-17-21-5-36 5-42 32z"/></g></svg>
-      <div class="vice-event-copy"><span>SPIKE PRESENTS · VICE CITY EVENT</span><h1>Лента находок<span>_</span></h1><p>Закат, неон и лучшие находки города. Ивент активен до 20 ноября.</p></div>
-      <div class="vice-event-side"><strong id="vice-countdown">ЗАГРУЗКА…</strong><button class="btn btn-primary" id="vice-run-open" type="button">▶ VICE RUN</button></div>
-    </section>
-    <div class="feed-masthead"><div><span class="feed-kicker">SPIKE / ОБЩАЯ ЛЕНТА</span><h1>Лента находок<span>_</span></h1><p>Видео, игры, музыка и кино от сообщества.</p></div></div>
     <nav class="category-nav" aria-label="Категории приложений"><div class="chip-group" id="chips-type">
             <button class="chip active" data-type="all" type="button"><span class="category-icon">✦</span>Все</button>
             <button class="chip" data-type="youtube" type="button"><span class="category-icon yt">▶</span>YouTube</button>
@@ -143,11 +138,6 @@
             <option value="title">По названию</option>
           </select>
         </div>
-        <div class="control-group control-search">
-          <label class="control-label" for="search-input">Поиск</label>
-          <button class="search-toggle" id="search-toggle" type="button" aria-label="Открыть поиск" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"></circle><path d="m16 16 5 5"></path></svg></button>
-          <input type="text" class="input" id="search-input" placeholder="Найти видео..." autocomplete="off" />
-        </div>
       </div>
 
       <div class="feed-head">
@@ -157,6 +147,7 @@
         </h2>
         <span class="count-pill" id="feed-count">0 видео</span>
         <button class="btn btn-ghost" id="random-post" type="button">🎲 Случайная находка</button>
+        <div class="control-search feed-search"><button class="search-toggle" id="search-toggle" type="button" aria-label="Открыть поиск" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"></circle><path d="m16 16 5 5"></path></svg></button><input type="text" class="input" id="search-input" aria-label="Поиск" placeholder="Найти видео..." autocomplete="off" /></div>
       </div>
       <div class="grid" id="feed-grid"></div>
       <div class="empty" id="empty" hidden>
@@ -194,9 +185,9 @@
       </div>
       <div class="cat-grid" id="cat-grid"></div>
     </section>
-    <section class="tab-view" id="view-updates" hidden><div class="view-intro"><span class="view-intro-icon">✦</span><div><span class="view-eyebrow">SPIKE / НОВОСТИ</span><h1>Обновления</h1><p>Что нового на сайте.</p></div></div><article class="release-card"><div class="release-head"><span class="release-version">1.1</span><span class="release-tag">VICE CITY EVENT</span></div><h2>VICE SPIKE — город просыпается</h2><p>Новый сезон Spike в духе неонового Vice City: закаты, пальмы, бирюзовый свет и аркадные задания.</p><ul><li><strong>VICE SPIKE:</strong> временный ивент активен до 20 ноября 2026 года.</li><li><strong>Vice Run:</strong> мини-игра с прыжками через препятствия. Управление — Space, стрелка вверх или тап по игровому полю.</li><li><strong>Постоянные награды:</strong> достижения за ивент сохраняются в профиле навсегда.</li><li><strong>Новые значки:</strong> «Первый закат», «Зелёный свет», «Местный житель», «Король побережья», «Хорошие связи», «Секретный тайник» и коллекционный знак «VICE / 2026».</li><li><strong>Обновлённые посты:</strong> посты теперь выглядят как компактная социальная лента, без огромного пустого блока. Изображение, автор, текст и действия собраны в одной карточке.</li><li><strong>Посты на мобильном:</strong> карточки стали вертикальнее и удобнее для управления одной рукой, комментарии открываются в отдельной панели.</li><li><strong>Поиск:</strong> поле поиска убрано из интерфейса и открывается по кнопке с иконкой лупы. Нажми на лупу, чтобы найти видео, игру, музыку или кино.</li><li><strong>Разные разделы:</strong> лента, посты, тренды, закладки и достижения получили собственные акцентные цвета и оформление.</li><li><strong>Оптимизация:</strong> тяжёлые 3D-эффекты убраны, фоновые glitch-эффекты работают на CSS и отключаются на мобильных устройствах и при настройке уменьшения движения.</li></ul><div class="release-callout">✦ Заезжай в Vice Spike, собери награды и оставь свой след в городе.</div></article></section>
-    <section class="tab-view" id="view-social" hidden><div class="social-header"><div><span class="social-eyebrow">SPIKE / СООБЩЕСТВО</span><h1>Твой уголок<br><em>интернета.</em></h1><p>Мемы, моды и мысли — делись тем, что стоит увидеть.</p><button class="btn btn-primary" id="social-create" type="button">＋ Создать пост</button></div><div class="social-hero-art" aria-hidden="true">✦</div></div><div class="social-toolbar"><div><h2>Свежие посты</h2><span>Что происходит в сообществе</span></div><div class="social-filters"><button class="chip active" type="button" data-social-filter="all">Все</button><button class="chip" type="button" data-social-filter="following">Подписки</button></div></div><p id="social-status" class="field-hint"></p><div id="social-grid" class="social-grid"></div></section>
-    <section class="tab-view" id="view-events" hidden><div class="events-hero"><span class="events-kicker">SPIKE / СОБЫТИЯ</span><h1>Встречаемся<br><em>на закате.</em></h1><p>Все события Spike — в одном месте. Открывай новые впечатления вместе с сообществом.</p></div><div class="events-heading"><div><span class="events-kicker">КАЛЕНДАРЬ SPIKE</span><h2>Сейчас и скоро</h2></div></div><div class="events-grid"><article class="event-card event-vice"><span class="event-label">ДО 20 НОЯБРЯ 2026</span><h3>Vice Spike</h3><p>Неоновый город, находки и аркадный забег Vice Run. Собирай ивентовые достижения в профиле.</p><button class="btn btn-primary" type="button" id="events-vice-run">Играть в Vice Run ↗</button></article><article class="event-card event-winter"><span class="event-label">СТАРТ · 20 НОЯБРЯ 2026</span><h3>Новый год</h3><p>Следующий ивент Spike начинается 20 ноября. Подробности и программа появятся позже.</p><span class="event-soon">СКОРО ✦</span></article></div></section>
+    <section class="tab-view" id="view-updates" hidden><div class="view-intro"><div><h1>Обновления</h1><p>Новости и изменения Spike.</p></div></div><article class="release-card"><div class="release-head"><span class="release-tag">SPIKE / ГЛОБАЛЬНОЕ ОБНОВЛЕНИЕ</span></div><h2>Большое обновление Spike</h2><p>Новая структура, оформление и возможности сообщества.</p><ul><li>Посты в основной ленте, ссылки в разделе «Видео».</li><li>Обновлены карточки, просмотр публикаций, профиль и навигация.</li><li>Анимированные смайлики; ответы и оценки постов требуют настройки базы.</li><li>GIF-аватары и GIF в постах — после настройки хранилища.</li><li>Ссылки на соцсети и автор оригинала — после обновления базы.</li><li>Хештеги, копирование ссылки и скачивание изображения.</li><li>Анонс новогоднего ивента 20 ноября 2026 года.</li></ul></article></section>
+    <section class="tab-view" id="view-social" hidden><div class="social-toolbar"><div><h2>Свежие посты</h2><span>Что происходит в сообществе</span></div><div class="social-filters"><button class="btn btn-primary" id="social-create" type="button">＋ Создать пост</button><button class="chip active" type="button" data-social-filter="all">Все</button><button class="chip" type="button" data-social-filter="following">Подписки</button></div></div><p id="social-status" class="field-hint"></p><div id="social-grid" class="social-grid"></div></section>
+    <section class="tab-view" id="view-events" hidden><div class="events-heading"><span class="events-kicker">SPIKE / СОБЫТИЯ</span><h1>Ивенты</h1></div><article class="event-card event-winter"><span class="event-label">20 НОЯБРЯ 2026</span><h2>Новогодний ивент</h2><p>Готовим новое событие. Подробности и программа появятся позже.</p><span class="event-soon">СКОРО</span></article></section>
     <section class="tab-view" id="view-bookmarks" hidden><div class="view-intro"><span class="view-intro-icon">★</span><div><h1>Закладки</h1><p>Твои сохранённые находки.</p></div></div><div id="bookmarks-message" class="empty-inner"></div><div class="grid" id="bookmarks-grid"></div></section>
     <section class="tab-view" id="view-achievements" hidden><div class="view-intro"><span class="view-intro-icon">🏆</span><div><h1>Достижения</h1><p>Твои первые шаги в Spike.</p></div></div><div id="achievements-grid" class="cat-grid"></div></section>
   </main><aside class="layout-aside" aria-label="О Spike"><div class="side-widget"><span class="widget-label">✦ КАК ЭТО РАБОТАЕТ</span><h2>Находка ждёт своих</h2><p>Добавь ссылку, обсуди её и сохрани то, к чему захочешь вернуться.</p><button type="button" class="side-cta" id="side-add">＋ Предложить ссылку</button></div><div class="side-widget side-widget-alt"><span class="widget-label">✧ МАЛЕНЬКАЯ ПОДСКАЗКА</span><p>Не знаешь, что открыть? Попробуй случайную находку в ленте.</p><button type="button" class="side-cta subtle" id="side-random">🎲 Удиви меня</button></div><div class="side-footer">SPIKE.NET <span>✦</span> МЕСТО ДЛЯ НАХОДОК</div></aside></div>
@@ -247,6 +238,7 @@
         <div class="field">
           <label class="field-label" for="f-title">Название <span class="required">*</span></label>
           <input type="text" class="input" id="f-title" placeholder="Название видео / фильма / игры" maxlength="140" required />
+          <label class="field-label" for="f-source-author">Автор оригинала (необязательно)</label><input type="text" class="input" id="f-source-author" placeholder="Канал, исполнитель или создатель" maxlength="160" />
           <span class="field-hint" id="f-title-hint">Название обязательно</span>
         </div>
         <div class="field-row">
@@ -328,8 +320,10 @@
     <div class="modal-head"><h2 class="modal-title" id="profile-title">Мой профиль</h2><button class="btn btn-ghost btn-sm" type="button" id="profile-close">✕</button></div>
     <form class="modal-body" id="profile-form"><div class="own-profile-header"><div class="profile-preview" id="profile-preview">✦</div><h3 id="own-profile-name">Профиль</h3><div id="own-profile-stats" class="own-profile-stats">Загрузка…</div></div>
       <div class="own-profile-tabs"><button type="button" class="chip active" data-own-tab="posts">Публикации</button><button type="button" class="chip" data-own-tab="saved">Сохранённые</button><button type="button" class="chip" data-own-tab="reposts">Репосты</button><button type="button" class="chip" data-own-tab="likes">Лайки</button></div><div id="own-profile-content" class="own-profile-content">Загрузка…</div><details class="profile-edit"><summary>Настроить профиль</summary>
+      <fieldset class="background-settings"><legend>Цвет фона</legend><p>Выбери палитру или настрой свой цвет. Настройка сохраняется на этом устройстве.</p><div class="background-options" role="group" aria-label="Палитра фона"><button type="button" data-background="ocean">Океан</button><button type="button" data-background="crimson">Красный</button><button type="button" data-background="violet">Фиолетовый</button><button type="button" data-background="forest">Лес</button><button type="button" data-background="graphite">Графит</button><label class="custom-background">Свой цвет <input type="color" id="background-custom" value="#415ca0" aria-label="Свой цвет фона"></label></div></fieldset>
       <label class="field">Уникальный ник <input class="input" id="profile-nickname" minlength="2" maxlength="24" required></label>
-      <label class="field">Аватар: PNG, JPEG или WebP до 1 МБ <input class="input" type="file" id="profile-avatar" accept="image/png,image/jpeg,image/webp"></label>
+      <label class="field">Аватар: PNG, JPEG, WebP или GIF до 3 МБ <input class="input" type="file" id="profile-avatar" accept="image/png,image/jpeg,image/webp,image/gif"></label>
+      <fieldset class="profile-social-settings"><legend>Мои соцсети</legend><p class="field-hint">Ссылки видны всем и не подтверждают владение аккаунтом.</p><label class="field">YouTube<input class="input" id="profile-link-youtube" type="url" maxlength="500" placeholder="https://youtube.com/@..."></label><label class="field">Twitch<input class="input" id="profile-link-twitch" type="url" maxlength="500" placeholder="https://twitch.tv/..."></label><label class="field">Telegram<input class="input" id="profile-link-telegram" type="url" maxlength="500" placeholder="https://t.me/..."></label><label class="field">TikTok<input class="input" id="profile-link-tiktok" type="url" maxlength="500" placeholder="https://tiktok.com/@..."></label><label class="field">X<input class="input" id="profile-link-x" type="url" maxlength="500" placeholder="https://x.com/..."></label><p class="field-hint" id="profile-links-message" role="status"></p><button class="btn btn-ghost" id="profile-links-save" type="button">Сохранить соцсети</button></fieldset>
       <div class="profile-customize"><label class="field">Рамка<select class="select" id="profile-frame" size="4"><option value="classic">Классика</option><option value="spark">Искра — первый ответ</option><option value="collector">Коллекционер — 10 закладок</option><option value="legend">Легенда — 25 комментариев</option><option value="comet">Комета — 3 комментария</option><option value="neon">Неон — 5 лайков</option><option value="orbit">Орбита — 5 закладок</option><option value="heart">Сердце — 10 лайков</option><option value="voice">Голос — 10 комментариев</option><option value="starfish">Морская звезда — первый ответ</option><option value="sponge">Морской пузырь — 5 закладок</option><option value="banana">Банановый заряд — 10 лайков</option></select></label><label class="field">Цвет<select class="select" id="profile-accent" size="4"><option value="violet">Фиолетовый</option><option value="cyan">Лазурный — 5 лайков</option><option value="gold">Золотой — 5 закладок</option><option value="rose">Розовый — первый ответ</option><option value="lime">Лайм — 10 закладок</option><option value="coral">Коралловый — 10 комментариев</option><option value="ice">Ледяной — 10 лайков</option></select></label></div><p class="field-hint">Выбери рамку и цвет в списках. Закрытые награды откроются за достижения.</p>
       <div><strong>Мои достижения</strong><div id="profile-achievements" class="profile-achievements"></div></div>
       <p class="auth-message" id="profile-message" role="status"></p><div class="modal-actions"><button class="btn btn-ghost btn-danger" id="profile-signout" type="button">Выйти из аккаунта</button><button class="btn btn-primary" type="submit">Сохранить профиль</button></div></details>
@@ -337,7 +331,7 @@
   <div class="modal-back" id="reports-modal" hidden><div class="modal" role="dialog" aria-modal="true" aria-labelledby="reports-title"><div class="modal-head"><h2 class="modal-title" id="reports-title">Жалобы</h2><button class="btn btn-ghost btn-sm" id="reports-close" type="button">✕</button></div><p class="reports-help">Здесь видны жалобы для модераторов. Отправить новую можно кнопкой «Пожаловаться» сверху.</p><div class="modal-body" id="reports-list"></div></div></div>
   <div class="modal-back" id="report-form-modal" hidden><div class="modal" role="dialog" aria-modal="true" aria-labelledby="report-form-title"><div class="modal-head"><h2 class="modal-title" id="report-form-title">Отправить жалобу</h2><button class="btn btn-ghost btn-sm" id="report-form-close" type="button">✕</button></div><form class="modal-body" id="report-form"><label class="field">Публикация<select class="select" id="report-post" required></select></label><label class="field">Причина<textarea class="textarea" id="report-reason" minlength="3" maxlength="500" required placeholder="Опиши проблему"></textarea></label><p class="field-hint" id="report-form-message" role="status"></p><button class="btn btn-primary" type="submit">Отправить жалобу</button></form></div></div>
   <div class="modal-back" id="public-profile-modal" hidden><div class="modal" role="dialog" aria-modal="true" aria-labelledby="public-profile-title"><div class="modal-head"><h2 class="modal-title" id="public-profile-title">Профиль</h2><button class="btn btn-ghost btn-sm" id="public-profile-close" type="button">✕</button></div><div class="modal-body" id="public-profile-body"></div></div></div>
-  <div class="modal-back" id="social-modal" hidden><div class="modal" role="dialog" aria-modal="true" aria-labelledby="social-title"><div class="modal-head"><h2 class="modal-title" id="social-title">Новый пост</h2><button class="btn btn-ghost" id="social-close" type="button">✕</button></div><form id="social-form" class="modal-body"><label class="field">Заголовок<input class="input" id="social-title-input" maxlength="140" required></label><label class="field">Категория<select class="select" id="social-category"><option value="meme">Мем</option><option value="mod">Мод</option><option value="topic">Обсуждение</option><option value="other">Другое</option></select></label><label class="field">Текст<textarea class="textarea" id="social-body" maxlength="3000" placeholder="Расскажи о находке или вставь ссылку на мод"></textarea></label><label class="field">Изображение с устройства (PNG, JPEG, WebP до 3 МБ)<input class="input" id="social-file" type="file" accept="image/png,image/jpeg,image/webp"></label><label class="field">Или ссылка на изображение<input class="input" id="social-image" type="url" maxlength="600" placeholder="https://..."></label><p id="social-error" class="field-hint" role="status"></p><button class="btn btn-primary" type="submit">Опубликовать</button></form></div></div>
+  <div class="modal-back" id="social-modal" hidden><div class="modal" role="dialog" aria-modal="true" aria-labelledby="social-title"><div class="modal-head"><h2 class="modal-title" id="social-title">Новый пост</h2><button class="btn btn-ghost" id="social-close" type="button">✕</button></div><form id="social-form" class="modal-body"><label class="field">Заголовок<input class="input" id="social-title-input" maxlength="140" required></label><label class="field">Категория<select class="select" id="social-category"><option value="meme">Мем</option><option value="mod">Мод</option><option value="topic">Обсуждение</option><option value="other">Другое</option></select></label><label class="field">Текст<textarea class="textarea" id="social-body" maxlength="3000" placeholder="Расскажи о находке или вставь ссылку на мод"></textarea></label><label class="field">Изображение или GIF с устройства (до 3 МБ)<input class="input" id="social-file" type="file" accept="image/png,image/jpeg,image/webp,image/gif"></label><label class="field">Или ссылка на изображение<input class="input" id="social-image" type="url" maxlength="600" placeholder="https://..."></label><p id="social-error" class="field-hint" role="status"></p><button class="btn btn-primary" type="submit">Опубликовать</button></form></div></div>
   <div class="modal-back" id="social-view-modal" hidden><div class="modal social-view-modal" role="dialog" aria-modal="true" aria-labelledby="social-view-title"><div class="modal-head"><h2 class="modal-title" id="social-view-title">Публикация</h2><button class="btn btn-ghost" id="social-view-close" type="button" aria-label="Закрыть">✕</button></div><div class="modal-body" id="social-view-body"></div></div></div>
   <!-- ====== ПЕРВЫЙ ЗАПУСК / ТРЕЙЛЕР ====== -->
   <div class="trailer" id="welcome-trailer" hidden aria-hidden="true">
@@ -346,6 +340,7 @@
       <button class="trailer-skip" id="trailer-skip" type="button">Пропустить <span>×</span></button>
       <div class="trailer-progress"><i></i><i></i><i></i><i></i></div>
       <div class="trailer-scanline"></div>
+      <div class="guide-orbit" aria-hidden="true"><div class="guide-ring guide-ring-a"></div><div class="guide-ring guide-ring-b"></div><div class="guide-core">✦</div><span class="guide-satellite gs-one">▶</span><span class="guide-satellite gs-two">♫</span><span class="guide-satellite gs-three">◉</span></div>
       <div class="trailer-scene scene-one">
         <span class="trailer-overline">SPIKE.NET / 01</span>
         <div class="trailer-mark">✦</div>
@@ -386,10 +381,10 @@
   </div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-  <script src="app.js?v=sunset4"></script>
+  <script src="app.js?v=global20"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="shared.js?v=sunset4"></script>
-  <script src="social.js?v=sunset3"></script>
-  <script src="welcome.js?v=sunset4"></script>
+  <script src="shared.js?v=global20"></script>
+  <script src="social.js?v=global20"></script>
+  <script src="welcome.js?v=space11"></script>
 </body>
 </html>

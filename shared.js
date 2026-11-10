@@ -19,6 +19,14 @@ Object.defineProperties(window, {
   currentUser: { get: () => currentUser },
 });
 const avatarUrl = path => path ? `${SPIKE_API.replace('/rest/v1', '')}/storage/v1/object/public/spike-avatars/${encodeURIComponent(path.split('/')[0])}/avatar` : '';
+const profileLinkHosts = { youtube: ['youtube.com','youtu.be'], twitch: ['twitch.tv'], telegram: ['t.me','telegram.me'], tiktok: ['tiktok.com'], x: ['x.com','twitter.com'] };
+function safeProfileLink(value, platform) {
+  if (!value || value.length > 500 || !profileLinkHosts[platform]) return '';
+  try { const u = new URL(value); const host = u.hostname.toLowerCase(); if (u.protocol !== 'https:' || u.username || u.password || !profileLinkHosts[platform].some(h => host === h || host.endsWith('.' + h))) return ''; return u.href; } catch { return ''; }
+}
+function profileLinksHTML(links) {
+  return Object.keys(profileLinkHosts).map(key => { const url = safeProfileLink(links?.[key], key); return url ? `<a class="profile-social-link" href="${escapeHTML(url)}" target="_blank" rel="noopener noreferrer">${escapeHTML(({youtube:'YouTube',twitch:'Twitch',telegram:'Telegram',tiktok:'TikTok',x:'X'})[key])} ↗</a>` : ''; }).join('');
+}
 let reactionsReady = false;
 let commentLikesReady = false;
 let commentLikes = [];
@@ -68,7 +76,7 @@ async function refreshShared() {
     items = posts.map(post => {
       const source = detectSource(post.url);
       return { id: post.id, title: post.title, url: post.url, type: source.type, source: source.source,
-        ytId: source.ytId, desc: post.description, poster: post.poster, year: '', tags: [], cover: '', authorId: post.user_id || null, author: profileMap.get(post.user_id)?.nickname || '', authorAvatar: avatarUrl(profileMap.get(post.user_id)?.avatar_path),
+        ytId: source.ytId, desc: post.description, poster: post.poster, sourceAuthor: post.source_author || twitchLogin(post.url) || '', year: '', tags: [], cover: '', authorId: post.user_id || null, author: profileMap.get(post.user_id)?.nickname || '', authorAvatar: avatarUrl(profileMap.get(post.user_id)?.avatar_path),
         likes: likeCounts.get(post.id) || 0, weeklyLikes: weeklyCounts.get(post.id) || 0, views: viewCounts.get(post.id) || 0, watched: false, createdAt: new Date(post.created_at).getTime(),
         comments: commentsByPost.get(post.id) || [] };
     });
@@ -117,15 +125,6 @@ function myAchievements() {
     make('Ценитель', 'Поставь 5 лайков', liked.size, 5, reactionsReady),
     make('Щедрое сердце', 'Поставь 10 лайков', liked.size, 10, reactionsReady),
     make('В диалоге', 'Ответь на комментарий', comments.filter(comment => comment.parentId).length, 1),
-    { name: 'Первый закат', description: 'Заверши забег Vice Run', value: viceRewards.has('sunset') ? 1 : 0, target: 1, available: true, done: viceRewards.has('sunset') },
-    { name: 'Зелёный свет', description: 'Набери 100 очков в Vice Run', value: viceRewards.has('green_light') ? 1 : 0, target: 1, available: true, done: viceRewards.has('green_light') },
-    { name: 'Местный житель', description: 'Набери 300 очков в Vice Run', value: viceRewards.has('local') ? 1 : 0, target: 1, available: true, done: viceRewards.has('local') },
-    { name: 'Король побережья', description: 'Набери 500 очков в Vice Run', value: viceRewards.has('coast_king') ? 1 : 0, target: 1, available: true, done: viceRewards.has('coast_king') },
-    { name: 'Хорошие связи', description: 'Оставь 5 комментариев на ивенте', value: viceRewards.has('connections') ? 1 : 0, target: 1, available: true, done: viceRewards.has('connections') },
-    { name: 'Секретный тайник', description: 'Архивная награда за закладки', value: viceRewards.has('stash') ? 1 : 0, target: 1, available: viceRewards.has('stash'), done: viceRewards.has('stash') },
-    { name: 'Пиратское радио', description: 'Добавь музыкальную находку', value: viceRewards.has('radio') ? 1 : 0, target: 1, available: true, done: viceRewards.has('radio') },
-    { name: 'Свой на побережье', description: 'Собери 3 награды Vice Spike', value: viceRewards.has('resident') ? 1 : 0, target: 1, available: true, done: viceRewards.has('resident') },
-    { name: 'VICE / 2026', description: 'Собери все награды ивента', value: viceRewards.has('collection') ? 1 : 0, target: 1, available: true, done: viceRewards.has('collection') },
   ];
 }
 
@@ -176,10 +175,11 @@ addFromLink = async function () {
   if (button.disabled) return;
   button.disabled = true;
   try {
-    let title = '', poster = '';
+    let title = '', poster = '', sourceAuthor = twitchLogin(url) || '';
     if (source.ytId) {
       const meta = await Promise.race([youtubeMeta(source.ytId), new Promise(resolve => setTimeout(() => resolve({}), 2500))]);
       title = meta.title || '';
+      sourceAuthor = meta.author || sourceAuthor;
     }
     if (source.source === 'Spotify' && !/^(?:https?:\/\/)?(?:www\.)?spotify\.link\//i.test(url)) {
       const meta = await Promise.race([spotifyMeta(url), new Promise(resolve => setTimeout(() => resolve({}), 2500))]);
@@ -187,7 +187,10 @@ addFromLink = async function () {
     }
     if (!title && source.type === 'game') title = slugTitle(url);
     if (!title) title = ({ youtube: 'Видео YouTube', twitch: 'Клип или трансляция Twitch', game: 'Игра Steam', music: `Музыка · ${source.source}`, film: 'Кино · Кинопоиск' })[source.type] || 'Публикация';
-    await sharedRequest('/spike_posts', { method: 'POST', headers: await postHeaders(), body: JSON.stringify({ title: title.slice(0, 140), url, poster, description: '' }) });
+    const payload = { title: title.slice(0, 140), url, poster, description: '' };
+    if (sourceAuthor) payload.source_author = sourceAuthor.slice(0, 160);
+    try { await sharedRequest('/spike_posts', { method: 'POST', headers: await postHeaders(), body: JSON.stringify(payload) }); }
+    catch (error) { if (!payload.source_author || !/source_author|schema cache/i.test(error.message)) throw error; delete payload.source_author; await sharedRequest('/spike_posts', { method: 'POST', headers: await postHeaders(), body: JSON.stringify(payload) }); }
     if (input.value.trim() === raw) input.value = '';
     await refreshShared();
     const sourceChip = $(`#chips-type [data-type="${source.type}"]`);
@@ -206,7 +209,8 @@ submitForm = async function (e) {
   if (!title || !url || detectSource(url).type === 'other') { toast('Укажи название и ссылку поддерживаемого сервиса', true); return; }
   if (poster && !/^https?:\/\//i.test(poster)) { toast('Ссылка на обложку должна начинаться с https://', true); return; }
   try {
-    await sharedRequest('/spike_posts', { method: 'POST', headers: await postHeaders(), body: JSON.stringify({ title, url, poster, description: $('#f-desc').value.trim() }) });
+    const sourceAuthor = $('#f-source-author').value.trim();
+    await sharedRequest('/spike_posts', { method: 'POST', headers: await postHeaders(), body: JSON.stringify({ title, url, poster, description: $('#f-desc').value.trim(), ...(sourceAuthor ? {source_author:sourceAuthor} : {}) }) });
     closeAdd(); await refreshShared(); toast('Добавлено в общую ленту');
   } catch { toast('Не удалось добавить публикацию', true); }
 };
@@ -284,6 +288,7 @@ openView = function (id) {
   if (currentUser) { nickname.value = currentProfile?.nickname || ''; nickname.readOnly = true; nickname.placeholder = 'Сначала создай профиль'; nickname.required = false; }
   if (currentUser) { nickname.type = 'hidden'; } 
   replacement.prepend(nickname);
+  addEmojiPicker(replacement, replacement.elements.comment);
   replacement.addEventListener('submit', async e => {
     e.preventDefault();
     const input = replacement.elements.comment;
@@ -291,7 +296,7 @@ openView = function (id) {
     const author = nickname.value.trim();
     if (currentUser && !currentProfile) { toast('Сначала создай профиль', true); $('#profile-modal').hidden = false; return; }
     if (!body || !author || !sharedReady) return;
-    const button = replacement.querySelector('button');
+    const button = replacement.querySelector('[type="submit"]');
     button.disabled = true;
     try {
       const session = currentUser ? (await authClient.auth.getSession()).data.session : null;
@@ -342,8 +347,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const logoMenu = $('.logo-menu'), accountControls = $('.topbar-right'), tabs = $('#tabs');
   const moveNavigation = () => {
     if (desktopLayout.matches) {
-      sidebar.prepend(logoMenu);
-      sidebar.appendChild(accountControls);
+      topbar.insertBefore(logoMenu, tabs);
+      topbar.appendChild(accountControls);
     } else {
       topbar.insertBefore(logoMenu, tabs);
       topbar.appendChild(accountControls);
@@ -531,6 +536,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const frame = ['classic','spark','collector','legend','comet','neon','orbit','heart','voice','starfish','sponge','banana'].includes(profile.frame_style) ? profile.frame_style : 'classic';
       const accent = ['violet','cyan','gold','rose','lime','coral','ice'].includes(profile.accent_style) ? profile.accent_style : 'violet';
       body.innerHTML = `<div class="public-profile profile-accent-${accent}"><div class="public-profile-head"><div class="profile-avatar-wrap">${king ? '<span class="profile-crown">👑</span>' : ''}<div class="profile-preview profile-frame-${frame}">${profile.avatar_path ? `<img src="${escapeHTML(avatarUrl(profile.avatar_path))}" alt="">` : '✦'}</div></div><div class="public-profile-info"><h3>${escapeHTML(profile.nickname)} ${king ? '👑' : ''}</h3><div class="profile-stats"><span><strong>${receivedLikes}</strong> лайков на ссылках</span><span><strong>${ownPosts.length}</strong> публикаций-ссылок</span></div><div class="profile-follow-slot"></div></div></div><section class="public-profile-section"><strong>Достижения</strong><p>${badges.length ? badges.join(' · ') : 'Пока нет открытых достижений.'}</p></section><section class="public-profile-section"><strong>Публикации</strong>${ownPosts.length ? ownPosts.map(post => `<button class="btn btn-ghost" type="button" data-profile-post="${escapeHTML(post.id)}">${escapeHTML(post.title)}</button>`).join('') : '<p>Новых публикаций пока нет. Старые карточки не были привязаны к автору.</p>'}</section></div>`;
+      sharedRequest(`/spike_profile_links?user_id=eq.${encodeURIComponent(link.dataset.userProfile)}&select=youtube,twitch,telegram,tiktok,x`).then(rows => { if (!body.isConnected || $('#public-profile-modal').hidden) return; const slot = body.querySelector('.public-profile-info'); if (slot && rows[0]) slot.insertAdjacentHTML('beforeend', `<div class="profile-social-links">${profileLinksHTML(rows[0])}</div>`); }).catch(() => {});
       if (authClient && typeof addProfileFollow === 'function') addProfileFollow(link.dataset.userProfile, body.querySelector('.profile-follow-slot'));
       if (typeof addSocialProfilePosts === 'function') addSocialProfilePosts(link.dataset.userProfile, body.querySelector('.public-profile'));
     } catch { body.textContent = 'Не удалось загрузить профиль.'; }
@@ -557,6 +563,10 @@ document.addEventListener('DOMContentLoaded', () => {
     preview.className = `profile-preview profile-frame-${['classic','spark','collector','legend','comet','neon','orbit','heart','voice','starfish','sponge','banana'].includes(currentProfile?.frame_style) ? currentProfile.frame_style : 'classic'}`;
     if (currentProfile?.avatar_path) { const img = document.createElement('img'); img.src = avatarUrl(currentProfile.avatar_path) + '?v=' + Date.now(); img.alt = ''; preview.appendChild(img); } else preview.textContent = '✦';
     $('#own-profile-name').textContent = currentProfile?.nickname || 'Создай профиль';
+    const linksMessage = $('#profile-links-message'); linksMessage.textContent = 'Загрузка ссылок…';
+    Object.keys(profileLinkHosts).forEach(key => { $(`#profile-link-${key}`).value = ''; });
+    const ownId = currentUser.id;
+    authClient.from('spike_profile_links').select('youtube,twitch,telegram,tiktok,x').eq('user_id', ownId).maybeSingle().then(({data,error}) => { if (currentUser?.id !== ownId || profileModal.hidden) return; if (error) { linksMessage.textContent = 'Соцсети не настроены в Supabase. Выполните profile-social-links.sql.'; return; } Object.keys(profileLinkHosts).forEach(key => { $(`#profile-link-${key}`).value = data?.[key] || ''; }); linksMessage.textContent = ''; });
     profileModal.hidden = false;
     if (typeof loadOwnProfile === 'function') loadOwnProfile();
     const rewards = { reply_1: 'Искра диалога · рамка «Искра»', bookmark_10: 'Архивариус · рамка «Коллекционер»', comment_25: 'Голос Spike · рамка «Легенда»', like_5: 'Ценитель · лазурный цвет', bookmark_5: 'Собиратель · золотой цвет' };
@@ -565,6 +575,13 @@ document.addEventListener('DOMContentLoaded', () => {
     profileModal.hidden = false;
   }
   $('#profile-button').addEventListener('click', showProfile);
+  $('#profile-links-save').addEventListener('click', async () => {
+    if (!currentUser || !authClient) return;
+    const data = { user_id: currentUser.id }, message = $('#profile-links-message');
+    for (const key of Object.keys(profileLinkHosts)) { const value = $(`#profile-link-${key}`).value.trim(); const safe = safeProfileLink(value, key); if (value && !safe) { message.textContent = `Укажи корректную HTTPS-ссылку для ${key}.`; return; } data[key] = safe; }
+    const button = $('#profile-links-save'); button.disabled = true;
+    try { const { error } = await authClient.from('spike_profile_links').upsert(data); if (error) throw error; message.textContent = 'Ссылки сохранены.'; } catch (error) { console.error('Соцсети:', error); message.textContent = 'Не удалось сохранить. Проверьте настройку profile-social-links.sql в Supabase.'; } finally { button.disabled = false; }
+  });
   const accountToggle = $('#account-toggle'), accountMenu = $('#account-menu');
   const closeAccount = () => { accountMenu.hidden = true; accountToggle.setAttribute('aria-expanded', 'false'); };
   accountToggle.addEventListener('click', () => { accountMenu.hidden = !accountMenu.hidden; accountToggle.setAttribute('aria-expanded', String(!accountMenu.hidden)); });
@@ -585,7 +602,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!currentUser) return;
     const nickname = $('#profile-nickname').value.trim(); const file = $('#profile-avatar').files[0]; const msg = $('#profile-message');
     if (nickname.length < 2 || nickname.length > 24) { msg.textContent = 'Ник должен содержать от 2 до 24 символов.'; return; }
-    if (file && (file.size > 1048576 || !['image/png','image/jpeg','image/webp'].includes(file.type))) { msg.textContent = 'Выбери PNG, JPEG или WebP размером до 1 МБ.'; return; }
+    if (file && (file.size > 3145728 || !['image/png','image/jpeg','image/webp','image/gif'].includes(file.type))) { msg.textContent = 'Выбери PNG, JPEG, WebP или GIF размером до 3 МБ.'; return; }
     const submit = e.currentTarget.querySelector('[type="submit"]'); submit.disabled = true; msg.textContent = 'Сохраняем…';
     try {
       let path = currentProfile?.avatar_path || null;

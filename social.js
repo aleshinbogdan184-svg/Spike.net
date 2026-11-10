@@ -4,6 +4,10 @@ let socialRows = [];
 let followRows = [];
 let socialProfiles = new Map();
 let socialLikes = [], socialReposts = [];
+let socialHashtag = '';
+function renderPostText(text) {
+  return String(text || '').split(/(#[\p{L}\p{N}_]{1,40})/gu).map(part => /^#[\p{L}\p{N}_]{1,40}$/u.test(part) ? `<button type="button" class="social-hashtag" data-hashtag="${escapeHTML(part.slice(1))}">${escapeHTML(part)}</button>` : escapeHTML(part)).join('');
+}
 
 function socialAvatar(profile) {
   const url = avatarUrl(profile?.avatar_path);
@@ -31,8 +35,10 @@ function renderSocial() {
   const status = $('#social-status'), grid = $('#social-grid');
   if (socialFilter === 'following' && !currentUser) { status.textContent = 'Войди, чтобы видеть посты подписок.'; grid.innerHTML = ''; return; }
   const following = new Set(followRows.filter(row => row.follower_id === currentUser?.id).map(row => row.followed_id));
-  const rows = socialRows.filter(row => socialFilter === 'all' || following.has(row.author_id));
+  const rows = socialRows.filter(row => (socialFilter === 'all' || following.has(row.author_id)) && (!socialHashtag || (String(row.title || '') + ' ' + String(row.body || '')).match(/#[\p{L}\p{N}_]{1,40}/gu)?.some(tag => tag.slice(1).toLocaleLowerCase() === socialHashtag.toLocaleLowerCase())));
   status.textContent = rows.length ? '' : socialFilter === 'all' ? 'Пока нет постов — создай первый!' : 'Здесь появятся посты авторов, на которых ты подписан.';
+  const tagStatus = $('#social-tag-status');
+  if (tagStatus) { tagStatus.hidden = !socialHashtag; tagStatus.querySelector('span').textContent = socialHashtag ? `#${socialHashtag}` : ''; }
   const labels = { meme: 'Мем', mod: 'Мод', topic: 'Обсуждение', other: 'Другое' };
   grid.innerHTML = rows.map(row => {
     const profile = socialProfiles.get(row.author_id);
@@ -40,7 +46,7 @@ function renderSocial() {
     const owner = currentUser && (currentUser.id === row.author_id || SPIKE_DEVELOPERS.has(currentUser.id));
     const isFollowing = following.has(row.author_id);
     const likes = socialLikes.filter(x => x.post_id === row.id), reposts = socialReposts.filter(x => x.post_id === row.id);
-    return `<article class="social-card"><button class="social-cover-button" type="button" data-social-open="${escapeHTML(row.id)}" aria-label="Открыть пост">${image ? `<img class="social-image" src="${escapeHTML(image)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.hidden=true">` : '<span class="social-placeholder">✦</span>'}</button><div class="social-body"><div class="social-meta"><button class="profile-link" type="button" data-user-profile="${escapeHTML(row.author_id)}">${socialAvatar(profile)} ${escapeHTML(profile?.nickname || 'Пользователь')}</button><span>${escapeHTML(labels[row.category] || 'Пост')}</span></div><button class="social-title-link" type="button" data-social-open="${escapeHTML(row.id)}">${escapeHTML(row.title)}</button><p>${escapeHTML(row.body)}</p><div class="social-actions"><button class="btn btn-ghost" type="button" data-social-like="${escapeHTML(row.id)}">${likes.some(x => x.user_id === currentUser?.id) ? '♥' : '♡'} ${likes.length}</button><button class="btn btn-ghost" type="button" data-social-open="${escapeHTML(row.id)}">💬 Открыть</button><button class="btn btn-ghost" type="button" data-social-repost="${escapeHTML(row.id)}">↻ ${reposts.length}</button>${currentUser && currentUser.id !== row.author_id ? `<button class="btn btn-ghost" type="button" data-follow="${escapeHTML(row.author_id)}">${isFollowing ? '✓' : '＋'}</button>` : ''}${owner ? `<button class="btn btn-ghost btn-danger" type="button" data-social-delete="${escapeHTML(row.id)}">Удалить</button>` : ''}<small>${timeAgo(new Date(row.created_at).getTime())}</small></div></div></article>`;
+    return `<article class="social-card"><button class="social-cover-button" type="button" data-social-open="${escapeHTML(row.id)}" aria-label="Открыть пост">${image ? `<img class="social-image" src="${escapeHTML(image)}" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.hidden=true">` : '<span class="social-placeholder">✦</span>'}</button><div class="social-body"><div class="social-meta"><button class="profile-link" type="button" data-user-profile="${escapeHTML(row.author_id)}">${socialAvatar(profile)} ${escapeHTML(profile?.nickname || 'Пользователь')}</button><span>${escapeHTML(labels[row.category] || 'Пост')}</span></div><button class="social-title-link" type="button" data-social-open="${escapeHTML(row.id)}">${escapeHTML(row.title)}</button><p>${escapeHTML(row.body)}</p><div class="social-actions"><button class="btn btn-ghost ${likes.some(x => x.user_id === currentUser?.id) ? 'liked' : ''}" type="button" data-social-like="${escapeHTML(row.id)}" aria-label="Нравится: ${likes.length}"><svg class="pixel-icon cactus-icon" aria-hidden="true"><use href="pixel-icons.svg#cactus"></use></svg> ${likes.length}</button><button class="btn btn-ghost social-comment-count" type="button" data-social-open="${escapeHTML(row.id)}" aria-label="Открыть комментарии"><svg class="pixel-icon" aria-hidden="true"><use href="pixel-icons.svg#comment"></use></svg> Открыть</button><button class="btn btn-ghost" type="button" data-social-repost="${escapeHTML(row.id)}">↻ ${reposts.length}</button>${currentUser && currentUser.id !== row.author_id ? `<button class="btn btn-ghost" type="button" data-follow="${escapeHTML(row.author_id)}">${isFollowing ? '✓' : '＋'}</button>` : ''}${owner ? `<button class="btn btn-ghost btn-danger" type="button" data-social-delete="${escapeHTML(row.id)}">Удалить</button>` : ''}<small>${timeAgo(new Date(row.created_at).getTime())}</small></div></div></article>`;
   }).join('');
 }
 
@@ -49,16 +55,35 @@ async function openSocialPost(id) {
   const container = $('#social-view-body'), profile = socialProfiles.get(row.author_id);
   $('#social-view-modal').hidden = false;
   container.innerHTML = `<div class="social-post-layout"><div class="social-post-main"><div class="social-post-author"><button class="social-author-link" type="button" data-user-profile="${escapeHTML(row.author_id)}">${socialAvatar(profile)}<span><strong>${escapeHTML(profile?.nickname || 'Пользователь')}</strong><small>${timeAgo(new Date(row.created_at).getTime())}</small></span></button></div><h2 class="social-post-title">${escapeHTML(row.title)}</h2>${row.body ? `<p class="social-view-text">${escapeHTML(row.body)}</p>` : ''}${/^https?:\/\//i.test(row.image_url) ? `<img class="social-view-image" src="${escapeHTML(row.image_url)}" alt="Изображение публикации" referrerpolicy="no-referrer">` : ''}</div><section class="social-discussion"><h3>Комментарии <span id="social-comment-count"></span></h3><form id="social-comment-form" class="social-comment-compose">${socialAvatar(currentProfile)}<input class="input" name="body" maxlength="500" required aria-label="Написать комментарий" placeholder="Написать комментарий"><button class="btn btn-primary" type="submit">Отправить</button></form><p class="field-hint">Для комментария нужен вход и профиль.</p><div id="social-comments" aria-live="polite">Загрузка…</div></section></div>`;
+  const postText = container.querySelector('.social-view-text'); if (postText) postText.innerHTML = renderPostText(row.body);
+  const actions = document.createElement('div'); actions.className = 'social-detail-actions';
+  const copy = document.createElement('button'); copy.className = 'btn btn-ghost'; copy.type = 'button'; copy.textContent = '↗ Копировать ссылку';
+  copy.addEventListener('click', async () => { const url = new URL(location.href); url.hash = `social=${encodeURIComponent(id)}`; try { await navigator.clipboard.writeText(url.href); toast('Ссылка скопирована'); } catch { window.prompt('Скопируй ссылку:', url.href); } }); actions.appendChild(copy);
+  if (/^https?:\/\//i.test(row.image_url || '')) { const download = document.createElement('button'); download.className = 'btn btn-ghost'; download.type = 'button'; download.textContent = '↓ Скачать изображение'; download.addEventListener('click', async () => { download.disabled = true; try { const response = await fetch(row.image_url); if (!response.ok) throw new Error('download'); const blob = await response.blob(); if (!blob.type.startsWith('image/')) throw new Error('not an image'); const url = URL.createObjectURL(blob), a = document.createElement('a'); a.href = url; a.download = `spike-${id}.${({ 'image/png':'png','image/jpeg':'jpg','image/webp':'webp','image/gif':'gif' })[blob.type] || 'img'}`; a.click(); setTimeout(() => URL.revokeObjectURL(url), 1000); } catch { toast('Не удалось скачать изображение: источник запретил доступ', true); } finally { download.disabled = false; } }); actions.appendChild(download); }
+  container.querySelector('.social-post-main').appendChild(actions);
+  container.addEventListener('click', e => { const tag = e.target.closest('[data-hashtag]'); if (!tag) return; socialHashtag = tag.dataset.hashtag; socialFilter = 'all'; $('#social-view-modal').hidden = true; $('#tabs [data-tab="social"]').click(); loadSocial(); });
+  let replyTo = null, commentLikes = [], repliesReady = true;
+  const replyHint = document.createElement('button'); replyHint.type = 'button'; replyHint.className = 'comment-reply-hint'; replyHint.hidden = true; replyHint.addEventListener('click', () => { replyTo = null; replyHint.hidden = true; });
+  $('#social-comment-form').before(replyHint);
   async function loadComments() {
     const target = $('#social-comments');
     try {
-      const rows = await sharedRequest(`/spike_social_comments?post_id=eq.${encodeURIComponent(id)}&select=id,user_id,body,created_at&order=created_at.asc&limit=200`);
+      let rows;
+      try { rows = await sharedRequest(`/spike_social_comments?post_id=eq.${encodeURIComponent(id)}&select=id,user_id,body,created_at,parent_id&order=created_at.asc&limit=200`); repliesReady = true; }
+      catch { rows = await sharedRequest(`/spike_social_comments?post_id=eq.${encodeURIComponent(id)}&select=id,user_id,body,created_at&order=created_at.asc&limit=200`); repliesReady = false; }
+      const likesResult = await sharedRequest('/spike_social_comment_likes?select=comment_id,user_id&limit=10000').catch(() => null);
+      commentLikes = likesResult || [];
       if (!target.isConnected) return;
       $('#social-comment-count').textContent = rows.length ? `· ${rows.length}` : '';
-      target.innerHTML = rows.length ? rows.map(c => { const commenter = socialProfiles.get(c.user_id) || (currentUser?.id === c.user_id ? currentProfile : null); return `<article class="social-comment"><button class="social-comment-avatar" type="button" data-user-profile="${escapeHTML(c.user_id)}" aria-label="Открыть профиль ${escapeHTML(commenter?.nickname || 'пользователя')}">${socialAvatar(commenter)}</button><div class="social-comment-content"><div class="social-comment-meta"><button class="profile-link" type="button" data-user-profile="${escapeHTML(c.user_id)}">${escapeHTML(commenter?.nickname || 'Пользователь')}</button><time>${timeAgo(new Date(c.created_at).getTime())}</time></div><p>${escapeHTML(c.body)}</p>${currentUser?.id === c.user_id ? `<button class="card-foot-btn comment-delete" type="button" data-social-comment-delete="${escapeHTML(c.id)}">Удалить</button>` : ''}</div></article>`; }).join('') : '<p class="social-comments-empty">Пока нет комментариев. Начни обсуждение!</p>';
+      const commentHTML = c => { const commenter = socialProfiles.get(c.user_id) || (currentUser?.id === c.user_id ? currentProfile : null), name = commenter?.nickname || 'Пользователь', likes = commentLikes.filter(l => l.comment_id === c.id), mine = likes.some(l => l.user_id === currentUser?.id); return `<article class="social-comment ${c.parent_id ? 'social-comment-reply' : ''}"><button class="social-comment-avatar" type="button" data-user-profile="${escapeHTML(c.user_id)}" aria-label="Профиль ${escapeHTML(name)}">${socialAvatar(commenter)}</button><div class="social-comment-content"><div class="social-comment-meta"><button class="profile-link" type="button" data-user-profile="${escapeHTML(c.user_id)}">${escapeHTML(name)}</button><time>${timeAgo(new Date(c.created_at).getTime())}</time></div><p>${renderCommentText(c.body)}</p><div class="comment-actions">${likesResult ? `<button class="card-foot-btn comment-like ${mine ? 'liked' : ''}" type="button" data-social-comment-like="${escapeHTML(c.id)}">${mine ? '♥' : '♡'} ${likes.length}</button>` : ''}${repliesReady && !c.parent_id ? `<button class="card-foot-btn" type="button" data-social-reply="${escapeHTML(c.id)}" data-reply-name="${escapeHTML(name)}">Ответить</button>` : ''}${currentUser?.id === c.user_id ? `<button class="card-foot-btn comment-delete" type="button" data-social-comment-delete="${escapeHTML(c.id)}">Удалить</button>` : ''}</div></div></article>`; };
+      target.innerHTML = rows.length ? rows.filter(c => !c.parent_id).map(c => { const replies = rows.filter(r => r.parent_id === c.id); return commentHTML(c) + (replies.length ? `<details class="social-replies"><summary>Показать ответы · ${replies.length}</summary>${replies.map(commentHTML).join('')}</details>` : ''); }).join('') : '<p class="social-comments-empty">Пока нет комментариев. Начни обсуждение!</p>';
     } catch { if (target.isConnected) target.textContent = 'Не удалось загрузить комментарии.'; }
   }
   $('#social-comments').addEventListener('click', async e => {
+    const reply = e.target.closest('[data-social-reply]');
+    if (reply) { replyTo = reply.dataset.socialReply; replyHint.textContent = `Ответ для ${reply.dataset.replyName} · отменить ×`; replyHint.hidden = false; $('#social-comment-form').elements.body.focus(); return; }
+    const like = e.target.closest('[data-social-comment-like]');
+    if (like) { if (!currentUser || !authClient) { toast('Войди, чтобы оценить комментарий', true); return; } like.disabled = true; const commentId = like.dataset.socialCommentLike, mine = commentLikes.some(l => l.comment_id === commentId && l.user_id === currentUser.id); try { const q = authClient.from('spike_social_comment_likes'), result = mine ? await q.delete().eq('comment_id', commentId).eq('user_id', currentUser.id) : await q.insert({comment_id:commentId,user_id:currentUser.id}); if (result.error) throw result.error; await loadComments(); } catch { like.disabled = false; toast('Не удалось сохранить оценку', true); } return; }
     const button = e.target.closest('[data-social-comment-delete]');
     if (!button || !currentUser || !authClient || !confirm('Удалить свой комментарий?')) return;
     button.disabled = true;
@@ -68,14 +93,16 @@ async function openSocialPost(id) {
       await loadComments(); toast('Комментарий удалён');
     } catch { button.disabled = false; toast('Не удалось удалить комментарий', true); }
   });
+  addEmojiPicker($('#social-comment-form'), $('#social-comment-form').elements.body);
   $('#social-comment-form').addEventListener('submit', async e => {
     e.preventDefault();
     if (!currentUser || !authClient || !currentProfile) { toast('Войди и создай профиль, чтобы комментировать', true); return; }
     const input = e.currentTarget.elements.body, text = input.value.trim(); if (!text) return;
-    const button = e.currentTarget.querySelector('button'); button.disabled = true;
-    const { error } = await authClient.from('spike_social_comments').insert({ post_id: id, user_id: currentUser.id, body: text });
+    const button = e.currentTarget.querySelector('[type="submit"]'); button.disabled = true;
+    const payload = { post_id: id, user_id: currentUser.id, body: text }; if (replyTo) payload.parent_id = replyTo;
+    const { error } = await authClient.from('spike_social_comments').insert(payload);
     button.disabled = false; if (error) { toast('Не удалось отправить комментарий', true); return; }
-    input.value = ''; await loadComments();
+    input.value = ''; replyTo = null; replyHint.hidden = true; await loadComments();
   });
   loadComments();
 }
@@ -110,10 +137,16 @@ document.addEventListener('DOMContentLoaded', () => {
   const updates = $('#view-updates .release-card ul');
   if (updates) { const item = document.createElement('li'); item.innerHTML = '<strong>Профили и посты:</strong> обновлённый профиль со вкладками публикаций, репостов и лайков; публичный огонёк ежедневных визитов, который меняется на 10, 50 и 100 днях; комментарии, лайки, репосты и подписки.'; updates.appendChild(item); }
   const sidebar = $('.layout-sidebar');
-  const sideButton = document.createElement('button'); sideButton.type = 'button'; sideButton.innerHTML = '▤ <span>Посты</span>';
+  const sideButton = document.createElement('button'); sideButton.type = 'button'; sideButton.innerHTML = '▤ <span>Лента</span>';
   sideButton.addEventListener('click', () => { $('#tabs [data-tab="social"]').click(); window.scrollTo({ top: 0, behavior: 'smooth' }); });
-  sidebar.insertBefore(sideButton, sidebar.querySelector('[data-layout-tab="trends"]'));
+  sidebar.insertBefore(sideButton, sidebar.querySelector('[data-layout-tab="feed"]'));
+  const videos = sidebar.querySelector('[data-layout-tab="feed"] span'); if (videos) videos.textContent = 'Видео';
   $('#tabs [data-tab="social"]').addEventListener('click', loadSocial);
+  const tagStatus = document.createElement('div'); tagStatus.id = 'social-tag-status'; tagStatus.className = 'social-tag-status'; tagStatus.hidden = true; tagStatus.innerHTML = 'Тег: <span></span> <button type="button">Сбросить ×</button>'; $('#social-status').before(tagStatus);
+  tagStatus.querySelector('button').addEventListener('click', () => { socialHashtag = ''; renderSocial(); });
+  const socialHash = location.hash.match(/^#social=([0-9a-f-]{36})$/i);
+  if (socialHash) { $('#tabs [data-tab="social"]').click(); loadSocial().then(() => { openSocialPost(socialHash[1]); }); }
+  else { $('#tabs [data-tab="social"]').click(); }
   document.querySelectorAll('[data-social-filter]').forEach(button => button.addEventListener('click', () => { socialFilter = button.dataset.socialFilter; document.querySelectorAll('[data-social-filter]').forEach(b => b.classList.toggle('active', b === button)); renderSocial(); }));
   $('#social-create').addEventListener('click', () => { if (!currentUser) { toast('Войди, чтобы создать пост', true); return; } if (!currentProfile) { toast('Сначала создай профиль', true); return; } $('#social-form').reset(); $('#social-error').textContent = ''; $('#social-modal').hidden = false; });
   $('#social-close').addEventListener('click', () => { $('#social-modal').hidden = true; });
@@ -122,7 +155,7 @@ document.addEventListener('DOMContentLoaded', () => {
     e.preventDefault(); if (!currentUser || !authClient) return;
     const title = $('#social-title-input').value.trim(), body = $('#social-body').value.trim(), image = $('#social-image').value.trim(), file = $('#social-file').files[0];
     if (!title || (image && !/^https?:\/\//i.test(image))) { $('#social-error').textContent = 'Укажи заголовок и корректную ссылку на картинку.'; return; }
-    if (file && (file.size > 3145728 || !['image/png','image/jpeg','image/webp'].includes(file.type))) { $('#social-error').textContent = 'Выбери PNG, JPEG или WebP размером до 3 МБ.'; return; }
+    if (file && (file.size > 3145728 || !['image/png','image/jpeg','image/webp','image/gif'].includes(file.type))) { $('#social-error').textContent = 'Выбери PNG, JPEG, WebP или GIF размером до 3 МБ.'; return; }
     const button = e.currentTarget.querySelector('[type="submit"]'); button.disabled = true;
     let imageUrl = image, uploadedPath = '';
     if (file) {
