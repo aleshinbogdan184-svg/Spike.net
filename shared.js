@@ -146,13 +146,16 @@ function renderExtras() {
 }
 
 async function loadBookmarks() {
-  bookmarkIds = new Set(); bookmarkReady = false;
-  if (currentUser && authClient) {
-    const { data, error } = await authClient.from('spike_bookmarks').select('post_id');
-    if (!error) { bookmarkReady = true; bookmarkIds = new Set((data || []).map(row => String(row.post_id))); }
-    else console.error('Не удалось загрузить закладки:', error);
-  }
+  const userId = currentUser?.id;
+  if (!userId || !authClient) { bookmarkIds = new Set(); bookmarkReady = false; renderExtras(); return; }
+  try {
+    const { data, error } = await authClient.from('spike_bookmarks').select('post_id').eq('user_id', userId);
+    if (currentUser?.id !== userId) return;
+    if (error) throw error;
+    bookmarkReady = true; bookmarkIds = new Set((data || []).map(row => String(row.post_id)));
+  } catch (error) { if (currentUser?.id !== userId) return; bookmarkReady = false; console.error('Не удалось загрузить закладки:', error); }
   renderExtras();
+  if (typeof ownProfileTab !== 'undefined' && ownProfileTab === 'saved' && !$('#profile-modal').hidden) renderOwnProfile();
 }
 
 async function postHeaders() {
@@ -279,6 +282,7 @@ openView = function (id) {
   nickname.maxLength = 30; nickname.placeholder = 'Твой ник'; nickname.required = true;
   nickname.value = localStorage.getItem('spike.nickname') || '';
   if (currentUser) { nickname.value = currentProfile?.nickname || ''; nickname.readOnly = true; nickname.placeholder = 'Сначала создай профиль'; nickname.required = false; }
+  if (currentUser) { nickname.type = 'hidden'; } 
   replacement.prepend(nickname);
   replacement.addEventListener('submit', async e => {
     e.preventDefault();

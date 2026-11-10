@@ -526,7 +526,8 @@ function renderFeed() {
 }
 
 function renderTrends() {
-  $("#trends-list").innerHTML = trendsHTML();
+  const list = $("#trends-list"), html = trendsHTML();
+  if (list.dataset.rendered !== html) { list.innerHTML = html; list.dataset.rendered = html; }
 }
 
 function renderCategories() {
@@ -772,7 +773,7 @@ function openView(id) {
   const isLiked = liked.has(id);
 
   $("#view-body").innerHTML = `
-    <div class="view-content">
+    <div class="view-content detail-layout"><div class="detail-main">
       <div class="view-thumb">
         ${thumbHTML(it)}
         <div class="v-overlay"></div>
@@ -784,11 +785,6 @@ function openView(id) {
       </div>
       <h2 class="view-title">${escapeHTML(it.title)}</h2>
       ${it.desc ? `<p class="view-desc">${escapeHTML(it.desc)}</p>` : ""}
-      <div class="view-meta">
-        <div class="view-meta-item"><div class="view-meta-k">Год / сезон</div><div class="view-meta-v">${escapeHTML(it.year || "—")}</div></div>
-        <div class="view-meta-item"><div class="view-meta-k">Лайки</div><div class="view-meta-v">❤ ${it.likes}</div></div>
-        <div class="view-meta-item"><div class="view-meta-k">Просмотры</div><div class="view-meta-v">👁 ${fmtNum(it.views)}</div></div>
-      </div>
       ${it.tags.length ? `<div class="view-tags">${it.tags.map((t) => `<span class="card-tag">#${escapeHTML(t)}</span>`).join("")}</div>` : ""}
       <div class="view-actions">
         <button class="view-action primary" data-watch="${it.id}" type="button">▶ Смотреть</button>
@@ -796,7 +792,7 @@ function openView(id) {
         <button class="view-action" data-watched="${it.id}" type="button">${it.watched ? "✔ Просмотрено" : "○ Отметить просмотром"}</button>
         ${it.url ? `<a class="view-action" href="${escapeHTML(it.url)}" target="_blank" rel="noopener noreferrer">↗ Источник</a>` : ""}
       </div>
-      <section class="comments">
+      </div><section class="comments detail-discussion">
         <h3>Комментарии · ${(it.comments || []).length}</h3>
         <form id="comment-form" class="comment-form"><input class="input" name="comment" maxlength="500" aria-label="Написать комментарий" placeholder="Написать комментарий…" required><button class="btn btn-primary" type="submit">Отправить</button></form>
         <div class="comment-list">${(it.comments || []).map((c) => `<article class="comment comment-frame-${escapeHTML(c.frame || 'classic')} comment-accent-${escapeHTML(c.accent || 'violet')} ${c.parentId ? 'comment-reply' : ''}" data-comment-id="${escapeHTML(c.id || '')}">${c.avatar ? `<img class="comment-avatar" src="${escapeHTML(c.avatar)}" alt="">` : '<span class="comment-avatar comment-avatar-fallback">✦</span>'}<div class="comment-content"><div class="comment-meta">${c.userId ? `<button type="button" class="profile-link ${c.developer ? 'developer-name' : ''}" data-user-profile="${escapeHTML(c.userId)}">${escapeHTML(c.author || 'Гость')}</button>` : `<strong class="comment-author">${escapeHTML(c.author || 'Гость')}</strong>`}${c.developer ? ' <span class="developer-badge">✦ РАЗРАБОТЧИК</span>' : ''}${c.createdAt ? `<time>${escapeHTML(timeAgo(c.createdAt))}</time>` : ''}</div>${c.parentId ? `<small class="comment-reply-label">↳ Ответ: ${escapeHTML((it.comments || []).find(parent => parent.id === c.parentId)?.author || 'комментарий')}</small>` : ''}<p class="comment-text">${escapeHTML(c.text)}</p><div class="comment-actions">${!c.parentId && c.id ? `<button type="button" class="card-foot-btn" data-reply="${escapeHTML(c.id)}" data-author="${escapeHTML(c.author || 'Гость')}">Ответить</button>` : ''}</div></div></article>`).join("") || '<p class="comment-empty">Пока нет комментариев. Начни обсуждение!</p>'}</div>
@@ -902,6 +898,7 @@ function switchTab(name) {
   $$(".tab-view").forEach((v) => { v.hidden = v.id !== `view-${name}`; });
   $(".hero").hidden = true;
   document.body.dataset.view = name;
+  if (name === 'trends') renderTrends();
 }
 
 function bindEvents() {
