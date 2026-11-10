@@ -207,5 +207,9 @@ body .card-title,body .card-description,body .card-author-link,body .card-author
 .source-author { color:#aeb5bd; font-size:14px; line-height:1.4; }
 /* Не запускаем непрерывную перерисовку крупных размытых слоёв. */
 .bg::before,.bg::after { animation:none!important; will-change:auto!important; }.topbar { backdrop-filter:none!important; -webkit-backdrop-filter:none!important; }
+/* Аватар находится в верхней панели: меню должно раскрываться вниз, внутрь экрана. */
+.topbar,.topbar-right,.account-menu-wrap { overflow:visible!important; }
+.account-menu-wrap { position:relative!important; }
+.account-menu { position:absolute!important; top:calc(100% + 10px)!important; right:0!important; bottom:auto!important; left:auto!important; z-index:200!important; max-width:calc(100vw - 24px); }
 #chips-type .category-icon { display:inline-grid!important; place-items:center; width:22px!important; height:22px!important; border-radius:5px!important; font-size:11px; margin-right:6px; }
 .hover-video-preview { position:absolute; inset:0; width:100%; height:100%; border:0; z-index:5; pointer-events:none; background:#090d17; }
