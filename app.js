@@ -968,6 +968,14 @@ function bindEvents() {
 
   $("#sort-select").addEventListener("change", (e) => { sortMode = e.target.value; renderFeed(); });
   $("#search-input").addEventListener("input", (e) => { searchQuery = e.target.value; renderFeed(); });
+  const searchToggle = $("#search-toggle");
+  if (searchToggle) searchToggle.addEventListener("click", () => {
+    const input = $("#search-input");
+    const open = !input.classList.contains("is-open");
+    input.classList.toggle("is-open", open);
+    searchToggle.setAttribute("aria-expanded", String(open));
+    if (open) input.focus(); else { input.value = ""; searchQuery = ""; renderFeed(); }
+  });
 
   const tagText = $("#f-tags .tag-text");
   tagText.addEventListener("keydown", (e) => {
@@ -1087,4 +1095,35 @@ function init() {
 document.addEventListener("visibilitychange", () => {
   document.documentElement.classList.toggle("page-hidden", document.hidden);
 });
-document.addEventListener("DOMContentLoaded", init);
+function initViceEvent() {
+  const end = new Date('2026-11-20T23:59:59+03:00');
+  const countdown = document.querySelector('#vice-countdown');
+  const updateCountdown = () => {
+    if (!countdown) return;
+    const left = end - Date.now();
+    if (left <= 0) { countdown.textContent = 'EVENT COMPLETE'; return; }
+    const days = Math.floor(left / 86400000), hours = Math.floor(left / 3600000) % 24;
+    countdown.textContent = `${days}D ${String(hours).padStart(2, '0')}H LEFT`;
+  };
+  updateCountdown(); setInterval(updateCountdown, 60000);
+
+  const modal = document.querySelector('#vice-game-modal'), canvas = document.querySelector('#vice-canvas');
+  const open = document.querySelector('#vice-run-open'), close = document.querySelector('#vice-run-close'), restart = document.querySelector('#vice-restart');
+  if (!modal || !canvas || !open) return;
+  const ctx = canvas.getContext('2d'), scoreEl = document.querySelector('#vice-score'), bestEl = document.querySelector('#vice-best');
+  let raf = 0, running = false, last = 0, score = 0, speed = 280, player, obstacles, spawn, serverRun = null;
+  let best = Number(localStorage.getItem('spike.vice.best') || 0); bestEl.textContent = String(best).padStart(5, '0');
+  const serverCall = async (fn, args = {}) => {
+    if (!window.authClient || !window.currentUser) return null;
+    const result = await window.authClient.rpc(fn, args);
+    if (result.error) throw result.error;
+    return result.data;
+  };
+  const jump = () => { if (!running) { start(); return; } if (player.y >= player.ground) player.vy = -620; };
+  const start = () => { cancelAnimationFrame(raf); running = true; score = 0; speed = 280; spawn = 0; serverRun = null; player = { x: 105, y: 220, ground: 220, vy: 0 }; obstacles = []; restart.textContent = 'Игра идёт…'; last = performance.now(); serverCall('spike_vice_start').then(id => { serverRun = id; }).catch(() => {}); raf = requestAnimationFrame(loop); };
+  const draw = () => { const w = 900, h = 280; ctx.clearRect(0,0,w,h); const sky = ctx.createLinearGradient(0,0,0,h); sky.addColorStop(0,'#27245a'); sky.addColorStop(.6,'#e66f91'); sky.addColorStop(1,'#ffbd70'); ctx.fillStyle = sky; ctx.fillRect(0,0,w,h); ctx.fillStyle = '#ffe18a'; ctx.beginPath(); ctx.arc(735,65,34,0,Math.PI*2); ctx.fill(); ctx.fillStyle = '#183447'; ctx.fillRect(0,242,w,38); ctx.fillStyle = '#26a2a2'; ctx.fillRect(0,238,w,4); ctx.strokeStyle = '#ffdc78'; ctx.lineWidth = 2; for(let x=0;x<w;x+=48){ctx.beginPath();ctx.moveTo(x,244);ctx.lineTo(x+25,280);ctx.stroke();} ctx.fillStyle = '#17263b'; ctx.fillRect(player.x,player.y-35,30,35); ctx.fillStyle = '#ff5f8f'; ctx.fillRect(player.x+7,player.y-49,16,14); ctx.fillStyle = '#ec6b64'; obstacles.forEach(o => {ctx.fillRect(o.x,o.y,o.w,o.h);ctx.fillStyle='#ffd15c';ctx.fillRect(o.x+4,o.y+5,o.w-8,4);ctx.fillStyle='#ec6b64';}); };
+  const loop = now => { if (!running) return; const dt = Math.min((now-last)/1000,.04); last=now; score += dt*10; speed += dt*3; scoreEl.textContent=String(Math.floor(score)).padStart(5,'0'); player.vy += 1500*dt; player.y += player.vy*dt; if(player.y>player.ground) {player.y=player.ground;player.vy=0;} spawn-=dt; if(spawn<=0){obstacles.push({x:900+20,y:220,w:24+Math.random()*22,h:20+Math.random()*22});spawn=1.1+Math.random()*.9;} obstacles.forEach(o=>o.x-=speed*dt); obstacles=obstacles.filter(o=>o.x>-60); if(obstacles.some(o=>player.x+26>o.x&&player.x<o.x+o.w&&player.y>o.y-35)){running=false;restart.textContent='Повторить забег';if(score>best){best=Math.floor(score);bestEl.textContent=String(best).padStart(5,'0');try{localStorage.setItem('spike.vice.best',best)}catch{}} if(serverRun){serverCall('spike_vice_finish',{p_run:serverRun,p_score:Math.floor(score)}).catch(() => {});} } draw();if(running)raf=requestAnimationFrame(loop); };
+  const resize = () => { const ratio = Math.min(2, window.devicePixelRatio || 1); const rect=canvas.getBoundingClientRect(); canvas.width=900*ratio; canvas.height=280*ratio; ctx.setTransform(ratio,0,0,ratio,0,0); };
+  open.addEventListener('click',()=>{modal.hidden=false;resize();start()}); close.addEventListener('click',()=>{modal.hidden=true;running=false;cancelAnimationFrame(raf)}); restart.addEventListener('click',start); canvas.addEventListener('pointerdown',jump); document.addEventListener('keydown',e=>{if(!modal.hidden&&(e.code==='Space'||e.key==='ArrowUp')){e.preventDefault();jump();}}); window.addEventListener('resize',resize,{passive:true});
+}
+document.addEventListener("DOMContentLoaded", () => { init(); initViceEvent(); });

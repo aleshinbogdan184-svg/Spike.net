@@ -10,9 +10,14 @@ let isOwner = false;
 let currentUser = null;
 let currentProfile = null;
 let earnedAchievements = new Set();
+let viceRewards = new Set();
 let hypeKing = null;
 let bookmarkIds = new Set();
 let bookmarkReady = false;
+Object.defineProperties(window, {
+  authClient: { get: () => authClient },
+  currentUser: { get: () => currentUser },
+});
 const avatarUrl = path => path ? `${SPIKE_API.replace('/rest/v1', '')}/storage/v1/object/public/spike-avatars/${encodeURIComponent(path.split('/')[0])}/avatar` : '';
 let reactionsReady = false;
 let commentLikesReady = false;
@@ -115,6 +120,15 @@ function myAchievements() {
     make('Ценитель', 'Поставь 5 лайков', liked.size, 5, reactionsReady),
     make('Щедрое сердце', 'Поставь 10 лайков', liked.size, 10, reactionsReady),
     make('В диалоге', 'Ответь на комментарий', comments.filter(comment => comment.parentId).length, 1),
+    { name: 'Первый закат', description: 'Заверши забег Vice Run', value: viceRewards.has('sunset') ? 1 : 0, target: 1, available: true, done: viceRewards.has('sunset') },
+    { name: 'Зелёный свет', description: 'Набери 100 очков в Vice Run', value: viceRewards.has('green_light') ? 1 : 0, target: 1, available: true, done: viceRewards.has('green_light') },
+    { name: 'Местный житель', description: 'Набери 300 очков в Vice Run', value: viceRewards.has('local') ? 1 : 0, target: 1, available: true, done: viceRewards.has('local') },
+    { name: 'Король побережья', description: 'Набери 500 очков в Vice Run', value: viceRewards.has('coast_king') ? 1 : 0, target: 1, available: true, done: viceRewards.has('coast_king') },
+    { name: 'Хорошие связи', description: 'Оставь 5 комментариев на ивенте', value: viceRewards.has('connections') ? 1 : 0, target: 1, available: true, done: viceRewards.has('connections') },
+    { name: 'Секретный тайник', description: 'Сохрани 5 находок', value: viceRewards.has('stash') ? 1 : 0, target: 1, available: true, done: viceRewards.has('stash') },
+    { name: 'Пиратское радио', description: 'Добавь музыкальную находку', value: viceRewards.has('radio') ? 1 : 0, target: 1, available: true, done: viceRewards.has('radio') },
+    { name: 'Свой на побережье', description: 'Собери 3 награды Vice Spike', value: viceRewards.has('resident') ? 1 : 0, target: 1, available: true, done: viceRewards.has('resident') },
+    { name: 'VICE / 2026', description: 'Собери все награды ивента', value: viceRewards.has('collection') ? 1 : 0, target: 1, available: true, done: viceRewards.has('collection') },
   ];
 }
 
@@ -469,6 +483,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const result = await authClient.from('spike_achievements').select('code').eq('user_id', user.id);
         if (currentUser?.id !== user.id) return;
         if (!result.error) earnedAchievements = new Set(result.data.map(row => row.code));
+        const vice = await authClient.from('spike_vice_rewards').select('code').eq('user_id', user.id);
+        if (!vice.error) viceRewards = new Set(vice.data.map(row => row.code));
+        await authClient.rpc('spike_vice_claim').catch(() => {});
       }
       await loadBookmarks();
       refreshShared();

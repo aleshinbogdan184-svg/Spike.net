@@ -13,7 +13,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Press+Start+2P&family=Russo+One&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="style.css?v=final2" />
+  <link rel="stylesheet" href="style.css?v=y2k1" />
 </head>
 <body>
   <!-- ====== ФОН ====== -->
@@ -77,6 +77,11 @@
   <!-- ====== ГЛАВНАЯ ====== -->
   <div class="site-layout"><aside class="layout-sidebar" aria-label="Навигация по сайту"><div class="side-heading">НАВИГАЦИЯ <span>01</span></div><button type="button" data-layout-tab="feed">⌂ <span>Лента</span></button><button type="button" data-layout-tab="trends">↗ <span>Тренды</span></button><button type="button" data-layout-tab="bookmarks">★ <span>Закладки</span></button><button type="button" data-layout-tab="achievements">✦ <span>Достижения</span></button><button type="button" data-layout-tab="updates">◈ <span>Обновления</span></button><div class="side-note"><strong>SPIKE / 1.0</strong><p>Твои находки заслуживают большего, чем затеряться в чате.</p></div></aside>
   <main class="main">
+    <section class="vice-event-banner" aria-label="Vice Spike событие">
+      <div class="vice-sun" aria-hidden="true"></div><div class="vice-palms" aria-hidden="true">♣</div>
+      <div class="vice-event-copy"><span>SPIKE PRESENTS · VICE CITY EVENT</span><h1>Лента находок<span>_</span></h1><p>Закат, неон и лучшие находки города. Ивент активен до 20 ноября.</p></div>
+      <div class="vice-event-side"><strong id="vice-countdown">ЗАГРУЗКА…</strong><button class="btn btn-primary" id="vice-run-open" type="button">▶ VICE RUN</button></div>
+    </section>
     <div class="feed-masthead"><div><span class="feed-kicker">SPIKE / ОБЩАЯ ЛЕНТА</span><h1>Лента находок<span>_</span></h1><p>Видео, игры, музыка и кино от сообщества.</p></div></div>
     <nav class="category-nav" aria-label="Категории приложений"><div class="chip-group" id="chips-type">
             <button class="chip active" data-type="all" type="button"><span class="category-icon">✦</span>Все</button>
@@ -138,8 +143,9 @@
           </select>
         </div>
         <div class="control-group control-search">
-          <label class="control-label">Поиск</label>
-          <input type="text" class="input" id="search-input" placeholder="Найти видео..." />
+          <label class="control-label" for="search-input">Поиск</label>
+          <button class="search-toggle" id="search-toggle" type="button" aria-label="Открыть поиск" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"></circle><path d="m16 16 5 5"></path></svg></button>
+          <input type="text" class="input" id="search-input" placeholder="Найти видео..." autocomplete="off" />
         </div>
       </div>
 
@@ -187,7 +193,7 @@
       </div>
       <div class="cat-grid" id="cat-grid"></div>
     </section>
-    <section class="tab-view" id="view-updates" hidden><div class="view-intro"><span class="view-intro-icon">✦</span><div><span class="view-eyebrow">SPIKE / НОВОСТИ</span><h1>Обновления</h1><p>Что нового на сайте.</p></div></div><article class="release-card"><div class="release-head"><span class="release-version">1.0</span><span class="release-tag">ОБНОВЛЕНИЕ ЛЕНТЫ</span></div><h2>Лента и обсуждения в новом стиле</h2><p>Обновили оформление Spike и сделали обсуждения удобнее, сохранив пиксельный стиль.</p><ul><li><strong>Общая лента:</strong> видео, игры, музыка и кино собраны на главной странице.</li><li><strong>Категории:</strong> выбирай нужный сервис над лентой — у каждого своя пиксельная иконка.</li><li><strong>Добавление ссылки:</strong> кнопка на боковой панели открывает форму, когда она нужна.</li><li><strong>Карточки:</strong> обновили оформление и добавили значки категорий рядом с названием сервиса.</li><li><strong>Просмотр постов:</strong> добавили шапку с аватаром автора, именем и временем публикации.</li><li><strong>Комментарии:</strong> привели обсуждения постов и ссылок к единому виду: аватары, имена, время и поле ввода перед лентой комментариев.</li><li><strong>Ответы и лайки:</strong> существующие ответы и лайки комментариев к ссылкам сохранены.</li><li><strong>Интерфейс:</strong> убрали большие поясняющие блоки и обновили ретро-оформление. Боковая панель и доступ к профилю сохранены.</li></ul><div class="release-callout">✦ Находи интересное, делись им и обсуждай на Spike.</div></article></section>
+    <section class="tab-view" id="view-updates" hidden><div class="view-intro"><span class="view-intro-icon">✦</span><div><span class="view-eyebrow">SPIKE / НОВОСТИ</span><h1>Обновления</h1><p>Что нового на сайте.</p></div></div><article class="release-card"><div class="release-head"><span class="release-version">1.1</span><span class="release-tag">VICE CITY EVENT</span></div><h2>VICE SPIKE — город просыпается</h2><p>Новый сезон Spike в духе неонового Vice City: закаты, пальмы, бирюзовый свет и аркадные задания.</p><ul><li><strong>VICE SPIKE:</strong> временный ивент активен до 20 ноября 2026 года.</li><li><strong>Vice Run:</strong> мини-игра с прыжками через препятствия. Управление — Space, стрелка вверх или тап по игровому полю.</li><li><strong>Постоянные награды:</strong> достижения за ивент сохраняются в профиле навсегда.</li><li><strong>Новые значки:</strong> «Первый закат», «Зелёный свет», «Местный житель», «Король побережья», «Хорошие связи», «Секретный тайник» и коллекционный знак «VICE / 2026».</li><li><strong>Обновлённые посты:</strong> посты теперь выглядят как компактная социальная лента, без огромного пустого блока. Изображение, автор, текст и действия собраны в одной карточке.</li><li><strong>Посты на мобильном:</strong> карточки стали вертикальнее и удобнее для управления одной рукой, комментарии открываются в отдельной панели.</li><li><strong>Поиск:</strong> поле поиска убрано из интерфейса и открывается по кнопке с иконкой лупы. Нажми на лупу, чтобы найти видео, игру, музыку или кино.</li><li><strong>Разные разделы:</strong> лента, посты, тренды, закладки и достижения получили собственные акцентные цвета и оформление.</li><li><strong>Оптимизация:</strong> тяжёлые 3D-эффекты убраны, фоновые glitch-эффекты работают на CSS и отключаются на мобильных устройствах и при настройке уменьшения движения.</li></ul><div class="release-callout">✦ Заезжай в Vice Spike, собери награды и оставь свой след в городе.</div></article></section>
     <section class="tab-view" id="view-social" hidden><div class="social-header"><div><span class="social-eyebrow">SPIKE / СООБЩЕСТВО</span><h1>Твой уголок<br><em>интернета.</em></h1><p>Мемы, моды и мысли — делись тем, что стоит увидеть.</p><button class="btn btn-primary" id="social-create" type="button">＋ Создать пост</button></div><div class="social-hero-art" aria-hidden="true">✦</div></div><div class="social-toolbar"><div><h2>Свежие посты</h2><span>Что происходит в сообществе</span></div><div class="social-filters"><button class="chip active" type="button" data-social-filter="all">Все</button><button class="chip" type="button" data-social-filter="following">Подписки</button></div></div><p id="social-status" class="field-hint"></p><div id="social-grid" class="social-grid"></div></section>
     <section class="tab-view" id="view-bookmarks" hidden><div class="view-intro"><span class="view-intro-icon">★</span><div><h1>Закладки</h1><p>Твои сохранённые находки.</p></div></div><div id="bookmarks-message" class="empty-inner"></div><div class="grid" id="bookmarks-grid"></div></section>
     <section class="tab-view" id="view-achievements" hidden><div class="view-intro"><span class="view-intro-icon">🏆</span><div><h1>Достижения</h1><p>Твои первые шаги в Spike.</p></div></div><div id="achievements-grid" class="cat-grid"></div></section>
@@ -365,6 +371,16 @@
     </div>
   </div>
 
+  <!-- Vice Run mini-game -->
+  <div class="modal-back vice-game-back" id="vice-game-modal" hidden>
+    <div class="vice-game" role="dialog" aria-modal="true" aria-labelledby="vice-game-title">
+      <button class="btn btn-ghost vice-game-close" id="vice-run-close" type="button">✕</button>
+      <div class="vice-game-head"><span>SPIKE ARCADE · 20.11</span><h2 id="vice-game-title">VICE RUN</h2><p>Прыгай через дорожные блоки и набери рекорд.</p></div>
+      <div class="vice-hud"><span>СЧЁТ <b id="vice-score">00000</b></span><span>РЕКОРД <b id="vice-best">00000</b></span></div>
+      <div class="vice-canvas-wrap"><canvas id="vice-canvas" width="900" height="280" aria-label="Мини-игра Vice Run"></canvas><div class="vice-game-hint">SPACE / ↑ / TAP — ПРЫЖОК</div></div>
+      <button class="btn btn-primary vice-restart" id="vice-restart" type="button">Начать забег</button>
+    </div>
+  </div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
   <script src="app.js?v=mobile70"></script>
