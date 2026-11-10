@@ -14,6 +14,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Press+Start+2P&family=Russo+One&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css?v=vice11-2" />
+  <link rel="stylesheet" href="sunset.css?v=2" />
 </head>
 <body>
   <!-- ====== ФОН ====== -->
@@ -48,12 +49,12 @@
     <nav class="tabs" id="tabs">
       <button class="tab active" data-tab="feed" type="button">Лента</button>
       <button class="tab" data-tab="social" type="button">Посты</button>
+      <button class="tab" data-tab="events" type="button">Ивенты</button>
       <button class="tab" data-tab="trends" type="button">
         Тренды
         <span class="tab-dot"></span>
       </button>
       <button class="tab" data-tab="updates" type="button">Обновления <span class="release-dot"></span></button>
-      <button class="tab tab-compact" data-tab="bookmarks" type="button" title="Закладки" aria-label="Закладки">★</button>
       <button class="tab tab-compact" data-tab="achievements" type="button" title="Достижения" aria-label="Достижения">🏆</button>
     </nav>
 
@@ -195,6 +196,7 @@
     </section>
     <section class="tab-view" id="view-updates" hidden><div class="view-intro"><span class="view-intro-icon">✦</span><div><span class="view-eyebrow">SPIKE / НОВОСТИ</span><h1>Обновления</h1><p>Что нового на сайте.</p></div></div><article class="release-card"><div class="release-head"><span class="release-version">1.1</span><span class="release-tag">VICE CITY EVENT</span></div><h2>VICE SPIKE — город просыпается</h2><p>Новый сезон Spike в духе неонового Vice City: закаты, пальмы, бирюзовый свет и аркадные задания.</p><ul><li><strong>VICE SPIKE:</strong> временный ивент активен до 20 ноября 2026 года.</li><li><strong>Vice Run:</strong> мини-игра с прыжками через препятствия. Управление — Space, стрелка вверх или тап по игровому полю.</li><li><strong>Постоянные награды:</strong> достижения за ивент сохраняются в профиле навсегда.</li><li><strong>Новые значки:</strong> «Первый закат», «Зелёный свет», «Местный житель», «Король побережья», «Хорошие связи», «Секретный тайник» и коллекционный знак «VICE / 2026».</li><li><strong>Обновлённые посты:</strong> посты теперь выглядят как компактная социальная лента, без огромного пустого блока. Изображение, автор, текст и действия собраны в одной карточке.</li><li><strong>Посты на мобильном:</strong> карточки стали вертикальнее и удобнее для управления одной рукой, комментарии открываются в отдельной панели.</li><li><strong>Поиск:</strong> поле поиска убрано из интерфейса и открывается по кнопке с иконкой лупы. Нажми на лупу, чтобы найти видео, игру, музыку или кино.</li><li><strong>Разные разделы:</strong> лента, посты, тренды, закладки и достижения получили собственные акцентные цвета и оформление.</li><li><strong>Оптимизация:</strong> тяжёлые 3D-эффекты убраны, фоновые glitch-эффекты работают на CSS и отключаются на мобильных устройствах и при настройке уменьшения движения.</li></ul><div class="release-callout">✦ Заезжай в Vice Spike, собери награды и оставь свой след в городе.</div></article></section>
     <section class="tab-view" id="view-social" hidden><div class="social-header"><div><span class="social-eyebrow">SPIKE / СООБЩЕСТВО</span><h1>Твой уголок<br><em>интернета.</em></h1><p>Мемы, моды и мысли — делись тем, что стоит увидеть.</p><button class="btn btn-primary" id="social-create" type="button">＋ Создать пост</button></div><div class="social-hero-art" aria-hidden="true">✦</div></div><div class="social-toolbar"><div><h2>Свежие посты</h2><span>Что происходит в сообществе</span></div><div class="social-filters"><button class="chip active" type="button" data-social-filter="all">Все</button><button class="chip" type="button" data-social-filter="following">Подписки</button></div></div><p id="social-status" class="field-hint"></p><div id="social-grid" class="social-grid"></div></section>
+    <section class="tab-view" id="view-events" hidden><div class="events-hero"><span class="events-kicker">SPIKE / СОБЫТИЯ</span><h1>Встречаемся<br><em>на закате.</em></h1><p>Все события Spike — в одном месте. Открывай новые впечатления вместе с сообществом.</p></div><div class="events-heading"><div><span class="events-kicker">КАЛЕНДАРЬ SPIKE</span><h2>Сейчас и скоро</h2></div></div><div class="events-grid"><article class="event-card event-vice"><span class="event-label">ДО 20 НОЯБРЯ 2026</span><h3>Vice Spike</h3><p>Неоновый город, находки и аркадный забег Vice Run. Собирай ивентовые достижения в профиле.</p><button class="btn btn-primary" type="button" id="events-vice-run">Играть в Vice Run ↗</button></article><article class="event-card event-winter"><span class="event-label">СТАРТ · 20 НОЯБРЯ 2026</span><h3>Новый год</h3><p>Следующий ивент Spike начинается 20 ноября. Подробности и программа появятся позже.</p><span class="event-soon">СКОРО ✦</span></article></div></section>
     <section class="tab-view" id="view-bookmarks" hidden><div class="view-intro"><span class="view-intro-icon">★</span><div><h1>Закладки</h1><p>Твои сохранённые находки.</p></div></div><div id="bookmarks-message" class="empty-inner"></div><div class="grid" id="bookmarks-grid"></div></section>
     <section class="tab-view" id="view-achievements" hidden><div class="view-intro"><span class="view-intro-icon">🏆</span><div><h1>Достижения</h1><p>Твои первые шаги в Spike.</p></div></div><div id="achievements-grid" class="cat-grid"></div></section>
   </main><aside class="layout-aside" aria-label="О Spike"><div class="side-widget"><span class="widget-label">✦ КАК ЭТО РАБОТАЕТ</span><h2>Находка ждёт своих</h2><p>Добавь ссылку, обсуди её и сохрани то, к чему захочешь вернуться.</p><button type="button" class="side-cta" id="side-add">＋ Предложить ссылку</button></div><div class="side-widget side-widget-alt"><span class="widget-label">✧ МАЛЕНЬКАЯ ПОДСКАЗКА</span><p>Не знаешь, что открыть? Попробуй случайную находку в ленте.</p><button type="button" class="side-cta subtle" id="side-random">🎲 Удиви меня</button></div><div class="side-footer">SPIKE.NET <span>✦</span> МЕСТО ДЛЯ НАХОДОК</div></aside></div>
@@ -348,19 +350,19 @@
         <span class="trailer-overline">SPIKE.NET / 01</span>
         <div class="trailer-mark">✦</div>
         <h2 id="trailer-title">Твоя лента.<br><em>Твои находки.</em></h2>
-        <p>Место, где классные ссылки не исчезают в потоке сообщений.</p>
+        <p>Spike — место для находок и общения. Сохраняй интересные ссылки, открывай посты сообщества и возвращайся к любимому в любое время.</p>
       </div>
       <div class="trailer-scene scene-two">
         <span class="trailer-overline">СОБИРАЙ В ОДНОМ МЕСТЕ</span>
         <div class="trailer-orbit"><b>▶</b><b>◉</b><b>♫</b><b>✦</b></div>
         <h2>Видео. Игры.<br><em>Музыка. Кино.</em></h2>
-        <p>Добавляй ссылки с YouTube, Twitch, Steam и любимых сервисов.</p>
+        <p>Нажми «Добавить ссылку», вставь адрес и заполни карточку. Выбирай категории и заглядывай в тренды, чтобы находить новое.</p>
       </div>
       <div class="trailer-scene scene-three">
         <span class="trailer-overline">ОТКРЫВАЙ НОВОЕ</span>
         <div class="trailer-mini-grid"><i>01</i><i>02</i><i>03</i><i>✦</i></div>
         <h2>Находи своё.<br><em>Делись с другими.</em></h2>
-        <p>Тренды, посты, лайки и закладки — всё, чтобы не потерять хорошее.</p>
+        <p>Войди в аккаунт, чтобы создавать посты, ставить лайки и комментировать. В профиле ждут достижения и награды событий.</p>
       </div>
       <div class="trailer-finish">
         <span class="trailer-overline">READY WHEN YOU ARE</span>
@@ -368,6 +370,7 @@
         <button class="btn btn-primary trailer-start" id="trailer-start" type="button">Войти в Spike <span>→</span></button>
         <button class="trailer-again" id="trailer-again" type="button">Посмотреть ещё раз</button>
       </div>
+      <div class="welcome-controls"><button id="trailer-prev" type="button">← Назад</button><button id="trailer-next" type="button">Далее →</button></div>
     </div>
   </div>
 
@@ -383,10 +386,10 @@
   </div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-  <script src="app.js?v=vice11-2"></script>
+  <script src="app.js?v=sunset2"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="shared.js?v=vice11-2"></script>
+  <script src="shared.js?v=sunset2"></script>
   <script src="social.js?v=vice11-2"></script>
-  <script src="welcome.js?v=vice11-2"></script>
+  <script src="welcome.js?v=sunset2"></script>
 </body>
 </html>

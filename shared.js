@@ -109,13 +109,10 @@ function myAchievements() {
   return [
     make('Первый комментарий', 'Оставь комментарий', comments.length, 1),
     make('Общительный', 'Оставь 10 комментариев', comments.length, 10),
-    make('Первая закладка', 'Сохрани публикацию', bookmarkIds.size, 1, bookmarkReady),
     make('Знакомство', 'Создай профиль', currentProfile ? 1 : 0, 1),
     make('Своя аватарка', 'Добавь аватар', currentProfile?.avatar_path ? 1 : 0, 1),
     make('Голос сообщества', 'Оставь 3 комментария', comments.length, 3),
     make('Мастер общения', 'Оставь 25 комментариев', comments.length, 25),
-    make('Коллекционер', 'Сохрани 5 публикаций', bookmarkIds.size, 5, bookmarkReady),
-    make('Хранитель находок', 'Сохрани 10 публикаций', bookmarkIds.size, 10, bookmarkReady),
     make('Первый лайк', 'Поставь лайк', liked.size, 1, reactionsReady),
     make('Ценитель', 'Поставь 5 лайков', liked.size, 5, reactionsReady),
     make('Щедрое сердце', 'Поставь 10 лайков', liked.size, 10, reactionsReady),
@@ -125,7 +122,7 @@ function myAchievements() {
     { name: 'Местный житель', description: 'Набери 300 очков в Vice Run', value: viceRewards.has('local') ? 1 : 0, target: 1, available: true, done: viceRewards.has('local') },
     { name: 'Король побережья', description: 'Набери 500 очков в Vice Run', value: viceRewards.has('coast_king') ? 1 : 0, target: 1, available: true, done: viceRewards.has('coast_king') },
     { name: 'Хорошие связи', description: 'Оставь 5 комментариев на ивенте', value: viceRewards.has('connections') ? 1 : 0, target: 1, available: true, done: viceRewards.has('connections') },
-    { name: 'Секретный тайник', description: 'Сохрани 5 находок', value: viceRewards.has('stash') ? 1 : 0, target: 1, available: true, done: viceRewards.has('stash') },
+    { name: 'Секретный тайник', description: 'Архивная награда за закладки', value: viceRewards.has('stash') ? 1 : 0, target: 1, available: viceRewards.has('stash'), done: viceRewards.has('stash') },
     { name: 'Пиратское радио', description: 'Добавь музыкальную находку', value: viceRewards.has('radio') ? 1 : 0, target: 1, available: true, done: viceRewards.has('radio') },
     { name: 'Свой на побережье', description: 'Собери 3 награды Vice Spike', value: viceRewards.has('resident') ? 1 : 0, target: 1, available: true, done: viceRewards.has('resident') },
     { name: 'VICE / 2026', description: 'Собери все награды ивента', value: viceRewards.has('collection') ? 1 : 0, target: 1, available: true, done: viceRewards.has('collection') },
@@ -135,7 +132,7 @@ function myAchievements() {
 function renderExtras() {
   const grid = $('#bookmarks-grid'), message = $('#bookmarks-message');
   if (!grid || !message) return;
-  const list = items.filter(item => bookmarkIds.has(item.id));
+  const list = items.filter(item => bookmarkIds.has(String(item.id)));
   message.hidden = !!currentUser && bookmarkReady && list.length > 0;
   message.textContent = !currentUser ? 'Войди, чтобы сохранять закладки.' : !bookmarkReady ? 'Закладки ещё не настроены или недоступны.' : 'Пока нет закладок. Нажми ☆ на карточке.';
   grid.innerHTML = list.map((item, i) => cardHTML(item, i)).join('');
@@ -152,7 +149,8 @@ async function loadBookmarks() {
   bookmarkIds = new Set(); bookmarkReady = false;
   if (currentUser && authClient) {
     const { data, error } = await authClient.from('spike_bookmarks').select('post_id');
-    if (!error) { bookmarkReady = true; bookmarkIds = new Set(data.map(row => row.post_id)); }
+    if (!error) { bookmarkReady = true; bookmarkIds = new Set((data || []).map(row => String(row.post_id))); }
+    else console.error('Не удалось загрузить закладки:', error);
   }
   renderExtras();
 }
@@ -388,14 +386,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const button = e.target.closest('[data-bookmark]');
     if (!button) return;
     if (!currentUser) { toast('Войди, чтобы сохранять закладки', true); return; }
-    if (!bookmarkReady) { toast('Закладки пока недоступны', true); return; }
+    if (!bookmarkReady) { await loadBookmarks(); if (!bookmarkReady) { toast('Закладки недоступны: проверьте таблицу spike_bookmarks в Supabase', true); return; } }
     const id = button.dataset.bookmark;
     button.disabled = true;
-    const result = bookmarkIds.has(id)
-      ? await authClient.from('spike_bookmarks').delete().eq('user_id', currentUser.id).eq('post_id', id)
-      : await authClient.from('spike_bookmarks').insert({ user_id: currentUser.id, post_id: id });
-    if (result.error) { button.disabled = false; toast('Не удалось сохранить закладку', true); return; }
-    await loadBookmarks();
+    try {
+      const result = bookmarkIds.has(id)
+        ? await authClient.from('spike_bookmarks').delete().eq('user_id', currentUser.id).eq('post_id', id)
+        : await authClient.from('spike_bookmarks').insert({ user_id: currentUser.id, post_id: id });
+      if (result.error) throw result.error;
+      await loadBookmarks();
+    } catch (error) {
+      console.error('Не удалось сохранить закладку:', error);
+      toast('Не удалось сохранить закладку. Проверьте настройки Supabase', true);
+    } finally { button.disabled = false; }
   });
 });
 

@@ -406,7 +406,6 @@ function cardHTML(it, index) {
         <div class="energy-meter" title="На основе общего числа просмотров карточки">⚡ Активность · ${fmtNum(it.views)} просмотров <span class="energy-bars" aria-hidden="true"><i></i><i></i><i></i></span></div>
         ${it.tags.length ? `<div class="card-tags">${it.tags.slice(0, 4).map((t) => `<span class="card-tag">#${escapeHTML(t)}</span>`).join("")}</div>` : ""}
         <div class="video-card-foot">
-          <button class="card-foot-btn bookmark-btn" data-bookmark="${escapeHTML(it.id)}" type="button" title="Сохранить в закладки">☆</button>
           <button class="card-foot-btn like-btn ${isLiked ? "liked" : ""}" data-like="${it.id}" type="button" title="Лайк">
             <span class="pixel-heart" aria-hidden="true">♥</span><span>${it.likes}</span>
           </button>
