@@ -483,9 +483,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const result = await authClient.from('spike_achievements').select('code').eq('user_id', user.id);
         if (currentUser?.id !== user.id) return;
         if (!result.error) earnedAchievements = new Set(result.data.map(row => row.code));
+        await authClient.rpc('spike_vice_claim').catch(() => {});
         const vice = await authClient.from('spike_vice_rewards').select('code').eq('user_id', user.id);
         if (!vice.error) viceRewards = new Set(vice.data.map(row => row.code));
-        await authClient.rpc('spike_vice_claim').catch(() => {});
       }
       await loadBookmarks();
       refreshShared();
