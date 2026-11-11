@@ -47,6 +47,10 @@
   prev.addEventListener('click', () => show(Math.max(0, index - 1)));
   next.addEventListener('click', () => show(Math.min(scenes.length, index + 1)));
   document.querySelector('.add-link-trigger-hero')?.addEventListener('click', () => document.querySelector('.add-link-trigger')?.click());
+  const mobileDock = document.querySelector('.mobile-dock');
+  const syncMobileDock = () => { const active = document.querySelector('#tabs .tab.active')?.dataset.tab; mobileDock?.querySelectorAll('[data-mobile-tab]').forEach(button => { const selected = button.dataset.mobileTab === active; button.classList.toggle('active', selected); if (selected) button.setAttribute('aria-current', 'page'); else button.removeAttribute('aria-current'); }); };
+  mobileDock?.addEventListener('click', e => { const button = e.target.closest('[data-mobile-tab]'); if (!button) return; document.querySelector(`#tabs [data-tab="${button.dataset.mobileTab}"]`)?.click(); syncMobileDock(); window.scrollTo({top:0,behavior:'auto'}); });
+  document.querySelectorAll('#tabs .tab').forEach(button => button.addEventListener('click', syncMobileDock)); syncMobileDock();
   const winterCountdown = document.querySelector('#winter-countdown');
   if (winterCountdown) {
     const updateWinterCountdown = () => { const left = new Date('2026-11-20T00:00:00+03:00').getTime() - Date.now(); if (left <= 0) { winterCountdown.textContent = '20 ноября · следи за новостями'; return; } const days = Math.floor(left / 86400000), hours = Math.floor(left / 3600000) % 24; winterCountdown.textContent = `До 20 ноября: ${days} дн. ${hours} ч.`; };
