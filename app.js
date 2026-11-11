@@ -1068,7 +1068,7 @@ function bindEvents() {
 
 function initParticles() {
   const canvas = $("#particles");
-  if (!canvas || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  if (!canvas || getComputedStyle(canvas).display === "none" || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   const ctx = canvas.getContext("2d");
   let w, h, parts, raf;
   const COUNT = Math.min(22, Math.floor(window.innerWidth / 55));
