@@ -10,7 +10,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Unbounded:wght@600;800&display=swap" rel="stylesheet">
 <style>
 :root{
-  --red:#e11d1d;--cyan:#19e6ff;--bg:#050204;--ink:#f4f6f8;--muted:#a9b3bb;
+  --red:#76b74d;--cyan:#c3f18b;--bg:#07110e;--ink:#f4f8f1;--muted:#b2c6b8;
   --head:'Unbounded','Arial Black',Impact,sans-serif;--body:'Inter',system-ui,-apple-system,'Segoe UI',sans-serif;
   box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
 }
@@ -18,7 +18,7 @@
 :root[data-theme="light"]{--bg:#0a0508}
 *,*::before,*::after{box-sizing:border-box}
 html{background:var(--bg)}
-body{margin:0;color:var(--ink);font:400 16px/1.5 var(--body);background:radial-gradient(75vmax 55vmax at 72% 42%,#7a0c0c,transparent 70%),linear-gradient(#1c050a,var(--bg) 75%) fixed}
+body{margin:0;color:var(--ink);font:400 16px/1.5 var(--body);background:radial-gradient(75vmax 55vmax at 72% 42%,#285d3b,transparent 70%),linear-gradient(#10271c,var(--bg) 75%) fixed}
 #gl{position:fixed;inset:0;width:100%;height:100%;display:block;pointer-events:none}
 .vig{position:fixed;inset:0;pointer-events:none;z-index:3;background:radial-gradient(120% 90% at 50% 45%,transparent 55%,rgba(0,0,0,.65))}
 .space{height:700vh}
@@ -27,12 +27,12 @@ body{margin:0;color:var(--ink);font:400 16px/1.5 var(--body);background:radial-g
 .logo svg{width:26px;height:26px;fill:#fff}
 .pct{font:600 13px var(--body);color:var(--muted)}
 .hero{position:fixed;inset:0;z-index:4;display:flex;flex-direction:column;justify-content:center;padding:90px 22px 120px;pointer-events:none;max-width:700px}
-h1{font:800 clamp(38px,11vw,92px)/1 var(--head);color:var(--cyan);text-transform:uppercase;margin:0 0 18px;text-shadow:0 0 34px rgba(25,230,255,.55)}
+h1{font:800 clamp(38px,11vw,92px)/1 var(--head);color:var(--cyan);text-transform:uppercase;margin:0 0 18px;text-shadow:0 0 34px rgba(151,225,100,.35)}
 .hero p{margin:0;color:#e1e7ea;font-size:clamp(16px,4.4vw,20px);max-width:24em}
 .down{margin-top:26px;font:600 14px var(--body);color:var(--muted);animation:nudge 1.6s ease-in-out infinite}
 @keyframes nudge{50%{transform:translateX(8px)}}
 @media(prefers-reduced-motion:reduce){.down{animation:none}}
-.card{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 16px);transform:translateX(-50%);width:min(520px,calc(100vw - 28px));z-index:5;background:rgba(14,6,12,.82);border:1px solid rgba(255,255,255,.18);border-left:6px solid var(--red);border-radius:18px;padding:16px 18px;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+.card{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 16px);transform:translateX(-50%);width:min(520px,calc(100vw - 28px));z-index:5;background:rgba(9,25,18,.94);border:1px solid rgba(197,241,160,.25);border-left:6px solid var(--red);border-radius:18px;padding:16px 18px}
 .card .n{font:600 13px var(--body);color:var(--muted)}
 .card h2{font:800 clamp(20px,5.4vw,28px)/1.15 var(--head);color:var(--cyan);margin:4px 0}
 .card p{margin:0 0 12px;color:#cfd8dd;font-size:15px}
@@ -70,33 +70,33 @@ h1{font:800 clamp(38px,11vw,92px)/1 var(--head);color:var(--cyan);text-transform
   function $(i){return document.getElementById(i)}
   var SITE='https://spike123net.github.io/Spike.net/';
   var D=[
-    {t:'YouTube',d:'Видео-находки: ставь снежинки лучшим роликам.'},
-    {t:'Twitch',d:'Стримы и клипы, которые не хочется потерять.'},
-    {t:'Steam',d:'Игры, скидки и находки для вечера.'},
-    {t:'Музыка',d:'Плейлисты и треки, которые зашли другим.'},
-    {t:'Кино',d:'Фильмы и сериалы на любой вечер.'},
-    {t:'Spike.net',d:'Вся лента находок на одном сайте. Заходи и добавляй свои ссылки.'}
+    {t:'YouTube',d:'Находи видео, обсуждай и делись лучшим.',tag:'ВИДЕО / НАХОДКИ',icon:'▶'},
+    {t:'Twitch',d:'Стримы и клипы от твоих любимых авторов.',tag:'СТРИМЫ / КЛИПЫ',icon:'◉'},
+    {t:'Steam',d:'Игры и открытия для твоего следующего вечера.',tag:'ИГРЫ / СООБЩЕСТВО',icon:'✚'},
+    {t:'Музыка',d:'Треки и плейлисты, которыми хочется поделиться.',tag:'МУЗЫКА / ЗВУК',icon:'♫'},
+    {t:'Кино',d:'Фильмы и истории, которые стоит обсудить.',tag:'КИНО / ИСТОРИИ',icon:'▣'},
+    {t:'Spike.net',d:'Публикуй находки, общайся и оставайся на связи.',tag:'ТВОЁ СООБЩЕСТВО',icon:'✦'}
   ],PX=[6,13,20,27,34,43];
   (function(){var d='',n=12;for(var i=0;i<n*2;i++){var r=i%2?7:19,a=Math.PI*i/n-Math.PI/2;d+=(i?'L':'M')+(20+Math.cos(a)*r).toFixed(1)+' '+(20+Math.sin(a)*r).toFixed(1)}$('lp').setAttribute('d',d+'Z')})();
   function nogl(){document.documentElement.classList.add('nogl')}
   if(!window.THREE){nogl();return}
   var R;try{R=new THREE.WebGLRenderer({canvas:$('gl'),antialias:true,alpha:true})}catch(e){nogl();return}
   var rm=matchMedia('(prefers-reduced-motion: reduce)').matches;
-  R.setPixelRatio(Math.min(window.devicePixelRatio||1,2));R.setClearColor(0x000000,0);R.toneMapping=THREE.ACESFilmicToneMapping;R.toneMappingExposure=1.15;R.outputEncoding=THREE.sRGBEncoding;
-  var FOG=0x12040a,scene=new THREE.Scene();scene.fog=new THREE.FogExp2(FOG,.05);
+  R.setPixelRatio(Math.min(window.devicePixelRatio||1,1.5));R.setClearColor(0x000000,0);R.toneMapping=THREE.ACESFilmicToneMapping;R.toneMappingExposure=1.15;R.outputEncoding=THREE.sRGBEncoding;
+  var FOG=0x07150f,scene=new THREE.Scene();scene.fog=new THREE.FogExp2(FOG,.05);
   var cam=new THREE.PerspectiveCamera(50,1,.1,120);
 
   /* studio environment for realistic metal */
-  var es=new THREE.Scene();es.add(new THREE.Mesh(new THREE.BoxGeometry(36,36,36),new THREE.MeshBasicMaterial({color:0x0a0508,side:THREE.BackSide})));
+  var es=new THREE.Scene();es.add(new THREE.Mesh(new THREE.BoxGeometry(36,36,36),new THREE.MeshBasicMaterial({color:0x08160f,side:THREE.BackSide})));
   function pan(c,k,w,h,x,y,z){var m=new THREE.Mesh(new THREE.PlaneGeometry(w,h),new THREE.MeshBasicMaterial({color:new THREE.Color(c).multiplyScalar(k),side:THREE.DoubleSide}));m.position.set(x,y,z);m.lookAt(0,0,0);es.add(m)}
-  pan(0xffffff,5,18,4,0,16,0);pan(0xff2a2a,4.5,4,14,-16,2,3);pan(0x19e6ff,5,4,14,16,0,-2);pan(0xffffff,3,16,3,0,0,-16);pan(0xff2a2a,2,12,3,0,-16,2);pan(0xffffff,2.5,3,10,6,3,16);
+  pan(0xffffff,5,18,4,0,16,0);pan(0x68c75b,4.5,4,14,-16,2,3);pan(0xa8edb5,5,4,14,16,0,-2);pan(0xffffff,3,16,3,0,0,-16);pan(0x6bb857,2,12,3,0,-16,2);pan(0xffffff,2.5,3,10,6,3,16);
   var pm=new THREE.PMREMGenerator(R);scene.environment=pm.fromScene(es,.02).texture;pm.dispose();
   var dl=new THREE.DirectionalLight(0xffffff,.6);dl.position.set(2,5,6);scene.add(dl);scene.add(new THREE.AmbientLight(0xffffff,.22));
 
   /* materials & shared assets */
   var chrome=new THREE.MeshStandardMaterial({color:0xe4eaee,metalness:1,roughness:.14,envMapIntensity:1.3}),
-      neon=new THREE.MeshStandardMaterial({color:0x19e6ff,emissive:0x19e6ff,emissiveIntensity:.75,metalness:.4,roughness:.25}),
-      red=new THREE.MeshStandardMaterial({color:0xe11d1d,metalness:.9,roughness:.22,envMapIntensity:1.2}),
+      neon=new THREE.MeshStandardMaterial({color:0xa8e879,emissive:0x72ca62,emissiveIntensity:.65,metalness:.4,roughness:.25}),
+      red=new THREE.MeshStandardMaterial({color:0x3c8b55,metalness:.9,roughness:.22,envMapIntensity:1.2}),
       black=new THREE.MeshStandardMaterial({color:0x0b0b0d,metalness:.85,roughness:.2,envMapIntensity:1.4}),
       lg=new THREE.TorusGeometry(.26,.07,18,36),X=new THREE.Vector3(1,0,0);
   var gc=document.createElement('canvas');gc.width=gc.height=64;var gx=gc.getContext('2d'),gr=gx.createRadialGradient(32,32,0,32,32,32);gr.addColorStop(0,'rgba(255,255,255,1)');gr.addColorStop(.35,'rgba(255,255,255,.35)');gr.addColorStop(1,'rgba(255,255,255,0)');gx.fillStyle=gr;gx.fillRect(0,0,64,64);
@@ -109,14 +109,16 @@ h1{font:800 clamp(38px,11vw,92px)/1 var(--head);color:var(--cyan);text-transform
   function atX(x){var b=0,bd=1e9;for(var i=0;i<samp.length;i++){var d=Math.abs(samp[i].x-x);if(d<bd){bd=d;b=i}}return samp[b]}
 
   function tex(i,x){var c=document.createElement('canvas');c.width=640;c.height=380;var g=c.getContext('2d');
-    var gr=g.createLinearGradient(0,0,640,380);gr.addColorStop(0,'#1a0709');gr.addColorStop(1,'#3a0b10');g.fillStyle=gr;g.fillRect(0,0,640,380);
-    g.fillStyle='#e11d1d';g.fillRect(0,0,16,380);g.strokeStyle='rgba(255,255,255,.28)';g.lineWidth=4;g.strokeRect(2,2,636,376);
-    g.fillStyle='rgba(255,255,255,.13)';g.font='800 150px sans-serif';g.fillText('0'+(i+1),430,170);
-    var fs=62;g.font='800 '+fs+'px sans-serif';while(g.measureText(x.t).width>560&&fs>28){fs-=3;g.font='800 '+fs+'px sans-serif'}
-    g.fillStyle='#19e6ff';g.fillText(x.t,44,232);
-    g.fillStyle='#d6dde2';g.font='600 27px sans-serif';var w=x.d.split(' '),ln='',y=282;
-    w.forEach(function(q){var t=ln?ln+' '+q:q;if(g.measureText(t).width>560){g.fillText(ln,44,y);ln=q;y+=34}else ln=t});g.fillText(ln,44,y);
-    g.fillStyle='#7f8b92';g.font='600 22px sans-serif';g.fillText('spike123net.github.io/Spike.net',44,356);
+    var gr=g.createLinearGradient(0,0,640,380);gr.addColorStop(0,'#10241b');gr.addColorStop(1,'#1d4230');g.fillStyle=gr;g.fillRect(0,0,640,380);
+    g.fillStyle='#a9e75d';g.fillRect(0,0,12,380);g.strokeStyle='rgba(205,245,183,.32)';g.lineWidth=3;g.strokeRect(2,2,636,376);
+    g.fillStyle='rgba(196,239,165,.11)';g.font='800 132px sans-serif';g.fillText('0'+(i+1),470,140);
+    g.fillStyle='#244e35';g.fillRect(42,36,66,66);g.fillStyle='#c3f18b';g.font='800 40px sans-serif';g.fillText(x.icon,57,83);
+    g.fillStyle='#a9cfac';g.font='700 18px sans-serif';g.fillText('SPIKE / '+x.tag,125,77);
+    var fs=58;g.font='800 '+fs+'px sans-serif';while(g.measureText(x.t).width>550&&fs>28){fs-=3;g.font='800 '+fs+'px sans-serif'}
+    g.fillStyle='#ecf8df';g.fillText(x.t,42,190);
+    g.fillStyle='#bdd3c3';g.font='500 26px sans-serif';var w=x.d.split(' '),ln='',y=237;
+    w.forEach(function(q){var t=ln?ln+' '+q:q;if(g.measureText(t).width>545){g.fillText(ln,42,y);ln=q;y+=34}else ln=t});g.fillText(ln,42,y);
+    g.fillStyle='#9fd475';g.font='700 18px sans-serif';g.fillText('SPIKE.NET  /  ОТКРЫВАЙ СВОЁ',42,344);
     var t=new THREE.CanvasTexture(c);t.anisotropy=8;t.encoding=THREE.sRGBEncoding;return t}
   var TX=D.map(function(x,i){return tex(i,x)});
 
@@ -125,14 +127,14 @@ h1{font:800 clamp(38px,11vw,92px)/1 var(--head);color:var(--cyan);text-transform
     var cg=new THREE.ConeGeometry(.15,.95,12),pos=ico.attributes.position,seen={},up=new THREE.Vector3(0,1,0);
     for(var i=0;i<pos.count;i++){var v=new THREE.Vector3().fromBufferAttribute(pos,i),k=v.x.toFixed(3)+v.y.toFixed(3)+v.z.toFixed(3);if(seen[k])continue;seen[k]=1;
       var d=v.clone().normalize(),m=new THREE.Mesh(cg,i%5===0?red:black);m.position.copy(d).multiplyScalar(.85);m.quaternion.setFromUnitVectors(up,d);g.add(m)}
-    var s=new THREE.Sprite(new THREE.SpriteMaterial({map:glowTex,color:0xff2a2a,blending:THREE.AdditiveBlending,transparent:true,depthWrite:false,opacity:.55,fog:false}));s.scale.set(4.2,4.2,1);g.add(s);return g}
+    var s=new THREE.Sprite(new THREE.SpriteMaterial({map:glowTex,color:0x8cdb69,blending:THREE.AdditiveBlending,transparent:true,depthWrite:false,opacity:.4,fog:false}));s.scale.set(4.2,4.2,1);g.add(s);return g}
 
   /* build the whole content once; called for the real scene and for its mirror */
   function build(parent,pick){
     var o={links:[],plaques:[],ball:null},chain=new THREE.Group();parent.add(chain);o.chain=chain;
     for(var i=0;i<K;i++){var u=(i+.5)/K,p=curve.getPointAt(u),tg=curve.getTangentAt(u),g=new THREE.Group(),mt=i%8===3?neon:i%8===7?red:chrome,m=new THREE.Mesh(lg,mt);
       m.scale.set(1.45,1,1);m.rotation.x=(i%2)*Math.PI/2;g.add(m);g.position.copy(p);g.quaternion.setFromUnitVectors(X,tg);chain.add(g);o.links.push(m);
-      if(mt===neon){var s=new THREE.Sprite(new THREE.SpriteMaterial({map:glowTex,color:0x19e6ff,blending:THREE.AdditiveBlending,transparent:true,depthWrite:false,opacity:.7,fog:false}));s.scale.set(1.7,1.7,1);g.add(s)}}
+      if(mt===neon){var s=new THREE.Sprite(new THREE.SpriteMaterial({map:glowTex,color:0x9fe77f,blending:THREE.AdditiveBlending,transparent:true,depthWrite:false,opacity:.6,fog:false}));s.scale.set(1.7,1.7,1);g.add(s)}}
     D.forEach(function(x,i){
       var P=atX(PX[i]),big=i===D.length-1,sc=big?1.25:1,grp=new THREE.Group();grp.position.set(P.x,P.y-1.2*sc,P.z+.5);parent.add(grp);
       var face=new THREE.MeshStandardMaterial({map:TX[i],emissiveMap:TX[i],emissive:0xffffff,emissiveIntensity:.5,roughness:.45,metalness:.3});
