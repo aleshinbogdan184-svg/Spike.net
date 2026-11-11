@@ -38,3 +38,14 @@ body,body :not(svg):not(path):not(use) { font-family:'Oswald',sans-serif!importa
 @media (max-width:390px) {
   .topbar .logo-text { display:none!important; }.topbar .tab { min-width:54px!important; padding-left:7px!important; padding-right:7px!important; font-size:11px!important; }.feed-head .section-title,.social-toolbar h2 { font-size:16px!important; max-width:calc(100% - 80px); }.feed-head #random-post { max-width:110px; font-size:11px!important; }.site-layout { width:calc(100% - 18px)!important; }
 }
+
+/* Живой фон и аккуратное мобильное меню категорий. */
+.bg { position:fixed!important; inset:0!important; overflow:hidden!important; background:radial-gradient(ellipse at 82% 8%,#1b526466,transparent 52%),radial-gradient(ellipse at 12% 82%,#63406b55,transparent 48%),#0a1115!important; }
+.bg::before,.bg::after { display:block!important; content:''!important; position:absolute!important; width:58vw!important; height:58vw!important; border-radius:50%!important; filter:blur(72px)!important; opacity:.28!important; pointer-events:none!important; animation:spike-aurora 18s ease-in-out infinite alternate!important; }
+.bg::before { top:-30vw!important; left:-18vw!important; background:#318f83!important; }.bg::after { right:-18vw!important; bottom:-30vw!important; background:#744d9b!important; animation-delay:-8s!important; }
+@keyframes spike-aurora { to { transform:translate3d(18vw,12vh,0) scale(1.18); } }
+.feed-search .category-nav.search-categories-open { top:calc(100% + 8px)!important; left:auto!important; right:0!important; width:min(340px,calc(100vw - 24px))!important; max-height:calc(100dvh - 110px)!important; overflow:auto!important; }
+.feed-search #chips-type { display:grid!important; grid-template-columns:repeat(3,minmax(0,1fr))!important; gap:8px!important; }
+.feed-search #chips-type .chip { min-width:0!important; width:100%!important; justify-content:center!important; overflow:hidden!important; text-overflow:ellipsis!important; white-space:nowrap!important; }
+@media(max-width:420px) { .feed-search .category-nav.search-categories-open { width:calc(100vw - 20px)!important; right:-2px!important; }.feed-search #chips-type { grid-template-columns:repeat(2,minmax(0,1fr))!important; } }
+@media(prefers-reduced-motion:reduce) { .bg::before,.bg::after { animation:none!important; } }
