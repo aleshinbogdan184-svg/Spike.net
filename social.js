@@ -262,7 +262,7 @@ async function renderOwnProfile() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  document.querySelectorAll('[data-own-tab]').forEach(button => button.addEventListener('click', () => { ownProfileTab = button.dataset.ownTab; document.querySelectorAll('[data-own-tab]').forEach(b => b.classList.toggle('active', b === button)); renderOwnProfile(); }));
+  document.querySelectorAll('[data-own-tab]').forEach(button => button.addEventListener('click', async () => { ownProfileTab = button.dataset.ownTab; document.querySelectorAll('[data-own-tab]').forEach(b => b.classList.toggle('active', b === button)); if (ownProfileTab === 'saved' && typeof loadBookmarks === 'function') { const content = $('#own-profile-content'); content.textContent = 'Загружаем сохранённые…'; await loadBookmarks(); } renderOwnProfile(); }));
   $('#own-profile-content').addEventListener('click', async e => {
     const link = e.target.closest('[data-own-link]');
     if (link) { $('#profile-modal').hidden = true; openView(link.dataset.ownLink); return; }
