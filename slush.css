@@ -1,0 +1,54 @@
+/* A light sticker-book treatment for Spike. No animated backgrounds or gradients. */
+:root { --bg:#dceeff; --surface:#fff; --surface-2:#e9ccff; --border:#000; --border-strong:#000; --text:#000; --muted:#414141; --muted-2:#555; --v:#5c4ade; --g:#55db9c; }
+body { background:#dceeff!important; color:#000!important; }
+.bg { background:#dceeff!important; }
+.bg::before,.bg::after,.vignette,.noise { display:none!important; }
+.topbar { background:#dceeff!important; border-bottom:1px solid #000!important; box-shadow:none!important; backdrop-filter:none!important; }
+.topbar .logo-icon { background:#55db9c!important; border:1px solid #000!important; border-radius:50%!important; }
+.logo-text,.logo-dot { color:#000!important; }
+.topbar .tab { color:#000!important; background:#fff!important; border:1px solid #000!important; border-radius:9999px!important; font:700 13px/1.1 Inter,system-ui,sans-serif!important; letter-spacing:.03em!important; }
+.topbar .tab.active { color:#000!important; background:#55db9c!important; box-shadow:none!important; }
+.topbar .tab:hover:not(.active) { color:#000!important; background:#e9ccff!important; }
+.btn,.chip,.view-action { border-radius:9999px!important; box-shadow:none!important; }
+.topbar-right .add-link-trigger,.btn-primary { background:#000!important; border:1px solid #000!important; color:#fff!important; border-radius:9999px!important; box-shadow:none!important; }
+.btn-primary:hover { background:#333!important; color:#fff!important; }
+.btn-ghost,.chip,.social-filters .chip { background:#fff!important; border:1px solid #000!important; color:#000!important; border-radius:9999px!important; }
+.chip.active,.social-filters .chip.active { background:#55db9c!important; border-color:#000!important; color:#000!important; }
+.site-layout { width:min(1440px,calc(100% - 64px))!important; }
+.social-toolbar h2,.feed-head .section-title,.view-intro h1,.events-heading h1 { color:#000!important; font-family:Inter,system-ui,sans-serif!important; font-weight:900!important; letter-spacing:-.06em!important; }
+.social-toolbar h2 { font-size:clamp(36px,5vw,64px)!important; line-height:.9!important; }
+.social-toolbar>div:first-child span,.signal-masthead p { color:#414141!important; }
+#view-social .social-grid { gap:20px!important; }
+.social-card,.video-card,.trend-item,.cat-card,.release-card { color:#000!important; background:#fff!important; border:1px solid #000!important; border-radius:20px!important; box-shadow:none!important; }
+.social-card:hover,.video-card:hover,.trend-item:hover,.cat-card:hover { transform:none!important; border-color:#000!important; box-shadow:none!important; }
+.social-cover-button { background:#e9ccff!important; border-bottom:1px solid #000!important; }
+.social-title-link,.card-title,.social-meta .profile-link,.card-author-link,.card-author,.card-stat,.card-time { color:#000!important; }
+.social-body p,.card-description,.social-actions small { color:#414141!important; }
+.social-meta>span,.social-actions .btn { background:#e9ccff!important; color:#000!important; border:1px solid #000!important; border-radius:9999px!important; }
+.social-actions,.video-card-foot { border-color:#000!important; }
+.controls,.main>.hero,.modal-back .modal,#profile-modal .modal,#modal-view-back .modal-view,#social-view-modal .social-view-modal { color:#000!important; background:#fff!important; border:1px solid #000!important; border-radius:20px!important; box-shadow:none!important; }
+.modal-head,.modal-back .modal-head { color:#000!important; background:#fff!important; border-bottom:1px solid #000!important; }
+.social-discussion,.detail-discussion,#social-view-modal .social-discussion { color:#000!important; background:#e9ccff!important; }
+.social-comment-content,.comment-content { color:#000!important; background:#fff!important; }
+.input,.select,.textarea { color:#000!important; background:#fff!important; border:1px solid #000!important; border-radius:20px!important; }
+.account-menu,.category-dropdown { color:#000!important; background:#fff!important; border:1px solid #000!important; border-radius:20px!important; box-shadow:none!important; }
+.account-menu button,.category-dropdown button { color:#000!important; }
+.events-heading { border-color:#000!important; }
+.events-heading h1 { color:#000!important; }
+.events-kicker,.event-label { color:#000!important; }
+.winter-teaser { color:#000!important; background:#55db9c!important; border:1px solid #000!important; border-radius:20px!important; box-shadow:none!important; }
+.winter-teaser .event-label { background:#ffd731!important; color:#000!important; border:1px solid #000; border-radius:999px!important; }
+.winter-copy h2,.winter-copy h2 span,.winter-copy p { color:#000!important; }
+.winter-countdown { color:#000!important; background:#fff!important; border:1px solid #000!important; border-radius:9999px!important; }
+.spike-credits { color:#000; background:#e9ccff!important; border:1px solid #000!important; border-radius:20px!important; }
+.spike-credits-authors span,.spike-credits-authors strong,.spike-credits-authors i { color:#000!important; }
+.spike-credits-links a { color:#000!important; background:#fff!important; border:1px solid #000!important; border-radius:9999px!important; }
+.spike-credits-links a:hover { color:#000!important; background:#ffd731!important; }
+:focus-visible { outline:3px solid #5c4ade!important; outline-offset:3px!important; }
+@media(max-width:760px) {
+  .site-layout { width:auto!important; margin:0 14px!important; }
+  .mobile-dock { background:#fff!important; border:1px solid #000!important; border-radius:20px!important; box-shadow:none!important; }
+  .mobile-dock button { color:#000!important; border-radius:9999px!important; }
+  .mobile-dock button.active { color:#000!important; background:#55db9c!important; box-shadow:none!important; }
+  .modal-back .modal { border-radius:20px 20px 0 0!important; }
+}
