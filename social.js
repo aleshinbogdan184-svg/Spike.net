@@ -69,13 +69,13 @@ async function openSocialPost(id) {
     const target = $('#social-comments');
     try {
       let rows;
-      try { rows = await sharedRequest(`/spike_social_comments?post_id=eq.${encodeURIComponent(id)}&select=id,user_id,body,created_at,parent_id&order=created_at.asc&limit=200`); repliesReady = true; }
+      try { rows = await sharedRequest(`/spike_social_comments?post_id=eq.${encodeURIComponent(id)}&select=*&order=created_at.asc&limit=200`); repliesReady = rows.length === 0 || Object.prototype.hasOwnProperty.call(rows[0], 'parent_id'); }
       catch { rows = await sharedRequest(`/spike_social_comments?post_id=eq.${encodeURIComponent(id)}&select=id,user_id,body,created_at&order=created_at.asc&limit=200`); repliesReady = false; }
       const likesResult = await sharedRequest('/spike_social_comment_likes?select=comment_id,user_id&limit=10000').catch(() => null);
       commentLikes = likesResult || [];
       if (!target.isConnected) return;
       $('#social-comment-count').textContent = rows.length ? `· ${rows.length}` : '';
-      const commentHTML = c => { const commenter = socialProfiles.get(c.user_id) || (currentUser?.id === c.user_id ? currentProfile : null), name = commenter?.nickname || 'Пользователь', likes = commentLikes.filter(l => l.comment_id === c.id), mine = likes.some(l => l.user_id === currentUser?.id); return `<article class="social-comment ${c.parent_id ? 'social-comment-reply' : ''}"><button class="social-comment-avatar" type="button" data-user-profile="${escapeHTML(c.user_id)}" aria-label="Профиль ${escapeHTML(name)}">${socialAvatar(commenter)}</button><div class="social-comment-content"><div class="social-comment-meta"><button class="profile-link" type="button" data-user-profile="${escapeHTML(c.user_id)}">${escapeHTML(name)}</button><time>${timeAgo(new Date(c.created_at).getTime())}</time></div><p>${renderCommentText(c.body)}</p><div class="comment-actions">${likesResult ? `<button class="card-foot-btn comment-like ${mine ? 'liked' : ''}" type="button" data-social-comment-like="${escapeHTML(c.id)}">${mine ? '♥' : '♡'} ${likes.length}</button>` : ''}${repliesReady && !c.parent_id ? `<button class="card-foot-btn" type="button" data-social-reply="${escapeHTML(c.id)}" data-reply-name="${escapeHTML(name)}">Ответить</button>` : ''}${currentUser?.id === c.user_id ? `<button class="card-foot-btn comment-delete" type="button" data-social-comment-delete="${escapeHTML(c.id)}">Удалить</button>` : ''}</div></div></article>`; };
+      const commentHTML = c => { const commenter = socialProfiles.get(c.user_id) || (currentUser?.id === c.user_id ? currentProfile : null), name = commenter?.nickname || 'Пользователь', likes = commentLikes.filter(l => l.comment_id === c.id), mine = likes.some(l => l.user_id === currentUser?.id); return `<article class="social-comment ${c.parent_id ? 'social-comment-reply' : ''}"><button class="social-comment-avatar" type="button" data-user-profile="${escapeHTML(c.user_id)}" aria-label="Профиль ${escapeHTML(name)}">${socialAvatar(commenter)}</button><div class="social-comment-content"><div class="social-comment-meta"><button class="profile-link" type="button" data-user-profile="${escapeHTML(c.user_id)}">${escapeHTML(name)}</button><time>${timeAgo(new Date(c.created_at).getTime())}</time></div><p>${renderCommentText(c.body)}</p>${commentGifHTML(c.gif_path)}<div class="comment-actions">${likesResult ? `<button class="card-foot-btn comment-like ${mine ? 'liked' : ''}" type="button" data-social-comment-like="${escapeHTML(c.id)}">${mine ? '♥' : '♡'} ${likes.length}</button>` : ''}${repliesReady && !c.parent_id ? `<button class="card-foot-btn" type="button" data-social-reply="${escapeHTML(c.id)}" data-reply-name="${escapeHTML(name)}">Ответить</button>` : ''}${currentUser?.id === c.user_id ? `<button class="card-foot-btn comment-delete" type="button" data-social-comment-delete="${escapeHTML(c.id)}">Удалить</button>` : ''}</div></div></article>`; };
       target.innerHTML = rows.length ? rows.filter(c => !c.parent_id).map(c => { const replies = rows.filter(r => r.parent_id === c.id); return commentHTML(c) + (replies.length ? `<details class="social-replies"><summary>Показать ответы · ${replies.length}</summary>${replies.map(commentHTML).join('')}</details>` : ''); }).join('') : '<p class="social-comments-empty">Пока нет комментариев. Начни обсуждение!</p>';
     } catch { if (target.isConnected) target.textContent = 'Не удалось загрузить комментарии.'; }
   }
@@ -94,14 +94,17 @@ async function openSocialPost(id) {
     } catch { button.disabled = false; toast('Не удалось удалить комментарий', true); }
   });
   addEmojiPicker($('#social-comment-form'), $('#social-comment-form').elements.body);
+  const gifInput = addGifPicker($('#social-comment-form'));
   $('#social-comment-form').addEventListener('submit', async e => {
     e.preventDefault();
     if (!currentUser || !authClient || !currentProfile) { toast('Войди и создай профиль, чтобы комментировать', true); return; }
     const input = e.currentTarget.elements.body, text = input.value.trim(); if (!text) return;
     const button = e.currentTarget.querySelector('[type="submit"]'); button.disabled = true;
     const payload = { post_id: id, user_id: currentUser.id, body: text }; if (replyTo) payload.parent_id = replyTo;
-    const { error } = await authClient.from('spike_social_comments').insert(payload);
-    button.disabled = false; if (error) { toast('Не удалось отправить комментарий', true); return; }
+    let gifPath = '';
+    try { gifPath = await uploadCommentGif(gifInput.files[0]); if (gifPath) payload.gif_path = gifPath; const { error } = await authClient.from('spike_social_comments').insert(payload); if (error) throw error; }
+    catch (error) { if (gifPath) await authClient.storage.from('spike-comment-gifs').remove([gifPath]).catch(() => {}); button.disabled = false; toast('Не удалось отправить комментарий или GIF. Проверь настройки Supabase.', true); return; }
+    button.disabled = false;
     input.value = ''; replyTo = null; replyHint.hidden = true; await loadComments();
   });
   loadComments();

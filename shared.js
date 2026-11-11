@@ -55,7 +55,7 @@ async function refreshShared() {
   try {
     const requests = await Promise.allSettled([
       sharedRequest('/spike_posts?select=*&order=created_at.desc&limit=200'),
-      sharedRequest('/spike_comments?select=id,parent_id,post_id,body,author_name,user_id,created_at&order=created_at.asc&limit=2000'),
+      sharedRequest('/spike_comments?select=*&order=created_at.asc&limit=2000'),
       sharedRequest('/spike_profiles?select=user_id,nickname,avatar_path,frame_style,accent_style&limit=10000'),
       sharedRequest('/spike_comment_likes?select=comment_id,user_id&limit=10000'),
       sharedRequest('/spike_likes?select=post_id,user_id,created_at&limit=10000'),
@@ -72,7 +72,7 @@ async function refreshShared() {
     likes.forEach(like => likeCounts.set(like.post_id, (likeCounts.get(like.post_id) || 0) + 1));
     likes.forEach(like => { if (like.created_at && new Date(like.created_at).getTime() >= Date.now() - 7 * 86400000) weeklyCounts.set(like.post_id, (weeklyCounts.get(like.post_id) || 0) + 1); });
     views.forEach(view => viewCounts.set(view.post_id, (viewCounts.get(view.post_id) || 0) + 1));
-    comments.forEach(c => { if (!commentsByPost.has(c.post_id)) commentsByPost.set(c.post_id, []); const p = profileMap.get(c.user_id); commentsByPost.get(c.post_id).push({ id: c.id, parentId: c.parent_id, text: c.body, createdAt: c.created_at ? new Date(c.created_at).getTime() : null, userId: c.user_id, author: p?.nickname || c.author_name || 'Гость', avatar: avatarUrl(p?.avatar_path), frame: p?.frame_style, accent: p?.accent_style, developer: !!c.user_id && SPIKE_DEVELOPERS.has(c.user_id) }); });
+    comments.forEach(c => { if (!commentsByPost.has(c.post_id)) commentsByPost.set(c.post_id, []); const p = profileMap.get(c.user_id); commentsByPost.get(c.post_id).push({ id: c.id, parentId: c.parent_id, text: c.body, gifPath: c.gif_path || '', createdAt: c.created_at ? new Date(c.created_at).getTime() : null, userId: c.user_id, author: p?.nickname || c.author_name || 'Гость', avatar: avatarUrl(p?.avatar_path), frame: p?.frame_style, accent: p?.accent_style, developer: !!c.user_id && SPIKE_DEVELOPERS.has(c.user_id) }); });
     items = posts.map(post => {
       const source = detectSource(post.url);
       return { id: post.id, title: post.title, url: post.url, type: source.type, source: source.source,
@@ -289,6 +289,7 @@ openView = function (id) {
   if (currentUser) { nickname.type = 'hidden'; } 
   replacement.prepend(nickname);
   addEmojiPicker(replacement, replacement.elements.comment);
+  const gifInput = addGifPicker(replacement);
   replacement.addEventListener('submit', async e => {
     e.preventDefault();
     const input = replacement.elements.comment;
@@ -298,13 +299,16 @@ openView = function (id) {
     if (!body || !author || !sharedReady) return;
     const button = replacement.querySelector('[type="submit"]');
     button.disabled = true;
+    let gifPath = '';
     try {
       const session = currentUser ? (await authClient.auth.getSession()).data.session : null;
       if (currentUser && !session) throw new Error('Сессия истекла');
-      await sharedRequest('/spike_comments', { method: 'POST', headers: { Prefer: 'return=minimal', ...(session ? { Authorization: `Bearer ${session.access_token}` } : {}) }, body: JSON.stringify({ post_id: id, body, author_name: author, parent_id: replyTo }) });
+      gifPath = await uploadCommentGif(gifInput.files[0]);
+      await sharedRequest('/spike_comments', { method: 'POST', headers: { Prefer: 'return=minimal', ...(session ? { Authorization: `Bearer ${session.access_token}` } : {}) }, body: JSON.stringify({ post_id: id, body, author_name: author, parent_id: replyTo, ...(gifPath ? {gif_path:gifPath} : {}) }) });
       localStorage.setItem('spike.nickname', author);
       await refreshShared(); openView(id); toast('Комментарий добавлен');
     } catch (error) {
+      if (gifPath) await authClient.storage.from('spike-comment-gifs').remove([gifPath]).catch(() => {});
       button.disabled = false;
       toast(error.status === 403 || error.status === 401 ? 'Нет разрешения сохранить комментарий' : 'Не удалось отправить комментарий. Проверь соединение.', true);
       console.error('Ошибка сохранения комментария:', error);

@@ -16,7 +16,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css?v=vice11-2" />
   <link rel="stylesheet" href="sunset.css?v=25" />
-  <link rel="stylesheet" href="spike-world.css?v=4" />
+  <link rel="stylesheet" href="spike-world.css?v=7" />
 </head>
 <body>
   <!-- ====== ФОН ====== -->
@@ -321,7 +321,6 @@
     <div class="modal-head"><h2 class="modal-title" id="profile-title">Мой профиль</h2><button class="btn btn-ghost btn-sm" type="button" id="profile-close">✕</button></div>
     <form class="modal-body" id="profile-form"><div class="own-profile-header"><div class="profile-preview" id="profile-preview">✦</div><h3 id="own-profile-name">Профиль</h3><div id="own-profile-stats" class="own-profile-stats">Загрузка…</div></div>
       <div class="own-profile-tabs"><button type="button" class="chip active" data-own-tab="posts">Публикации</button><button type="button" class="chip" data-own-tab="saved">Сохранённые</button><button type="button" class="chip" data-own-tab="reposts">Репосты</button><button type="button" class="chip" data-own-tab="likes">Лайки</button></div><div id="own-profile-content" class="own-profile-content">Загрузка…</div><details class="profile-edit"><summary>Настроить профиль</summary>
-      <fieldset class="background-settings"><legend>Цвет фона</legend><p>Выбери палитру или настрой свой цвет. Настройка сохраняется на этом устройстве.</p><div class="background-options" role="group" aria-label="Палитра фона"><button type="button" data-background="ocean">Океан</button><button type="button" data-background="crimson">Красный</button><button type="button" data-background="violet">Фиолетовый</button><button type="button" data-background="forest">Лес</button><button type="button" data-background="graphite">Графит</button><label class="custom-background">Свой цвет <input type="color" id="background-custom" value="#415ca0" aria-label="Свой цвет фона"></label></div></fieldset>
       <label class="field">Уникальный ник <input class="input" id="profile-nickname" minlength="2" maxlength="24" required></label>
       <label class="field">Аватар: PNG, JPEG, WebP или GIF до 3 МБ <input class="input" type="file" id="profile-avatar" accept="image/png,image/jpeg,image/webp,image/gif"></label>
       <fieldset class="profile-social-settings"><legend>Мои соцсети</legend><p class="field-hint">Ссылки видны всем и не подтверждают владение аккаунтом.</p><label class="field">YouTube<input class="input" id="profile-link-youtube" type="url" maxlength="500" placeholder="https://youtube.com/@..."></label><label class="field">Twitch<input class="input" id="profile-link-twitch" type="url" maxlength="500" placeholder="https://twitch.tv/..."></label><label class="field">Telegram<input class="input" id="profile-link-telegram" type="url" maxlength="500" placeholder="https://t.me/..."></label><label class="field">TikTok<input class="input" id="profile-link-tiktok" type="url" maxlength="500" placeholder="https://tiktok.com/@..."></label><label class="field">X<input class="input" id="profile-link-x" type="url" maxlength="500" placeholder="https://x.com/..."></label><p class="field-hint" id="profile-links-message" role="status"></p><button class="btn btn-ghost" id="profile-links-save" type="button">Сохранить соцсети</button></fieldset>
@@ -382,10 +381,10 @@
   </div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-  <script src="app.js?v=global20"></script>
+  <script src="app.js?v=gif26"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="shared.js?v=perf25"></script>
-  <script src="social.js?v=perf25"></script>
-  <script src="welcome.js?v=space11"></script>
+  <script src="shared.js?v=gif26"></script>
+  <script src="social.js?v=gif26"></script>
+  <script src="welcome.js?v=space12"></script>
 </body>
 </html>

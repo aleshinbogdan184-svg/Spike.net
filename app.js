@@ -755,6 +755,24 @@ function addEmojiPicker(form, input) {
   Object.entries(spikeEmoji).forEach(([code, emoji]) => { const button = document.createElement('button'); button.type = 'button'; button.title = code; button.setAttribute('aria-label', code); button.textContent = emoji; button.addEventListener('click', () => { const start = input.selectionStart ?? input.value.length, end = input.selectionEnd ?? start; const next = input.value.slice(0, start) + code + input.value.slice(end); if (next.length > input.maxLength && input.maxLength > 0) return; input.value = next; details.open = false; input.focus(); input.setSelectionRange(start + code.length, start + code.length); }); list.appendChild(button); });
   details.appendChild(list); form.insertBefore(details, form.querySelector('[type="submit"]'));
 }
+function addGifPicker(form) {
+  const label = document.createElement('label'); label.className = 'comment-gif-picker'; label.textContent = 'GIF'; label.title = 'Добавить GIF до 3 МБ';
+  const input = document.createElement('input'); input.type = 'file'; input.accept = 'image/gif'; input.hidden = true; label.appendChild(input);
+  input.addEventListener('change', () => { label.firstChild.textContent = input.files.length ? 'GIF ✓' : 'GIF'; });
+  form.insertBefore(label, form.querySelector('[type="submit"]')); return input;
+}
+async function uploadCommentGif(file) {
+  if (!file) return '';
+  if (!currentUser || !authClient) throw new Error('Для GIF нужен вход');
+  if (file.type !== 'image/gif' || file.size > 3145728) throw new Error('Выбери GIF размером до 3 МБ');
+  const path = `${currentUser.id}/${crypto.randomUUID()}.gif`;
+  const { error } = await authClient.storage.from('spike-comment-gifs').upload(path, file, { contentType:'image/gif' });
+  if (error) throw error; return path;
+}
+function commentGifHTML(path) {
+  if (!/^[0-9a-f-]{36}\/[0-9a-f-]{36}\.gif$/i.test(path || '')) return '';
+  return `<img class="comment-gif" src="${escapeHTML(SPIKE_API.replace('/rest/v1', '') + '/storage/v1/object/public/spike-comment-gifs/' + path)}" alt="GIF в комментарии" loading="lazy">`;
+}
 
 function openView(id) {
   const it = items.find((i) => i.id === id);
@@ -786,7 +804,7 @@ function openView(id) {
       </div><section class="comments detail-discussion">
         <h3>Комментарии · ${(it.comments || []).length}</h3>
         <form id="comment-form" class="comment-form"><input class="input" name="comment" maxlength="500" aria-label="Написать комментарий" placeholder="Написать комментарий…" required><button class="btn btn-primary" type="submit">Отправить</button></form>
-        <div class="comment-list">${(it.comments || []).map((c) => `<article class="comment comment-frame-${escapeHTML(c.frame || 'classic')} comment-accent-${escapeHTML(c.accent || 'violet')} ${c.parentId ? 'comment-reply' : ''}" data-comment-id="${escapeHTML(c.id || '')}">${c.avatar ? `<img class="comment-avatar" src="${escapeHTML(c.avatar)}" alt="">` : '<span class="comment-avatar comment-avatar-fallback">✦</span>'}<div class="comment-content"><div class="comment-meta">${c.userId ? `<button type="button" class="profile-link ${c.developer ? 'developer-name' : ''}" data-user-profile="${escapeHTML(c.userId)}">${escapeHTML(c.author || 'Гость')}</button>` : `<strong class="comment-author">${escapeHTML(c.author || 'Гость')}</strong>`}${c.developer ? ' <span class="developer-badge">✦ РАЗРАБОТЧИК</span>' : ''}${c.createdAt ? `<time>${escapeHTML(timeAgo(c.createdAt))}</time>` : ''}</div>${c.parentId ? `<small class="comment-reply-label">↳ Ответ: ${escapeHTML((it.comments || []).find(parent => parent.id === c.parentId)?.author || 'комментарий')}</small>` : ''}<p class="comment-text">${renderCommentText(c.text)}</p><div class="comment-actions">${!c.parentId && c.id ? `<button type="button" class="card-foot-btn" data-reply="${escapeHTML(c.id)}" data-author="${escapeHTML(c.author || 'Гость')}">Ответить</button>` : ''}</div></div></article>`).join("") || '<p class="comment-empty">Пока нет комментариев. Начни обсуждение!</p>'}</div>
+        <div class="comment-list">${(it.comments || []).map((c) => `<article class="comment comment-frame-${escapeHTML(c.frame || 'classic')} comment-accent-${escapeHTML(c.accent || 'violet')} ${c.parentId ? 'comment-reply' : ''}" data-comment-id="${escapeHTML(c.id || '')}">${c.avatar ? `<img class="comment-avatar" src="${escapeHTML(c.avatar)}" alt="">` : '<span class="comment-avatar comment-avatar-fallback">✦</span>'}<div class="comment-content"><div class="comment-meta">${c.userId ? `<button type="button" class="profile-link ${c.developer ? 'developer-name' : ''}" data-user-profile="${escapeHTML(c.userId)}">${escapeHTML(c.author || 'Гость')}</button>` : `<strong class="comment-author">${escapeHTML(c.author || 'Гость')}</strong>`}${c.developer ? ' <span class="developer-badge">✦ РАЗРАБОТЧИК</span>' : ''}${c.createdAt ? `<time>${escapeHTML(timeAgo(c.createdAt))}</time>` : ''}</div>${c.parentId ? `<small class="comment-reply-label">↳ Ответ: ${escapeHTML((it.comments || []).find(parent => parent.id === c.parentId)?.author || 'комментарий')}</small>` : ''}<p class="comment-text">${renderCommentText(c.text)}</p>${commentGifHTML(c.gifPath)}<div class="comment-actions">${!c.parentId && c.id ? `<button type="button" class="card-foot-btn" data-reply="${escapeHTML(c.id)}" data-author="${escapeHTML(c.author || 'Гость')}">Ответить</button>` : ''}</div></div></article>`).join("") || '<p class="comment-empty">Пока нет комментариев. Начни обсуждение!</p>'}</div>
       </section>
     </div>`;
   $("#comment-form").addEventListener("submit", (e) => {
