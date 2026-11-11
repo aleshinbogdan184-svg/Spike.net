@@ -47,22 +47,11 @@
   prev.addEventListener('click', () => show(Math.max(0, index - 1)));
   next.addEventListener('click', () => show(Math.min(scenes.length, index + 1)));
   document.querySelector('.add-link-trigger-hero')?.addEventListener('click', () => document.querySelector('.add-link-trigger')?.click());
-  const backgroundPresets = { ocean: ['#17345d', '#56304f'], crimson: ['#641c30', '#301321'], violet: ['#402d6b', '#542b55'], forest: ['#164e49', '#273d32'], graphite: ['#303a4a', '#252530'] };
-  const backgroundKey = 'spike.background.v1';
-  const applyBackground = value => {
-    const isCustom = /^#[0-9a-f]{6}$/i.test(value);
-    const colors = isCustom ? [value, value] : backgroundPresets[value] || backgroundPresets.ocean;
-    document.documentElement.style.setProperty('--background-one', colors[0]);
-    document.documentElement.style.setProperty('--background-two', colors[1]);
-    document.querySelectorAll('[data-background]').forEach(button => button.setAttribute('aria-pressed', String(!isCustom && button.dataset.background === value)));
-    if (isCustom) document.querySelector('#background-custom').value = value;
-  };
-  let savedBackground = 'ocean';
-  try { savedBackground = localStorage.getItem(backgroundKey) || 'ocean'; } catch {}
-  applyBackground(savedBackground);
-  const setBackground = value => { applyBackground(value); try { localStorage.setItem(backgroundKey, value); } catch {} };
-  document.querySelectorAll('[data-background]').forEach(button => button.addEventListener('click', () => setBackground(button.dataset.background)));
-  document.querySelector('#background-custom')?.addEventListener('input', e => setBackground(e.target.value));
+  const winterCountdown = document.querySelector('#winter-countdown');
+  if (winterCountdown) {
+    const updateWinterCountdown = () => { const left = new Date('2026-11-20T00:00:00+03:00').getTime() - Date.now(); if (left <= 0) { winterCountdown.textContent = '20 ноября · следи за новостями'; return; } const days = Math.floor(left / 86400000), hours = Math.floor(left / 3600000) % 24; winterCountdown.textContent = `До 20 ноября: ${days} дн. ${hours} ч.`; };
+    updateWinterCountdown(); setInterval(updateWinterCountdown, 60000);
+  }
   document.querySelector('[data-layout-tab="bookmarks"]')?.remove();
   const sidebarEvents = document.createElement('button');
   sidebarEvents.type = 'button'; sidebarEvents.innerHTML = '✧ <span>Ивенты</span>';

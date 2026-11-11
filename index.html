@@ -16,7 +16,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css?v=vice11-2" />
   <link rel="stylesheet" href="sunset.css?v=25" />
-  <link rel="stylesheet" href="spike-world.css?v=7" />
+  <link rel="stylesheet" href="spike-world.css?v=8" />
 </head>
 <body>
   <!-- ====== ФОН ====== -->
@@ -188,7 +188,7 @@
     </section>
     <section class="tab-view" id="view-updates" hidden><div class="view-intro"><div><h1>Обновления</h1><p>Новости и изменения Spike.</p></div></div><article class="release-card"><div class="release-head"><span class="release-tag">SPIKE / ГЛОБАЛЬНОЕ ОБНОВЛЕНИЕ</span></div><h2>Большое обновление Spike</h2><p>Новая структура, оформление и возможности сообщества.</p><ul><li>Посты в основной ленте, ссылки в разделе «Видео».</li><li>Обновлены карточки, просмотр публикаций, профиль и навигация.</li><li>Анимированные смайлики; ответы и оценки постов требуют настройки базы.</li><li>GIF-аватары и GIF в постах — после настройки хранилища.</li><li>Ссылки на соцсети и автор оригинала — после обновления базы.</li><li>Хештеги, копирование ссылки и скачивание изображения.</li><li>Анонс новогоднего ивента 20 ноября 2026 года.</li></ul></article></section>
     <section class="tab-view" id="view-social" hidden><div class="social-toolbar"><div><h2>Свежие посты</h2><span>Что происходит в сообществе</span></div><div class="social-filters"><button class="btn btn-primary" id="social-create" type="button">＋ Создать пост</button><button class="chip active" type="button" data-social-filter="all">Все</button><button class="chip" type="button" data-social-filter="following">Подписки</button></div></div><p id="social-status" class="field-hint"></p><div id="social-grid" class="social-grid"></div></section>
-    <section class="tab-view" id="view-events" hidden><div class="events-heading"><span class="events-kicker">SPIKE / СОБЫТИЯ</span><h1>Ивенты</h1></div><article class="event-card event-winter"><span class="event-label">20 НОЯБРЯ 2026</span><h2>Новогодний ивент</h2><p>Готовим новое событие. Подробности и программа появятся позже.</p><span class="event-soon">СКОРО</span></article></section>
+    <section class="tab-view" id="view-events" hidden><div class="events-heading"><span class="events-kicker">SPIKE / СОБЫТИЯ</span><h1>Ивенты</h1></div><article class="event-card winter-teaser"><div class="winter-copy"><span class="event-label">СКОРО · 20 НОЯБРЯ 2026</span><h2>Что-то зимнее<br>уже близко<span>✦</span></h2><p>Новогодний ивент приходит в Spike 20 ноября. Подробности и программа появятся позже.</p><div class="winter-countdown" id="winter-countdown" aria-live="polite">Скоро</div></div><div class="winter-art" aria-hidden="true"><span class="winter-star">✦</span><span class="winter-tree tree-top"></span><span class="winter-tree tree-mid"></span><span class="winter-tree tree-bottom"></span><span class="winter-trunk"></span><span class="winter-gift">✦</span><i class="winter-snow snow-a">✧</i><i class="winter-snow snow-b">✦</i><i class="winter-snow snow-c">✧</i></div></article></section>
     <section class="tab-view" id="view-bookmarks" hidden><div class="view-intro"><span class="view-intro-icon">★</span><div><h1>Закладки</h1><p>Твои сохранённые находки.</p></div></div><div id="bookmarks-message" class="empty-inner"></div><div class="grid" id="bookmarks-grid"></div></section>
     <section class="tab-view" id="view-achievements" hidden><div class="view-intro"><span class="view-intro-icon">🏆</span><div><h1>Достижения</h1><p>Твои первые шаги в Spike.</p></div></div><div id="achievements-grid" class="cat-grid"></div></section>
   </main><aside class="layout-aside" aria-label="О Spike"><div class="side-widget"><span class="widget-label">✦ КАК ЭТО РАБОТАЕТ</span><h2>Находка ждёт своих</h2><p>Добавь ссылку, обсуди её и сохрани то, к чему захочешь вернуться.</p><button type="button" class="side-cta" id="side-add">＋ Предложить ссылку</button></div><div class="side-widget side-widget-alt"><span class="widget-label">✧ МАЛЕНЬКАЯ ПОДСКАЗКА</span><p>Не знаешь, что открыть? Попробуй случайную находку в ленте.</p><button type="button" class="side-cta subtle" id="side-random">🎲 Удиви меня</button></div><div class="side-footer">SPIKE.NET <span>✦</span> МЕСТО ДЛЯ НАХОДОК</div></aside></div>
@@ -385,6 +385,6 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="shared.js?v=gif26"></script>
   <script src="social.js?v=gif26"></script>
-  <script src="welcome.js?v=space12"></script>
+  <script src="welcome.js?v=winter27"></script>
 </body>
 </html>

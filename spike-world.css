@@ -52,6 +52,19 @@ body,body :not(svg):not(path):not(use) { font-family:'Oswald',sans-serif!importa
 @media(max-width:760px) { .bg::before,.bg::after { width:52vw!important; height:52vw!important; opacity:.13!important; animation-duration:40s!important; } }
 @media(prefers-reduced-motion:reduce) { .bg::before,.bg::after { animation:none!important; } }
 
+/* Мягкий перелив Spike: два композитных слоя без blur и непрерывного JS. */
+.bg { background:linear-gradient(145deg,#091515,#10211f 55%,#101923)!important; }
+.bg::before,.bg::after { display:block!important; position:absolute!important; inset:0!important; width:100%!important; height:100%!important; border-radius:0!important; filter:none!important; pointer-events:none!important; will-change:opacity!important; transform:none!important; }
+.bg::before { background:radial-gradient(ellipse at 15% 18%,#356d4c88,transparent 46%),radial-gradient(ellipse at 85% 85%,#315c6b77,transparent 48%)!important; opacity:.35!important; animation:world-shimmer 14s ease-in-out infinite alternate!important; }
+.bg::after { background:radial-gradient(ellipse at 85% 20%,#4e527b88,transparent 48%),radial-gradient(ellipse at 15% 85%,#4d714c66,transparent 48%)!important; opacity:.18!important; animation:world-shimmer 19s ease-in-out infinite alternate-reverse!important; }
+@keyframes world-shimmer { from { opacity:.12; } to { opacity:.38; } }
+.winter-teaser { position:relative; overflow:hidden; display:flex; align-items:center; justify-content:space-between; gap:30px; max-width:950px; min-height:300px; padding:clamp(24px,4vw,48px)!important; background:linear-gradient(125deg,#132c27,#183c34 50%,#17283e)!important; }
+.winter-copy { position:relative; z-index:1; max-width:560px; }.winter-copy h2 { color:#f3faed; font:800 clamp(24px,3vw,37px)/1.3 'Press Start 2P',monospace; margin:20px 0; }.winter-copy h2 span { color:#d0ed7a; }.winter-copy p { color:#bfd4c9; font-size:16px; line-height:1.5; }.winter-countdown { display:inline-block; margin-top:8px; padding:10px 14px; border:1px solid #a9e75d66; border-radius:6px; background:#0d211bbf; color:#ddf4aa; font-size:14px; }
+.winter-art { position:relative; flex:0 0 220px; height:230px; }.winter-tree { position:absolute; left:50%; width:0; height:0; transform:translateX(-50%); border-left:solid transparent; border-right:solid transparent; border-bottom:0; }.tree-top { top:45px; border-left-width:42px; border-right-width:42px; border-top:64px solid #92d069; }.tree-mid { top:85px; border-left-width:65px; border-right-width:65px; border-top:80px solid #5aab67; }.tree-bottom { top:125px; border-left-width:88px; border-right-width:88px; border-top:88px solid #31815d; }.winter-trunk { position:absolute; left:98px; top:195px; width:24px; height:30px; background:#a5774f; }.winter-star { position:absolute; z-index:2; top:14px; left:91px; color:#ffe290; font-size:38px; }.winter-gift { position:absolute; right:5px; bottom:4px; padding:9px; color:#ffd4aa; background:#a25453; border-radius:4px; }.winter-snow { position:absolute; color:#dcf4e3; font-style:normal; }.snow-a { top:35px; left:5px; }.snow-b { top:95px; right:0; }.snow-c { bottom:30px; left:15px; }
+@media(max-width:760px) { .winter-teaser { min-height:0; gap:10px; }.winter-copy h2 { font-size:20px; }.winter-art { flex-basis:130px; transform:scale(.65); transform-origin:center right; margin-left:-55px; }.bg::before,.bg::after { animation-duration:25s!important; } }
+@media(max-width:420px) { .winter-art { display:none; }.winter-copy h2 { font-size:18px; } }
+@media(prefers-reduced-motion:reduce) { .bg::before,.bg::after { animation:none!important; } }
+
 /* Лёгкий animated backdrop: без шаров, blur и canvas-перерисовки. */
 .bg { background:linear-gradient(145deg,#091418 0%,#101e25 48%,#101820 100%)!important; overflow:hidden!important; }
 .bg>* { display:none!important; }
