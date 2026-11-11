@@ -41,3 +41,13 @@
 @keyframes signal-glow-b { from { transform:translate3d(2%,-1%,0); opacity:.2; } to { transform:translate3d(-3%,2%,0); opacity:.5; } }
 @media(max-width:760px) { .bg::before { animation-duration:28s!important; }.bg::after { display:none!important; } }
 @media(prefers-reduced-motion:reduce) { .bg::before,.bg::after { animation:none!important; } }
+
+/* Световая текстура Spike — отдельные композитные слои, без canvas и blur. */
+.bg { background:#061310!important; }
+.bg::before,.bg::after { display:block!important; content:''!important; position:absolute!important; inset:-12%!important; width:124%!important; height:124%!important; border:0!important; border-radius:0!important; filter:none!important; pointer-events:none!important; }
+.bg::before { background:radial-gradient(ellipse at 50% 44%,#4b9c6b99 0%,#164c3f99 40%,#071715 80%)!important; opacity:.86!important; animation:spike-ambient 24s ease-in-out infinite alternate!important; }
+.bg::after { background:url('spike-light.svg') center/cover no-repeat!important; opacity:.46!important; animation:spike-reflection 30s ease-in-out infinite alternate!important; }
+@keyframes spike-ambient { from { transform:translate3d(-2%,-1%,0) scale(1); } to { transform:translate3d(2%,2%,0) scale(1.04); } }
+@keyframes spike-reflection { from { transform:translate3d(1%,-1%,0) scale(1); opacity:.26; } to { transform:translate3d(-2%,2%,0) scale(1.06); opacity:.48; } }
+@media(max-width:760px) { .bg::before { animation:none!important; opacity:.65!important; }.bg::after { display:block!important; animation:none!important; opacity:.2!important; } }
+@media(prefers-reduced-motion:reduce) { .bg::before,.bg::after { animation:none!important; } }
