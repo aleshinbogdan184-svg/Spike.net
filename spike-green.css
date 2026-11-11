@@ -1,0 +1,11 @@
+/* Green palette for the restored Spike interface. */
+:root { --bg:#081510; --surface:#10271d; --surface-2:#1a3829; --border:#426a4d; --border-strong:#719a72; --text:#f0f8eb; --muted:#aec5b2; --muted-2:#819c87; --v:#b9e977; --v2:#d0f59a; --c:#83d9a1; --p:#a6dd87; --grad:linear-gradient(135deg,#b9e977,#78d99e); --grad-text:linear-gradient(90deg,#d4f9a3,#88dfac); }
+body { background:#081510!important; color:#f0f8eb!important; }
+.bg { background:#081510!important; }
+.bg::before { background:radial-gradient(ellipse at 50% 35%,#28694b99,transparent 70%)!important; }
+.bg::after { display:none!important; }
+.topbar,.layout-sidebar,.account-menu,.category-dropdown { background:#0d2017!important; border-color:#53775c!important; }
+.topbar .tab.active,.chip.active,.btn-primary { color:#102015!important; background:#b9e977!important; border-color:#b9e977!important; }
+.social-card,.video-card,.trend-item,.cat-card,.release-card,.modal,.controls,.main>.hero { background:#132b20!important; border-color:#52795a!important; }
+.input,.select,.textarea { background:#0a1d14!important; border-color:#52795a!important; color:#f0f8eb!important; }
+.side-note,.vice-event-banner,.vice-game-back,#view-updates .release-card { display:none!important; }

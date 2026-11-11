@@ -392,16 +392,39 @@ function cardHTML(it, index) {
         <span class="views-badge">👁 ${fmtNum(it.views)}</span>
       </button>
       <div class="video-card-body">
-        ${it.author && it.authorId ? `<button class="card-author-link" type="button" data-user-profile="${escapeHTML(it.authorId)}">${it.authorAvatar ? `<img src="${escapeHTML(it.authorAvatar)}" alt="">` : '<span>✦</span>'}<span>${escapeHTML(it.author)}</span></button>` : '<span class="card-author">Гость</span>'}
+        <div class="card-top">
+          ${typePill(it.type)}
+          <span class="source-pill">${escapeHTML(it.source || "ссылка")}</span>
+        </div>
         <h3 class="card-title">${escapeHTML(it.title)}</h3>
-        ${it.sourceAuthor ? `<div class="source-author">Автор: ${escapeHTML(it.sourceAuthor)}</div>` : ''}
-        ${it.desc ? `<p class="card-description">${escapeHTML(it.desc)}</p>` : ''}
+        ${it.author && it.authorId ? `<button class="card-author-link" type="button" data-user-profile="${escapeHTML(it.authorId)}">${it.authorAvatar ? `<img src="${escapeHTML(it.authorAvatar)}" alt="">` : '<span>✦</span>'}<span>${escapeHTML(it.author)}</span></button>` : '<span class="card-author">Гость</span>'}
+        <div class="card-meta">
+          ${it.year ? `<span>${escapeHTML(it.year)}</span>` : ""}
+          <span>👁 ${fmtNum(it.views)}</span>
+          <span>${timeAgo(it.createdAt)}</span>
+        </div>
+        <div class="energy-meter" title="На основе общего числа просмотров карточки">⚡ Активность · ${fmtNum(it.views)} просмотров <span class="energy-bars" aria-hidden="true"><i></i><i></i><i></i></span></div>
+        ${it.tags.length ? `<div class="card-tags">${it.tags.slice(0, 4).map((t) => `<span class="card-tag">#${escapeHTML(t)}</span>`).join("")}</div>` : ""}
         <div class="video-card-foot">
-          <span class="card-stat" title="Просмотры" aria-label="Просмотры: ${fmtNum(it.views)}"><svg class="pixel-icon" aria-hidden="true"><use href="pixel-icons.svg#eye"></use></svg> ${fmtNum(it.views)}</span>
-          <button class="card-foot-btn like-btn ${isLiked ? "liked" : ""}" data-like="${it.id}" type="button" title="Нравится" aria-label="Нравится: ${it.likes}"><svg class="pixel-icon cactus-icon" aria-hidden="true"><use href="pixel-icons.svg#cactus"></use></svg> ${it.likes}</button>
-          <button class="card-foot-btn comment-count" data-open="${it.id}" type="button" title="Комментарии" aria-label="Комментарии: ${(it.comments || []).length}"><svg class="pixel-icon" aria-hidden="true"><use href="pixel-icons.svg#comment"></use></svg> ${(it.comments || []).length}</button>
-          <button class="card-foot-btn bookmark-btn" data-bookmark="${escapeHTML(it.id)}" type="button" title="Сохранить в профиль">☆</button>
-          <time class="card-time">${timeAgo(it.createdAt)}</time>
+          <button class="card-foot-btn bookmark-btn" data-bookmark="${escapeHTML(it.id)}" type="button" title="Сохранить в закладки">☆</button>
+          <button class="card-foot-btn like-btn ${isLiked ? "liked" : ""}" data-like="${it.id}" type="button" title="Лайк">
+            <span class="pixel-heart" aria-hidden="true">♥</span><span>${it.likes}</span>
+          </button>
+          <button class="card-foot-btn" data-open="${it.id}" type="button" title="Комментарии">💬 ${(it.comments || []).length}</button>
+          <button class="card-foot-btn watch-btn" data-watch="${it.id}" type="button" title="${it.watched ? "Смотреть ещё раз" : "Смотреть"}">
+            ▶ ${it.watched ? "Ещё" : "Смотреть"}
+          </button>
+          <button class="card-foot-btn ${it.watched ? "watched" : ""}" data-watched="${it.id}" type="button" title="Просмотрено / не просмотрено">
+            ${it.watched ? "✔" : "○"}
+          </button>
+          <div class="card-actions">
+            <button class="icon-btn" data-open="${it.id}" type="button" title="Подробнее">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8h.01M11 12h1v4h1"/></svg>
+            </button>
+            <button class="icon-btn danger" data-del="${it.id}" type="button" title="Удалить">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a1 1 0 011-1h6a1 1 0 011 1v2m2 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6"/></svg>
+            </button>
+          </div>
         </div>
       </div>
     </article>`;
@@ -503,8 +526,7 @@ function renderFeed() {
 }
 
 function renderTrends() {
-  const list = $("#trends-list"), html = trendsHTML();
-  if (list.dataset.rendered !== html) { list.innerHTML = html; list.dataset.rendered = html; }
+  $("#trends-list").innerHTML = trendsHTML();
 }
 
 function renderCategories() {
@@ -545,7 +567,7 @@ async function youtubeMeta(ytId) {
     const res = await fetch(`https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${ytId}&format=json`);
     if (!res.ok) return {};
     const data = await res.json();
-    return { title: (data.title || "").trim(), author: (data.author_name || "").trim().slice(0, 160) };
+    return { title: (data.title || "").trim() };
   } catch { return {}; }
 }
 
@@ -611,7 +633,6 @@ function openAdd(prefill = {}) {
   $("#f-url").value = prefill.url || "";
   $("#f-poster").value = prefill.poster || "";
   $("#f-desc").value = prefill.desc || "";
-  $("#f-source-author").value = prefill.sourceAuthor || "";
 
   renderThumbPreview();
   syncTagsInput();
@@ -744,38 +765,6 @@ function submitForm(e) {
 
 /* ---------------- view ---------------- */
 
-const spikeEmoji = { ':spike:': '🌵', ':fire:': '🔥', ':heart:': '💚', ':wow:': '😮', ':laugh:': '😂', ':party:': '🎉' };
-function renderCommentText(text) {
-  return String(text || '').split(/(\[giphy:[A-Za-z0-9]{1,80}\]|:spike:|:fire:|:heart:|:wow:|:laugh:|:party:)/g).map(part => { const match = /^\[giphy:([A-Za-z0-9]{1,80})\]$/.exec(part); if (match) return `<img class="comment-gif" src="https://media.giphy.com/media/${match[1]}/giphy.gif" alt="GIF из GIPHY" loading="lazy" referrerpolicy="no-referrer">`; return spikeEmoji[part] ? `<span class="animated-emoji" role="img" aria-label="${escapeHTML(part)}">${spikeEmoji[part]}</span>` : escapeHTML(part); }).join('');
-}
-function addEmojiPicker(form, input) {
-  const details = document.createElement('details'); details.className = 'emoji-picker';
-  const summary = document.createElement('summary'); summary.textContent = 'GIF'; summary.setAttribute('aria-label', 'Поиск GIF в GIPHY'); details.appendChild(summary);
-  const panel = document.createElement('div'); panel.className = 'giphy-panel'; panel.innerHTML = '<input class="input giphy-search" type="search" placeholder="Найти GIF" aria-label="Поиск GIF"><div class="giphy-categories"><button type="button" data-giphy-query="">Популярные</button><button type="button" data-giphy-query="cats">Котики</button><button type="button" data-giphy-query="anime">Аниме</button><button type="button" data-giphy-query="reactions">Реакции</button></div><div class="giphy-results" aria-live="polite"></div><button class="giphy-more" type="button" hidden>Показать ещё</button><a class="giphy-credit" href="https://giphy.com/" target="_blank" rel="noopener noreferrer">Powered by GIPHY</a>';
-  const search = panel.querySelector('input'), results = panel.querySelector('.giphy-results'), more = panel.querySelector('.giphy-more'); let timer = 0, request = 0, offset = 0;
-  async function load(append = false) { const seq = ++request, query = search.value.trim(), url = new URL(query ? 'https://api.giphy.com/v1/gifs/search' : 'https://api.giphy.com/v1/gifs/trending'); if (!append) { offset = 0; results.textContent = 'Загрузка…'; } more.hidden = true; url.search = new URLSearchParams({api_key:'1Ad6jeNHzjuN3TWyGIx09hiFWfJCnRjB',limit:'24',offset:String(offset),rating:'pg-13',...(query ? {q:query} : {})}); try { const response = await fetch(url); if (!response.ok) throw new Error('GIPHY ' + response.status); const data = await response.json(); if (seq !== request || !details.open) return; if (!append) results.replaceChildren(); for (const gif of data.data || []) { if (!/^[A-Za-z0-9]{1,80}$/.test(gif.id) || !/^https:\/\/[^/]*giphy\.com\//i.test(gif.images?.fixed_width_small?.url || '')) continue; const button = document.createElement('button'); button.type = 'button'; button.title = gif.title || 'GIF'; const img = document.createElement('img'); img.src = gif.images.fixed_width_small.url; img.alt = gif.title || 'GIF'; img.loading = 'lazy'; img.referrerPolicy = 'no-referrer'; button.appendChild(img); button.addEventListener('click', () => { const token = `[giphy:${gif.id}]`, start = input.selectionStart ?? input.value.length, end = input.selectionEnd ?? start, next = input.value.slice(0,start) + token + input.value.slice(end); if (input.maxLength > 0 && next.length > input.maxLength) return; input.value = next; details.open = false; input.focus(); }); results.appendChild(button); } offset += (data.data || []).length; more.hidden = !(data.data || []).length || offset >= (data.pagination?.total_count || 0); if (!results.childNodes.length) results.textContent = 'Ничего не найдено'; } catch { if (seq === request) results.textContent = 'GIPHY недоступен. Попробуй ещё раз.'; } }
-  details.addEventListener('toggle', () => { if (details.open) load(); else { request++; results.replaceChildren(); } }); search.addEventListener('input', () => { clearTimeout(timer); timer = setTimeout(() => load(), 350); }); panel.querySelectorAll('[data-giphy-query]').forEach(button => button.addEventListener('click', () => { search.value = button.dataset.giphyQuery; load(); })); more.addEventListener('click', () => load(true));
-  details.appendChild(panel); form.insertBefore(details, form.querySelector('[type="submit"]'));
-}
-function addGifPicker(form) {
-  const label = document.createElement('label'); label.className = 'comment-gif-picker'; label.textContent = 'GIF'; label.title = 'Добавить GIF до 3 МБ';
-  const input = document.createElement('input'); input.type = 'file'; input.accept = 'image/gif'; input.hidden = true; label.appendChild(input);
-  input.addEventListener('change', () => { label.firstChild.textContent = input.files.length ? 'GIF ✓' : 'GIF'; });
-  form.insertBefore(label, form.querySelector('[type="submit"]')); return input;
-}
-async function uploadCommentGif(file) {
-  if (!file) return '';
-  if (!currentUser || !authClient) throw new Error('Для GIF нужен вход');
-  if (file.type !== 'image/gif' || file.size > 3145728) throw new Error('Выбери GIF размером до 3 МБ');
-  const path = `${currentUser.id}/${crypto.randomUUID()}.gif`;
-  const { error } = await authClient.storage.from('spike-comment-gifs').upload(path, file, { contentType:'image/gif' });
-  if (error) throw error; return path;
-}
-function commentGifHTML(path) {
-  if (!/^[0-9a-f-]{36}\/[0-9a-f-]{36}\.gif$/i.test(path || '')) return '';
-  return `<img class="comment-gif" src="${escapeHTML(SPIKE_API.replace('/rest/v1', '') + '/storage/v1/object/public/spike-comment-gifs/' + path)}" alt="GIF в комментарии" loading="lazy">`;
-}
-
 function openView(id) {
   const it = items.find((i) => i.id === id);
   if (!it) return;
@@ -783,7 +772,7 @@ function openView(id) {
   const isLiked = liked.has(id);
 
   $("#view-body").innerHTML = `
-    <div class="view-content detail-layout"><div class="detail-main">
+    <div class="view-content">
       <div class="view-thumb">
         ${thumbHTML(it)}
         <div class="v-overlay"></div>
@@ -794,19 +783,23 @@ function openView(id) {
         <span class="count-pill">👁 ${fmtNum(it.views)}</span>
       </div>
       <h2 class="view-title">${escapeHTML(it.title)}</h2>
-      ${it.sourceAuthor ? `<p class="source-author">Автор: ${escapeHTML(it.sourceAuthor)}</p>` : ''}
       ${it.desc ? `<p class="view-desc">${escapeHTML(it.desc)}</p>` : ""}
+      <div class="view-meta">
+        <div class="view-meta-item"><div class="view-meta-k">Год / сезон</div><div class="view-meta-v">${escapeHTML(it.year || "—")}</div></div>
+        <div class="view-meta-item"><div class="view-meta-k">Лайки</div><div class="view-meta-v">❤ ${it.likes}</div></div>
+        <div class="view-meta-item"><div class="view-meta-k">Просмотры</div><div class="view-meta-v">👁 ${fmtNum(it.views)}</div></div>
+      </div>
       ${it.tags.length ? `<div class="view-tags">${it.tags.map((t) => `<span class="card-tag">#${escapeHTML(t)}</span>`).join("")}</div>` : ""}
       <div class="view-actions">
         <button class="view-action primary" data-watch="${it.id}" type="button">▶ Смотреть</button>
-        <button class="view-action ${isLiked ? "liked" : ""}" data-like="${it.id}" type="button">${isLiked ? "🌵 Нравится" : "🌵 Оценить"} · ${it.likes}</button>
+        <button class="view-action ${isLiked ? "liked" : ""}" data-like="${it.id}" type="button">${isLiked ? "❤ В лайках" : "♡ Лайкнуть"} · ${it.likes}</button>
         <button class="view-action" data-watched="${it.id}" type="button">${it.watched ? "✔ Просмотрено" : "○ Отметить просмотром"}</button>
         ${it.url ? `<a class="view-action" href="${escapeHTML(it.url)}" target="_blank" rel="noopener noreferrer">↗ Источник</a>` : ""}
       </div>
-      </div><section class="comments detail-discussion">
+      <section class="comments">
         <h3>Комментарии · ${(it.comments || []).length}</h3>
         <form id="comment-form" class="comment-form"><input class="input" name="comment" maxlength="500" aria-label="Написать комментарий" placeholder="Написать комментарий…" required><button class="btn btn-primary" type="submit">Отправить</button></form>
-        <div class="comment-list">${(it.comments || []).map((c) => `<article class="comment comment-frame-${escapeHTML(c.frame || 'classic')} comment-accent-${escapeHTML(c.accent || 'violet')} ${c.parentId ? 'comment-reply' : ''}" data-comment-id="${escapeHTML(c.id || '')}">${c.avatar ? `<img class="comment-avatar" src="${escapeHTML(c.avatar)}" alt="">` : '<span class="comment-avatar comment-avatar-fallback">✦</span>'}<div class="comment-content"><div class="comment-meta">${c.userId ? `<button type="button" class="profile-link ${c.developer ? 'developer-name' : ''}" data-user-profile="${escapeHTML(c.userId)}">${escapeHTML(c.author || 'Гость')}</button>` : `<strong class="comment-author">${escapeHTML(c.author || 'Гость')}</strong>`}${c.developer ? ' <span class="developer-badge">✦ РАЗРАБОТЧИК</span>' : ''}${c.createdAt ? `<time>${escapeHTML(timeAgo(c.createdAt))}</time>` : ''}</div>${c.parentId ? `<small class="comment-reply-label">↳ Ответ: ${escapeHTML((it.comments || []).find(parent => parent.id === c.parentId)?.author || 'комментарий')}</small>` : ''}<p class="comment-text">${renderCommentText(c.text)}</p>${commentGifHTML(c.gifPath)}<div class="comment-actions">${!c.parentId && c.id ? `<button type="button" class="card-foot-btn" data-reply="${escapeHTML(c.id)}" data-author="${escapeHTML(c.author || 'Гость')}">Ответить</button>` : ''}</div></div></article>`).join("") || '<p class="comment-empty">Пока нет комментариев. Начни обсуждение!</p>'}</div>
+        <div class="comment-list">${(it.comments || []).map((c) => `<article class="comment comment-frame-${escapeHTML(c.frame || 'classic')} comment-accent-${escapeHTML(c.accent || 'violet')} ${c.parentId ? 'comment-reply' : ''}" data-comment-id="${escapeHTML(c.id || '')}">${c.avatar ? `<img class="comment-avatar" src="${escapeHTML(c.avatar)}" alt="">` : '<span class="comment-avatar comment-avatar-fallback">✦</span>'}<div class="comment-content"><div class="comment-meta">${c.userId ? `<button type="button" class="profile-link ${c.developer ? 'developer-name' : ''}" data-user-profile="${escapeHTML(c.userId)}">${escapeHTML(c.author || 'Гость')}</button>` : `<strong class="comment-author">${escapeHTML(c.author || 'Гость')}</strong>`}${c.developer ? ' <span class="developer-badge">✦ РАЗРАБОТЧИК</span>' : ''}${c.createdAt ? `<time>${escapeHTML(timeAgo(c.createdAt))}</time>` : ''}</div>${c.parentId ? `<small class="comment-reply-label">↳ Ответ: ${escapeHTML((it.comments || []).find(parent => parent.id === c.parentId)?.author || 'комментарий')}</small>` : ''}<p class="comment-text">${escapeHTML(c.text)}</p><div class="comment-actions">${!c.parentId && c.id ? `<button type="button" class="card-foot-btn" data-reply="${escapeHTML(c.id)}" data-author="${escapeHTML(c.author || 'Гость')}">Ответить</button>` : ''}</div></div></article>`).join("") || '<p class="comment-empty">Пока нет комментариев. Начни обсуждение!</p>'}</div>
       </section>
     </div>`;
   $("#comment-form").addEventListener("submit", (e) => {
@@ -909,7 +902,6 @@ function switchTab(name) {
   $$(".tab-view").forEach((v) => { v.hidden = v.id !== `view-${name}`; });
   $(".hero").hidden = true;
   document.body.dataset.view = name;
-  if (name === 'trends') renderTrends();
 }
 
 function bindEvents() {
@@ -977,36 +969,13 @@ function bindEvents() {
   $("#sort-select").addEventListener("change", (e) => { sortMode = e.target.value; renderFeed(); });
   $("#search-input").addEventListener("input", (e) => { searchQuery = e.target.value; renderFeed(); });
   const searchToggle = $("#search-toggle");
-  const categoryMenu = document.querySelector('.category-nav');
-  document.querySelector('.feed-search').appendChild(categoryMenu);
   if (searchToggle) searchToggle.addEventListener("click", () => {
     const input = $("#search-input");
     const open = !input.classList.contains("is-open");
     input.classList.toggle("is-open", open);
-    document.querySelector('.category-nav').classList.toggle('search-categories-open', open);
     searchToggle.setAttribute("aria-expanded", String(open));
     if (open) input.focus(); else { input.value = ""; searchQuery = ""; renderFeed(); }
   });
-  if (matchMedia('(hover: hover) and (pointer: fine)').matches && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    let timer = 0, preview = null;
-    const clearPreview = () => { clearTimeout(timer); if (preview) { preview.remove(); preview = null; } };
-    document.addEventListener('pointerover', e => {
-      const card = e.target.closest('.video-card[data-id]');
-      if (!card || card.contains(e.relatedTarget)) return;
-      const item = items.find(it => String(it.id) === card.dataset.id);
-      if (!item?.ytId) return;
-      clearPreview();
-      timer = setTimeout(() => {
-        if (!card.isConnected || !card.matches(':hover')) return;
-        const target = card.querySelector('.thumb'); if (!target) return;
-        preview = document.createElement('iframe'); preview.className = 'hover-video-preview'; preview.title = 'Предпросмотр видео';
-        preview.src = `https://www.youtube-nocookie.com/embed/${encodeURIComponent(item.ytId)}?autoplay=1&mute=1&controls=0&playsinline=1&rel=0`;
-        preview.allow = 'autoplay; encrypted-media'; preview.tabIndex = -1; target.appendChild(preview);
-      }, 900);
-    });
-    document.addEventListener('pointerout', e => { const card = e.target.closest('.video-card[data-id]'); if (card && !card.contains(e.relatedTarget)) clearPreview(); });
-    document.addEventListener('visibilitychange', () => { if (document.hidden) clearPreview(); });
-  }
 
   const tagText = $("#f-tags .tag-text");
   tagText.addEventListener("keydown", (e) => {
@@ -1068,7 +1037,7 @@ function bindEvents() {
 
 function initParticles() {
   const canvas = $("#particles");
-  if (!canvas || getComputedStyle(canvas).display === "none" || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  if (!canvas || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
   const ctx = canvas.getContext("2d");
   let w, h, parts, raf;
   const COUNT = Math.min(22, Math.floor(window.innerWidth / 55));
@@ -1151,10 +1120,10 @@ function initViceEvent() {
     return result.data;
   };
   const jump = () => { if (!running) { start(); return; } if (player.y >= player.ground) player.vy = -620; };
-  const start = () => { cancelAnimationFrame(raf); running = true; score = 0; speed = 320; spawn = 0; serverRun = null; player = { x: 105, y: 220, ground: 220, vy: 0 }; obstacles = []; restart.textContent = 'Игра идёт…'; last = performance.now(); serverCall('spike_vice_start').then(id => { serverRun = id; }).catch(() => {}); raf = requestAnimationFrame(loop); };
+  const start = () => { cancelAnimationFrame(raf); running = true; score = 0; speed = 280; spawn = 0; serverRun = null; player = { x: 105, y: 220, ground: 220, vy: 0 }; obstacles = []; restart.textContent = 'Игра идёт…'; last = performance.now(); serverCall('spike_vice_start').then(id => { serverRun = id; }).catch(() => {}); raf = requestAnimationFrame(loop); };
   const draw = () => { const w = 900, h = 280; ctx.clearRect(0,0,w,h); const sky = ctx.createLinearGradient(0,0,0,h); sky.addColorStop(0,'#27245a'); sky.addColorStop(.6,'#e66f91'); sky.addColorStop(1,'#ffbd70'); ctx.fillStyle = sky; ctx.fillRect(0,0,w,h); ctx.fillStyle = '#ffe18a'; ctx.beginPath(); ctx.arc(735,65,34,0,Math.PI*2); ctx.fill(); ctx.fillStyle = '#183447'; ctx.fillRect(0,242,w,38); ctx.fillStyle = '#26a2a2'; ctx.fillRect(0,238,w,4); ctx.strokeStyle = '#ffdc78'; ctx.lineWidth = 2; for(let x=0;x<w;x+=48){ctx.beginPath();ctx.moveTo(x,244);ctx.lineTo(x+25,280);ctx.stroke();} ctx.fillStyle = '#17263b'; ctx.fillRect(player.x,player.y-35,30,35); ctx.fillStyle = '#ff5f8f'; ctx.fillRect(player.x+7,player.y-49,16,14); ctx.fillStyle = '#ec6b64'; obstacles.forEach(o => {ctx.fillRect(o.x,o.y,o.w,o.h);ctx.fillStyle='#ffd15c';ctx.fillRect(o.x+4,o.y+5,o.w-8,4);ctx.fillStyle='#ec6b64';}); };
   const loop = now => { if (!running) return; const dt = Math.min((now-last)/1000,.04); last=now; score += dt*10; speed += dt*3; scoreEl.textContent=String(Math.floor(score)).padStart(5,'0'); player.vy += 1500*dt; player.y += player.vy*dt; if(player.y>player.ground) {player.y=player.ground;player.vy=0;} spawn-=dt; if(spawn<=0){obstacles.push({x:900+20,y:220,w:24+Math.random()*22,h:20+Math.random()*22});spawn=1.1+Math.random()*.9;} obstacles.forEach(o=>o.x-=speed*dt); obstacles=obstacles.filter(o=>o.x>-60); if(obstacles.some(o=>player.x+26>o.x&&player.x<o.x+o.w&&player.y>o.y-35)){running=false;restart.textContent='Повторить забег';if(score>best){best=Math.floor(score);bestEl.textContent=String(best).padStart(5,'0');try{localStorage.setItem('spike.vice.best',best)}catch{}} if(serverRun){serverCall('spike_vice_finish',{p_run:serverRun,p_score:Math.floor(score)}).catch(() => {});} } draw();if(running)raf=requestAnimationFrame(loop); };
   const resize = () => { const ratio = Math.min(2, window.devicePixelRatio || 1); const rect=canvas.getBoundingClientRect(); canvas.width=900*ratio; canvas.height=280*ratio; ctx.setTransform(ratio,0,0,ratio,0,0); };
   open.addEventListener('click',()=>{modal.hidden=false;resize();start()}); close.addEventListener('click',()=>{modal.hidden=true;running=false;cancelAnimationFrame(raf)}); restart.addEventListener('click',start); canvas.addEventListener('pointerdown',jump); document.addEventListener('keydown',e=>{if(!modal.hidden&&(e.code==='Space'||e.key==='ArrowUp')){e.preventDefault();jump();}}); window.addEventListener('resize',resize,{passive:true});
 }
-document.addEventListener("DOMContentLoaded", () => { init(); });
+document.addEventListener("DOMContentLoaded", () => { init(); initViceEvent(); });
