@@ -52,6 +52,19 @@ body,body :not(svg):not(path):not(use) { font-family:'Oswald',sans-serif!importa
 @media(max-width:760px) { .bg::before,.bg::after { width:52vw!important; height:52vw!important; opacity:.13!important; animation-duration:40s!important; } }
 @media(prefers-reduced-motion:reduce) { .bg::before,.bg::after { animation:none!important; } }
 
+/* Final background override: flat gradient layers, never circles. */
+.bg::before,.bg::after { inset:0!important; width:100%!important; height:100%!important; border-radius:0!important; filter:none!important; transform:none!important; opacity:.24!important; }
+.bg::before { top:0!important; left:0!important; background:linear-gradient(135deg,#21423899,transparent 55%,#21334888)!important; animation:world-shimmer 18s ease-in-out infinite alternate!important; }
+.bg::after { right:0!important; bottom:0!important; background:linear-gradient(30deg,#293b3588,transparent 58%,#35465277)!important; animation:world-shimmer 24s ease-in-out infinite alternate-reverse!important; }
+.winter-tree { border-top:0!important; }.tree-top { border-bottom:64px solid #92d069!important; }.tree-mid { border-bottom:80px solid #5aab67!important; }.tree-bottom { border-bottom:88px solid #31815d!important; }
+
+/* Убираем старые декоративные фигуры; переливается только прозрачность градиента. */
+.bg { background:#0b1719!important; }.bg::before,.bg::after { inset:0!important; width:100%!important; height:100%!important; border-radius:0!important; filter:none!important; transform:none!important; }
+.bg::before { background:linear-gradient(135deg,#21423899,transparent 55%,#21334888)!important; animation:world-shimmer 18s ease-in-out infinite alternate!important; }.bg::after { background:linear-gradient(30deg,#293b3588,transparent 58%,#35465277)!important; animation:world-shimmer 24s ease-in-out infinite alternate-reverse!important; }
+.winter-tree { border-top:0!important; }.tree-top { border-bottom:64px solid #92d069!important; }.tree-mid { border-bottom:80px solid #5aab67!important; }.tree-bottom { border-bottom:88px solid #31815d!important; }
+.giphy-panel { position:absolute; z-index:50; top:calc(100% + 8px); right:0; width:min(320px,calc(100vw - 40px)); padding:10px; border:1px solid #52776a; border-radius:10px; background:#10201d; box-shadow:0 12px 30px #000a; }.giphy-panel .giphy-search { width:100%; margin:0 0 8px; }.giphy-results { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:5px; max-height:220px; overflow:auto; color:#c8d6cb; }.giphy-results button { min-width:0; padding:0; height:65px; border:0; border-radius:4px; overflow:hidden; background:#182925; cursor:pointer; }.giphy-results img { display:block; width:100%; height:100%; object-fit:cover; }.giphy-credit { display:block; margin-top:8px; color:#d5e6da; text-align:right; font-size:11px; }.emoji-picker summary { font-size:12px!important; font-weight:700; }
+@media(prefers-reduced-motion:reduce) { .bg::before,.bg::after { animation:none!important; } }
+
 /* Мягкий перелив Spike: два композитных слоя без blur и непрерывного JS. */
 .bg { background:linear-gradient(145deg,#091515,#10211f 55%,#101923)!important; }
 .bg::before,.bg::after { display:block!important; position:absolute!important; inset:0!important; width:100%!important; height:100%!important; border-radius:0!important; filter:none!important; pointer-events:none!important; will-change:opacity!important; transform:none!important; }
