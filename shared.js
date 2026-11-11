@@ -471,6 +471,8 @@ document.addEventListener('DOMContentLoaded', () => {
   document.addEventListener('keydown', e => { if (e.key === 'Escape' && toggle.getAttribute('aria-expanded') === 'true') setMenu(false, true); });
   if (!window.supabase) { $('#auth-button').disabled = true; return; }
   authClient = window.supabase.createClient(SPIKE_API.replace('/rest/v1', ''), SPIKE_KEY);
+  document.querySelector('#connection-status').textContent = 'Загрузка общей ленты…';
+  refreshShared();
   const button = $('#auth-button');
   const modal = $('#auth-modal');
   const message = $('#auth-message');
