@@ -1126,4 +1126,4 @@ function initViceEvent() {
   const resize = () => { const ratio = Math.min(2, window.devicePixelRatio || 1); const rect=canvas.getBoundingClientRect(); canvas.width=900*ratio; canvas.height=280*ratio; ctx.setTransform(ratio,0,0,ratio,0,0); };
   open.addEventListener('click',()=>{modal.hidden=false;resize();start()}); close.addEventListener('click',()=>{modal.hidden=true;running=false;cancelAnimationFrame(raf)}); restart.addEventListener('click',start); canvas.addEventListener('pointerdown',jump); document.addEventListener('keydown',e=>{if(!modal.hidden&&(e.code==='Space'||e.key==='ArrowUp')){e.preventDefault();jump();}}); window.addEventListener('resize',resize,{passive:true});
 }
-document.addEventListener("DOMContentLoaded", () => { init(); initViceEvent(); });
+document.addEventListener("DOMContentLoaded", () => { init(); });
