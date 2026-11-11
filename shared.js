@@ -19,6 +19,7 @@ Object.defineProperties(window, {
   currentUser: { get: () => currentUser },
 });
 const avatarUrl = path => path ? `${SPIKE_API.replace('/rest/v1', '')}/storage/v1/object/public/spike-avatars/${encodeURIComponent(path.split('/')[0])}/avatar` : '';
+function avatarCropStyle(profile) { const zoom = Math.max(1, Math.min(3, Number(profile?.avatar_zoom) || 1)), x = Math.max(0, Math.min(100, Number(profile?.avatar_x ?? 50))), y = Math.max(0, Math.min(100, Number(profile?.avatar_y ?? 50))); return `object-position:${x}% ${y}%;transform:scale(${zoom});transform-origin:${x}% ${y}%`; }
 const profileLinkHosts = { youtube: ['youtube.com','youtu.be'], twitch: ['twitch.tv'], telegram: ['t.me','telegram.me'], tiktok: ['tiktok.com'], x: ['x.com','twitter.com'] };
 function safeProfileLink(value, platform) {
   if (!value || value.length > 500 || !profileLinkHosts[platform]) return '';
@@ -56,7 +57,7 @@ async function refreshShared() {
     const requests = await Promise.allSettled([
       sharedRequest('/spike_posts?select=*&order=created_at.desc&limit=200'),
       sharedRequest('/spike_comments?select=*&order=created_at.asc&limit=2000'),
-      sharedRequest('/spike_profiles?select=user_id,nickname,avatar_path,frame_style,accent_style&limit=10000'),
+      sharedRequest('/spike_profiles?select=*&limit=10000'),
       sharedRequest('/spike_comment_likes?select=comment_id,user_id&limit=10000'),
       sharedRequest('/spike_likes?select=post_id,user_id,created_at&limit=10000'),
       sharedRequest('/spike_views?select=post_id&limit=10000'),
@@ -503,7 +504,7 @@ document.addEventListener('DOMContentLoaded', () => {
         currentProfile = data;
         const avatarButton = $('#account-toggle');
         avatarButton.textContent = '';
-        if (data?.avatar_path) { const img = document.createElement('img'); img.src = avatarUrl(data.avatar_path) + '?v=' + Date.now(); img.alt = ''; avatarButton.appendChild(img); }
+        if (data?.avatar_path) { const img = document.createElement('img'); img.src = avatarUrl(data.avatar_path) + '?v=' + Date.now(); img.alt = ''; img.style.cssText = avatarCropStyle(data); avatarButton.appendChild(img); }
         else avatarButton.textContent = (data?.nickname || '✦').slice(0, 1).toUpperCase();
         const result = await authClient.from('spike_achievements').select('code').eq('user_id', user.id);
         if (currentUser?.id !== user.id) return;
@@ -531,7 +532,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!link) return;
     const body = $('#public-profile-body'); $('#public-profile-modal').hidden = false; body.textContent = 'Загрузка…';
     try {
-      const rows = await sharedRequest(`/spike_profiles?user_id=eq.${encodeURIComponent(link.dataset.userProfile)}&select=nickname,avatar_path,frame_style,accent_style`);
+      const rows = await sharedRequest(`/spike_profiles?user_id=eq.${encodeURIComponent(link.dataset.userProfile)}&select=*`);
       const profile = rows[0];
       if (!profile) { body.textContent = 'Профиль не найден.'; return; }
       const count = items.flatMap(item => item.comments).filter(comment => comment.userId === link.dataset.userProfile).length;
@@ -567,7 +568,8 @@ document.addEventListener('DOMContentLoaded', () => {
     $('#profile-message').textContent = '';
     const preview = $('#profile-preview'); preview.textContent = '';
     preview.className = `profile-preview profile-frame-${['classic','spark','collector','legend','comet','neon','orbit','heart','voice','starfish','sponge','banana'].includes(currentProfile?.frame_style) ? currentProfile.frame_style : 'classic'}`;
-    if (currentProfile?.avatar_path) { const img = document.createElement('img'); img.src = avatarUrl(currentProfile.avatar_path) + '?v=' + Date.now(); img.alt = ''; preview.appendChild(img); } else preview.textContent = '✦';
+    if (currentProfile?.avatar_path) { const img = document.createElement('img'); img.src = avatarUrl(currentProfile.avatar_path) + '?v=' + Date.now(); img.alt = ''; img.style.cssText = avatarCropStyle(currentProfile); preview.appendChild(img); } else preview.textContent = '✦';
+    $('#avatar-zoom').value = currentProfile?.avatar_zoom ?? 1; $('#avatar-x').value = currentProfile?.avatar_x ?? 50; $('#avatar-y').value = currentProfile?.avatar_y ?? 50;
     $('#own-profile-name').textContent = currentProfile?.nickname || 'Создай профиль';
     const linksMessage = $('#profile-links-message'); linksMessage.textContent = 'Загрузка ссылок…';
     Object.keys(profileLinkHosts).forEach(key => { $(`#profile-link-${key}`).value = ''; });
@@ -581,6 +583,11 @@ document.addEventListener('DOMContentLoaded', () => {
     profileModal.hidden = false;
   }
   $('#profile-button').addEventListener('click', showProfile);
+  let avatarPreviewObjectUrl = '';
+  const updateAvatarPreview = () => { const img = $('#profile-preview img'); if (img) img.style.cssText = avatarCropStyle({avatar_zoom:$('#avatar-zoom').value,avatar_x:$('#avatar-x').value,avatar_y:$('#avatar-y').value}); };
+  ['avatar-zoom','avatar-x','avatar-y'].forEach(id => $(`#${id}`).addEventListener('input', updateAvatarPreview));
+  $('#avatar-crop-reset').addEventListener('click', () => { $('#avatar-zoom').value = 1; $('#avatar-x').value = 50; $('#avatar-y').value = 50; updateAvatarPreview(); });
+  $('#profile-avatar').addEventListener('change', e => { if (avatarPreviewObjectUrl) URL.revokeObjectURL(avatarPreviewObjectUrl); const file = e.target.files[0]; if (!file || !['image/png','image/jpeg','image/webp','image/gif'].includes(file.type) || file.size > 3145728) { avatarPreviewObjectUrl = ''; return; } avatarPreviewObjectUrl = URL.createObjectURL(file); const preview = $('#profile-preview'); preview.textContent = ''; const img = document.createElement('img'); img.src = avatarPreviewObjectUrl; img.alt = ''; preview.appendChild(img); updateAvatarPreview(); });
   $('#profile-links-save').addEventListener('click', async () => {
     if (!currentUser || !authClient) return;
     const data = { user_id: currentUser.id }, message = $('#profile-links-message');
@@ -613,9 +620,9 @@ document.addEventListener('DOMContentLoaded', () => {
     try {
       let path = currentProfile?.avatar_path || null;
       if (file) { path = `${currentUser.id}/avatar`; const { error } = await authClient.storage.from('spike-avatars').upload(path, file, { upsert: true, contentType: file.type }); if (error) throw error; }
-      const { data, error } = await authClient.from('spike_profiles').upsert({ user_id: currentUser.id, nickname, avatar_path: path, frame_style: $('#profile-frame').value, accent_style: $('#profile-accent').value }).select().single();
+      const { data, error } = await authClient.from('spike_profiles').upsert({ user_id: currentUser.id, nickname, avatar_path: path, frame_style: $('#profile-frame').value, accent_style: $('#profile-accent').value, avatar_zoom:Number($('#avatar-zoom').value), avatar_x:Number($('#avatar-x').value), avatar_y:Number($('#avatar-y').value) }).select().single();
       if (error) throw error;
-      currentProfile = data; const avatarButton = $('#account-toggle'); avatarButton.textContent = ''; if (data.avatar_path) { const img = document.createElement('img'); img.src = avatarUrl(data.avatar_path) + '?v=' + Date.now(); img.alt = ''; avatarButton.appendChild(img); } else avatarButton.textContent = (data.nickname || '✦').slice(0, 1).toUpperCase(); profileModal.hidden = true; await refreshShared(); toast('Профиль сохранён');
+      currentProfile = data; const avatarButton = $('#account-toggle'); avatarButton.textContent = ''; if (data.avatar_path) { const img = document.createElement('img'); img.src = avatarUrl(data.avatar_path) + '?v=' + Date.now(); img.alt = ''; img.style.cssText = avatarCropStyle(data); avatarButton.appendChild(img); } else avatarButton.textContent = (data.nickname || '✦').slice(0, 1).toUpperCase(); profileModal.hidden = true; await refreshShared(); toast('Профиль сохранён');
     } catch (error) { console.error('Ошибка профиля:', error); msg.textContent = error.code === '23505' ? 'Этот ник уже занят.' : 'Не удалось сохранить профиль. Проверь настройки базы и формат изображения.'; }
     finally { submit.disabled = false; }
   });

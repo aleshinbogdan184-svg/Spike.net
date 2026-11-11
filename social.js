@@ -11,7 +11,7 @@ function renderPostText(text) {
 
 function socialAvatar(profile) {
   const url = avatarUrl(profile?.avatar_path);
-  return `<span class="social-avatar">${url ? `<img src="${escapeHTML(url)}" alt="" onerror="this.hidden=true">` : '✦'}</span>`;
+  return `<span class="social-avatar">${url ? `<img src="${escapeHTML(url)}" style="${avatarCropStyle(profile)}" alt="" onerror="this.hidden=true">` : '✦'}</span>`;
 }
 
 async function loadSocial() {
@@ -21,7 +21,7 @@ async function loadSocial() {
     const [posts, follows, profiles, likes, reposts] = await Promise.all([
       sharedRequest('/spike_social_posts?select=*&order=created_at.desc&limit=100'),
       sharedRequest('/spike_follows?select=follower_id,followed_id&limit=10000'),
-      sharedRequest('/spike_profiles?select=user_id,nickname,avatar_path&limit=10000'),
+      sharedRequest('/spike_profiles?select=*&limit=10000'),
       sharedRequest('/spike_social_likes?select=post_id,user_id&limit=10000').catch(() => []),
       sharedRequest('/spike_social_reposts?select=post_id,user_id&limit=10000').catch(() => []),
     ]);

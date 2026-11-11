@@ -52,6 +52,15 @@ body,body :not(svg):not(path):not(use) { font-family:'Oswald',sans-serif!importa
 @media(max-width:760px) { .bg::before,.bg::after { width:52vw!important; height:52vw!important; opacity:.13!important; animation-duration:40s!important; } }
 @media(prefers-reduced-motion:reduce) { .bg::before,.bg::after { animation:none!important; } }
 
+/* Ненавязчивый кактусовый узор поверх спокойного градиента. */
+.bg { background:linear-gradient(145deg,#091715,#132820 55%,#111d26)!important; }
+.bg::before { inset:0!important; width:100%!important; height:100%!important; border-radius:0!important; transform:none!important; background:url('cactus-pattern.svg') repeat!important; background-size:240px 220px!important; opacity:.34!important; animation:none!important; }
+.bg::after { inset:0!important; width:100%!important; height:100%!important; border-radius:0!important; transform:none!important; background:linear-gradient(130deg,#25463166,transparent 52%,#283c4966)!important; opacity:.3!important; animation:world-shimmer 22s ease-in-out infinite alternate!important; }
+.giphy-categories { display:flex; gap:4px; overflow-x:auto; margin-bottom:8px; }.giphy-categories button,.giphy-more { flex:none; border:1px solid #ffffff24; border-radius:5px; background:#1c3029; color:#d8eadb; padding:5px 8px; cursor:pointer; font-size:12px; }.giphy-more { margin-top:7px; }.giphy-more[hidden] { display:none; }
+.avatar-crop-controls { display:grid; gap:10px; padding:14px; margin:12px 0; border:1px solid #52776a; border-radius:8px; }.avatar-crop-controls p { margin:0; color:#b9cfc1; }.avatar-crop-controls label { display:grid; grid-template-columns:130px minmax(0,1fr); gap:10px; align-items:center; }.avatar-crop-controls input { width:100%; }.profile-preview,.social-avatar,.account-avatar,.card-author-link img,.comment-avatar { overflow:hidden; }
+.giphy-footer-credit { display:block; margin-top:12px; color:#a9e75d; text-decoration:none; font-size:12px; }
+@media(prefers-reduced-motion:reduce) { .bg::after { animation:none!important; } }
+
 /* Final background override: flat gradient layers, never circles. */
 .bg::before,.bg::after { inset:0!important; width:100%!important; height:100%!important; border-radius:0!important; filter:none!important; transform:none!important; opacity:.24!important; }
 .bg::before { top:0!important; left:0!important; background:linear-gradient(135deg,#21423899,transparent 55%,#21334888)!important; animation:world-shimmer 18s ease-in-out infinite alternate!important; }
@@ -88,3 +97,9 @@ body,body :not(svg):not(path):not(use) { font-family:'Oswald',sans-serif!importa
 @keyframes spike-light-b { 0% { transform:translate3d(4vw,2vh,0) scale(1); } 100% { transform:translate3d(-25vw,-16vh,0) scale(1.1); } }
 @media(max-width:760px) { .bg::before,.bg::after { width:110vw!important; height:70vw!important; opacity:.09!important; animation-duration:38s!important; } }
 @media(prefers-reduced-motion:reduce) { .bg::before,.bg::after { animation:none!important; } }
+
+/* Последний слой фона: единый кактусовый паттерн вместо старых кругов. */
+.bg { background:linear-gradient(145deg,#091715,#132820 55%,#111d26)!important; }
+.bg::before { inset:0!important; width:100%!important; height:100%!important; border-radius:0!important; transform:none!important; filter:none!important; background:url('cactus-pattern.svg') repeat!important; background-size:240px 220px!important; opacity:.34!important; animation:none!important; }
+.bg::after { inset:0!important; width:100%!important; height:100%!important; border-radius:0!important; transform:none!important; filter:none!important; background:linear-gradient(130deg,#25463166,transparent 52%,#283c4966)!important; opacity:.3!important; animation:world-shimmer 22s ease-in-out infinite alternate!important; }
+@media(prefers-reduced-motion:reduce) { .bg::after { animation:none!important; } }

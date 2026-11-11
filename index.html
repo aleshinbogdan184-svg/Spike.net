@@ -16,7 +16,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css?v=vice11-2" />
   <link rel="stylesheet" href="sunset.css?v=25" />
-  <link rel="stylesheet" href="spike-world.css?v=9" />
+  <link rel="stylesheet" href="spike-world.css?v=10" />
 </head>
 <body>
   <!-- ====== ФОН ====== -->
@@ -192,7 +192,7 @@
     <section class="tab-view" id="view-bookmarks" hidden><div class="view-intro"><span class="view-intro-icon">★</span><div><h1>Закладки</h1><p>Твои сохранённые находки.</p></div></div><div id="bookmarks-message" class="empty-inner"></div><div class="grid" id="bookmarks-grid"></div></section>
     <section class="tab-view" id="view-achievements" hidden><div class="view-intro"><span class="view-intro-icon">🏆</span><div><h1>Достижения</h1><p>Твои первые шаги в Spike.</p></div></div><div id="achievements-grid" class="cat-grid"></div></section>
   </main><aside class="layout-aside" aria-label="О Spike"><div class="side-widget"><span class="widget-label">✦ КАК ЭТО РАБОТАЕТ</span><h2>Находка ждёт своих</h2><p>Добавь ссылку, обсуди её и сохрани то, к чему захочешь вернуться.</p><button type="button" class="side-cta" id="side-add">＋ Предложить ссылку</button></div><div class="side-widget side-widget-alt"><span class="widget-label">✧ МАЛЕНЬКАЯ ПОДСКАЗКА</span><p>Не знаешь, что открыть? Попробуй случайную находку в ленте.</p><button type="button" class="side-cta subtle" id="side-random">🎲 Удиви меня</button></div><div class="side-footer">SPIKE.NET <span>✦</span> МЕСТО ДЛЯ НАХОДОК</div></aside></div>
-  <footer class="site-footer"><div class="developers"><span>РАЗРАБОТЧИКИ</span><strong>splox <i>by</i> wyoka</strong></div></footer>
+  <footer class="site-footer"><div class="developers"><span>РАЗРАБОТЧИКИ</span><strong>splox <i>by</i> wyoka</strong></div><a class="giphy-footer-credit" href="https://giphy.com/" target="_blank" rel="noopener noreferrer">Powered by GIPHY</a></footer>
 
   <!-- ====== МОДАЛКА МОДЕРАЦИИ ====== -->
   <div class="modal-back" id="modal-mod-back" hidden>
@@ -323,6 +323,7 @@
       <div class="own-profile-tabs"><button type="button" class="chip active" data-own-tab="posts">Публикации</button><button type="button" class="chip" data-own-tab="saved">Сохранённые</button><button type="button" class="chip" data-own-tab="reposts">Репосты</button><button type="button" class="chip" data-own-tab="likes">Лайки</button></div><div id="own-profile-content" class="own-profile-content">Загрузка…</div><details class="profile-edit"><summary>Настроить профиль</summary>
       <label class="field">Уникальный ник <input class="input" id="profile-nickname" minlength="2" maxlength="24" required></label>
       <label class="field">Аватар: PNG, JPEG, WebP или GIF до 3 МБ <input class="input" type="file" id="profile-avatar" accept="image/png,image/jpeg,image/webp,image/gif"></label>
+      <div class="avatar-crop-controls"><p>Настрой кадр аватара — изменения сохранят анимацию GIF.</p><label>Масштаб <input id="avatar-zoom" type="range" min="1" max="3" step="0.05" value="1"></label><label>По горизонтали <input id="avatar-x" type="range" min="0" max="100" value="50"></label><label>По вертикали <input id="avatar-y" type="range" min="0" max="100" value="50"></label><button id="avatar-crop-reset" class="btn btn-ghost" type="button">По центру</button></div>
       <fieldset class="profile-social-settings"><legend>Мои соцсети</legend><p class="field-hint">Ссылки видны всем и не подтверждают владение аккаунтом.</p><label class="field">YouTube<input class="input" id="profile-link-youtube" type="url" maxlength="500" placeholder="https://youtube.com/@..."></label><label class="field">Twitch<input class="input" id="profile-link-twitch" type="url" maxlength="500" placeholder="https://twitch.tv/..."></label><label class="field">Telegram<input class="input" id="profile-link-telegram" type="url" maxlength="500" placeholder="https://t.me/..."></label><label class="field">TikTok<input class="input" id="profile-link-tiktok" type="url" maxlength="500" placeholder="https://tiktok.com/@..."></label><label class="field">X<input class="input" id="profile-link-x" type="url" maxlength="500" placeholder="https://x.com/..."></label><p class="field-hint" id="profile-links-message" role="status"></p><button class="btn btn-ghost" id="profile-links-save" type="button">Сохранить соцсети</button></fieldset>
       <div class="profile-customize"><label class="field">Рамка<select class="select" id="profile-frame" size="4"><option value="classic">Классика</option><option value="spark">Искра — первый ответ</option><option value="collector">Коллекционер — 10 закладок</option><option value="legend">Легенда — 25 комментариев</option><option value="comet">Комета — 3 комментария</option><option value="neon">Неон — 5 лайков</option><option value="orbit">Орбита — 5 закладок</option><option value="heart">Сердце — 10 лайков</option><option value="voice">Голос — 10 комментариев</option><option value="starfish">Морская звезда — первый ответ</option><option value="sponge">Морской пузырь — 5 закладок</option><option value="banana">Банановый заряд — 10 лайков</option></select></label><label class="field">Цвет<select class="select" id="profile-accent" size="4"><option value="violet">Фиолетовый</option><option value="cyan">Лазурный — 5 лайков</option><option value="gold">Золотой — 5 закладок</option><option value="rose">Розовый — первый ответ</option><option value="lime">Лайм — 10 закладок</option><option value="coral">Коралловый — 10 комментариев</option><option value="ice">Ледяной — 10 лайков</option></select></label></div><p class="field-hint">Выбери рамку и цвет в списках. Закрытые награды откроются за достижения.</p>
       <div><strong>Мои достижения</strong><div id="profile-achievements" class="profile-achievements"></div></div>
@@ -381,10 +382,10 @@
   </div>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-  <script src="app.js?v=giphy27"></script>
+  <script src="app.js?v=giphy28"></script>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="shared.js?v=gif26"></script>
-  <script src="social.js?v=gif26"></script>
+  <script src="shared.js?v=crop28"></script>
+  <script src="social.js?v=crop28"></script>
   <script src="welcome.js?v=winter27"></script>
 </body>
 </html>
